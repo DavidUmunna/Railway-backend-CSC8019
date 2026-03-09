@@ -21,16 +21,15 @@ pom.xml.releaseBackup
 pom.xml.versionsBackup
 pom.xml.next
 
+
 # Spring Boot
-/src/main/resources/application-local.properties
-/src/main/resources/application-dev.properties
+backend/src/main/resources/
 logs/
 *.log
 
 # Frontend (React/Node)
 **/node_modules/
 **/dist/
-**/build/
 **/coverage/
 .next/
 .yarn/
