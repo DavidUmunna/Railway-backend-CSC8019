@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # IntelliJ / IDE
 .idea/
 *.iml
@@ -64,3 +65,9 @@ keystore
 *.swo
 *~
 !.gitkeep
+=======
+node_modules
+.vite
+.idea
+.DS_Store
+>>>>>>> 176b9e4ccc70ffd53bf6fda6ab060cb2ba608fe4

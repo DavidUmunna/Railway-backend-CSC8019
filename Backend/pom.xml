@@ -32,6 +32,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+<<<<<<< HEAD
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -71,6 +72,8 @@
             <scope>compile</scope>
         </dependency>
 
+=======
+>>>>>>> 176b9e4ccc70ffd53bf6fda6ab060cb2ba608fe4
     </dependencies>
 
     <build>

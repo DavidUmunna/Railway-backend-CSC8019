@@ -37,6 +37,7 @@ git checkout -b feature/<short-description>
 
 ```
 
+<<<<<<< HEAD
 ## sql scripts usage
 the sql scripts are going to be used to connect to our backend java application and  get data from the database
 - use mysql workbench to create start server
@@ -184,6 +185,10 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
+=======
+Always commit with description
+
+>>>>>>> 176b9e4ccc70ffd53bf6fda6ab060cb2ba608fe4
 
 
 
