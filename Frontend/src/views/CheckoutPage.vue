@@ -2,7 +2,7 @@
   <div class="checkout-page">
     <h2>Order Summary</h2>
     
-    <div class="order-details">
+    <div v-if="cart.items.length > 0" class="order-details">
       <div v-for="item in cart.items" :key="item.id + item.size" class="order-item">
         <span>{{ item.name }} ({{ item.size }}) x {{ item.quantity }}</span>
         <span>£{{ (item.price * item.quantity).toFixed(2) }}</span>
@@ -13,11 +13,28 @@
       </div>
     </div>
 
+    <div v-else class="empty-cart-message">
+      <p>Your cart is empty. Please add some coffee first!</p>
+      <button @click="$emit('changeTab', 'menu')" class="go-back-btn">Go to Menu</button>
+    </div>
+
     <div class="checkout-actions">
       <label for="time">Select Pick-up Time:</label>
-      <input type="time" id="time" v-model="selectedTime" class="time-input" />
+      <input 
+        type="time" 
+        id="time" 
+        v-model="selectedTime" 
+        class="time-input" 
+        :disabled="cart.items.length === 0"
+      />
       
-      <button @click="handleConfirm" class="confirm-btn">Confirm Order</button>
+      <button 
+        @click="handleConfirm" 
+        class="confirm-btn" 
+        :disabled="cart.items.length === 0"
+      >
+        Confirm Order
+      </button>
     </div>
   </div>
 </template>
@@ -36,25 +53,28 @@ const selectedTime = ref('');
 const emit = defineEmits(['changeTab']);
 
 /**
- * Handles order confirmation.
- * This will move the cart items to orderHistory and clear the cart.
+ * Validates and finalizes the order.
+ * Ensures the cart is not empty and a pick-up time is selected.
  */
 const handleConfirm = () => {
+  // 1. Check for empty cart
+  if (cart.items.length === 0) {
+    alert('Your cart is empty. Please add items before placing an order.');
+    return;
+  }
+
+  // 2. Check for missing pick-up time
   if (!selectedTime.value) {
     alert('Please select a pick-up time!');
     return;
   }
   
-  // 1. Update the store with the selected time
+  // 3. Update store with time and submit order
   cart.selectedTime = selectedTime.value;
-  
-  // 2. Archive the order and clear the cart
   cart.submitOrder(); 
   
-  // 3. Optional: Provide feedback to the user
+  // 4. Feedback and navigation
   alert('Order placed successfully!');
-  
-  // 4. Redirect to the Orders page to show the history
   emit('changeTab', 'orders');
 };
 </script>
@@ -71,6 +91,24 @@ const handleConfirm = () => {
   padding: 15px; 
   border-radius: 8px; 
   margin-bottom: 20px; 
+}
+
+.empty-cart-message {
+  text-align: center;
+  padding: 40px 20px;
+  background: #fff5f5;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.go-back-btn {
+  margin-top: 10px;
+  background: none;
+  border: 1px solid #6F4E37;
+  color: #6F4E37;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 .order-item { 
@@ -109,7 +147,14 @@ const handleConfirm = () => {
   font-size: 1.1rem; 
 }
 
-.confirm-btn:hover { 
+.confirm-btn:hover:not(:disabled) { 
   background: #503928; 
+}
+
+/* UI for disabled state */
+.confirm-btn:disabled, .time-input:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 </style>

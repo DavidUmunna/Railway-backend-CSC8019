@@ -6,7 +6,6 @@
         <h3>{{ item.name }}</h3>
         <p>
           Regular: £{{ item.regularPrice.toFixed(2) }}
-          
           <template v-if="item.largePrice">
              | Large: £{{ item.largePrice.toFixed(2) }}
           </template>
@@ -15,7 +14,6 @@
 
       <div class="actions">
         <button @click="handleAdd(item, 'Regular')">Add Reg</button>
-        
         <button v-if="item.largePrice" @click="handleAdd(item, 'Large')">
           Add Large
         </button>
@@ -29,11 +27,9 @@
 import { useCartStore } from '../store/cart';
 
 /**
- * Mock data representing items from the backend.
- * Note: 'largePrice' can be null for items that don't support a large size (e.g., Mineral Water).
+ * Menu data mock-up.
+ * 'largePrice' is null if the large size is unavailable for a specific item.
  */
-// src/views/MenuPage.vue (在 <script setup> 中)
-
 const menuData = [
   { id: 1, name: 'Americano', regularPrice: 1.50, largePrice: 2.00 },
   { id: 2, name: 'Americano with milk', regularPrice: 2.00, largePrice: 2.50 },
@@ -44,13 +40,13 @@ const menuData = [
   { id: 7, name: 'Mineral Water', regularPrice: 1.00, largePrice: null }
 ];
 
-// Initialize Pinia store to handle cart state
+// Initialize Pinia store to manage cart state
 const cart = useCartStore();
 
 /**
- * Handles adding an item to the cart.
+ * Handles the 'Add to Cart' action.
  * @param {Object} item - The product being added.
- * @param {String} size - The selected size ('Regular' or 'Large').
+ * @param {String} size - Selected size ('Regular' or 'Large').
  */
 const handleAdd = (item, size) => {
   cart.addToCart(item, size);
@@ -58,24 +54,45 @@ const handleAdd = (item, size) => {
 </script>
 
 <style scoped>
+/* Base container style: horizontal layout for desktop */
 .coffee-card { 
   display: flex; 
   justify-content: space-between; 
+  align-items: center; 
   padding: 15px; 
   border-bottom: 1px solid #eee; 
 }
 
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
 .actions button { 
-  margin-left: 5px; 
   background: #6F4E37; 
   color: white; 
   border: none; 
-  padding: 5px 10px; 
+  padding: 8px 12px; 
   border-radius: 4px; 
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .actions button:hover {
   background: #503928;
+}
+
+/* Responsive layout: switch to vertical stack for small screens */
+@media (max-width: 480px) {
+  .coffee-card {
+    flex-direction: column; 
+    align-items: flex-start; 
+    gap: 10px;
+  }
+
+  .actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
 }
 </style>
