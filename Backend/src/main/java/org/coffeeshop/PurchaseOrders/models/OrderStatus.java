@@ -1,9 +1,8 @@
-
-package org.coffeeshop.PurchaseOrders.models;
+package org.coffeeshop.purchaseorders.models;
 
 public enum OrderStatus {
     ACCEPTED,
-    COLLECTED,
     IN_PROGRESS,
-    COMPLETED
+    COMPLETED,
+    COLLECTED
 }

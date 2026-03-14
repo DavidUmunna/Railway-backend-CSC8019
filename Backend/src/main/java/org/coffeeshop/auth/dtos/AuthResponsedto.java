@@ -1,4 +1,4 @@
 package org.coffeeshop.auth.dtos;
 
-public class AuthResponsedto {
+public class AuthResponseDto {
 }
