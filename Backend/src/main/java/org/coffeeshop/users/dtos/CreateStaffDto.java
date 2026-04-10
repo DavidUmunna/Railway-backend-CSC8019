@@ -4,8 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public record StaffDto(
-        @JsonProperty("id") Long id,
+public record CreateStaffDto(
         @NotBlank
         @Size(min = 3, max = 50)
         @JsonProperty("username") String username,
@@ -18,6 +17,7 @@ public record StaffDto(
         @NotBlank
         @JsonProperty("role") String role,
         @JsonProperty(value = "password", access = JsonProperty.Access.WRITE_ONLY)
+        @NotBlank
         @Size(min = 8, max = 100) String password
 ) {
 

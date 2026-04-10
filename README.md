@@ -21,11 +21,11 @@ git checkout develop
 
 ##  Workflow
 
-start from development do not push to main 
+start from develop do not push to main 
 ```bash
 
-git checkout development
-git pull origin development
+git checkout develop
+git pull origin develop
 ```
 
 
@@ -62,7 +62,7 @@ Stations are separated logically using `station_id` on orders.
 Frontend  →  DTO  →  Controller  →  Service  →  Entity/SQL  →  DB
    ↑                        ↓           ↓            ↑
    └────────────── DTO (response)  ←  Entity/SQL  ←─┘
-DTOs: What the API exposes (request/response shapes, validation, no JPA annotations)[web:421][web:555].
+DTOs: What the API exposes (request/response shapes, validation, no JPA annotations).
 
 Entities: How we store data in the database (JPA mappings, relationships).
 
@@ -120,7 +120,7 @@ This separation keeps the API stable while allowing us to change database detail
 
 # Staff Workflow – CoffeeShop API
 
-This module provides the backend workflow for managing staff in the CoffeeShop application. It exposes REST endpoints for creating staff, persists staff data using Spring Data JPA, and securely stores passwords using a `PasswordEncoder` (BCrypt). [web:835][web:838]
+This module provides the backend workflow for managing staff in the CoffeeShop application. It exposes REST endpoints for creating staff, persists staff data using Spring Data JPA, and securely stores passwords using a `PasswordEncoder` (BCrypt). 
 
 ## Tech Stack
 
@@ -129,7 +129,7 @@ This module provides the backend workflow for managing staff in the CoffeeShop a
 - Spring Security `PasswordEncoder` (BCrypt)
 - JPA/Hibernate
 - MySQL (or any configured relational DB)
-- JUnit 5, Spring Boot Test, MockMvc for tests [web:833][web:840]
+- JUnit 5, Spring Boot Test, MockMvc for tests 
 
 ## Package Structure
 
@@ -140,35 +140,33 @@ This module provides the backend workflow for managing staff in the CoffeeShop a
 - `org.coffeeshop.staff.controller` – `StaffController` REST endpoints
 - `org.coffeeshop.security` – `SecurityConfig` with `PasswordEncoder` bean
 - `org.coffeeshop.staff.controller` – `StaffController` REST endpoints
-- `org.coffeeshop.staff.controller` (test) – `StaffControllerTest` using `@WebMvcTest` [web:838][web:841]
+- `org.coffeeshop.staff.controller` (test) – `StaffControllerTest` using `@WebMvcTest` 
 
 ## Staff Entity
 
 Core fields (typical example):
 
 - `id` (Long)
-- `email` (unique, used as username for login)
+- `username` (unique, used for login)
 - `firstName`
 - `lastName`
-- `role` (e.g. `BARISTA`, `MANAGER`)
-- `active` (boolean)
-- `passwordHash` (BCrypt hash, never plain text) [web:792]
+- `role` (`staff_user` or `Admin`)
+- `passwordHash` (BCrypt hash, never plain text) 
 
 ## DTO
 
 `StaffDto` is used as the API contract:
 
-- Request: includes `email` (acts as username) and `password` (plain text) for creation.
-- Response: **excludes** `password`, returns other staff details and generated `id`. [web:659]
+- Request: includes `username` and `password` (plain text) for creation.
+- Response: **excludes** `password`, returns other staff details and generated `id`. 
 
 Example DTO fields:
 
 - `id`
-- `email`
+- `username`
 - `firstName`
 - `lastName`
 - `role`
-- `active`
 - `password` (request only)
 
 ## Security and Password Encoding

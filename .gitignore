@@ -7,6 +7,10 @@
 !.vscode/settings.json
 !.idea/runConfigurations/
 
+# Draw.io backup files
+.$*.bkp
+*.bkp
+
 # Maven / Backend
 **/target/
 **/build/
@@ -23,7 +27,8 @@ pom.xml.next
 
 
 # Spring Boot
-backend/src/main/resources/
+Backend/src/main/resources/
+Backend/src/test/resources/
 logs/
 *.log
 

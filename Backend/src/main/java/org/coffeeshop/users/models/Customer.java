@@ -1,40 +1,53 @@
 package org.coffeeshop.users.models;
 
-import java.util.List;
-
-import org.coffeeshop.purchaseorders.models.PurchaseOrder;
-
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "customer")
-public class Customer {
+public  class Customer {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name = "customer_id")
-    private int id;
+    private Long customerId;
 
-    @Column(name = "customer_name")
-    private String name;
-    
-    @Column(name = "customer_phone")
-    private String phone;
+    @Column(name = "customer_firstname", nullable = false)
+    private String customerFirstName;
 
-    @OneToMany(mappedBy = "customer")
-    private List<PurchaseOrder> orders;  // TBC should initialize here as well? 
-    
-    public Customer() {}
+    @Column(name = "customer_lastname", nullable = false)
+    private String customerLastName;
 
-    public void setName(String name) {
-        this.name = name;
-    }
-    
-    public void setPhone(String phone) {
-        this.phone = phone;
+
+    @Column(name = "customer_phone_number")
+    private String customerPhoneNumber;
+
+
+
+    protected Customer() {
+
     }
 
-    public int getId() {
-        return id;
+    public Customer(String customerFirstName, String customerLastName, String customerPhoneNumber) {
+        this(null, customerFirstName, customerLastName, customerPhoneNumber);
     }
+
+    public Customer(Long customerId, String customerFirstName, String customerLastName, String customerPhoneNumber) {
+        this.customerId = customerId;
+        this.customerFirstName = customerFirstName;
+        this.customerLastName = customerLastName;
+        this.customerPhoneNumber = customerPhoneNumber;
+    }
+
+
+    public Long getId() { return customerId;}
+    public String getCustomerFirstName() { return customerFirstName;}
+    public String getCustomerLastName() { return customerLastName;}
+    public String getCustomerPhoneNumber() { return customerPhoneNumber;}
+    public  String toString() {
+        return "customer id: " + this.getId()+"\n"+
+                "customer firstname:"+this.getCustomerFirstName()+"\n"
+                + "customer lastname:"+this.getCustomerLastName()+"\n"
+                + "customer phone number:"+this.getCustomerPhoneNumber();
+    }
+
 }
