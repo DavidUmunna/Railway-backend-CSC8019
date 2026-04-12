@@ -1,6 +1,6 @@
 package org.coffeeshop.stations.dtos;
 
-public class StationDtos {
+public class StationDto {
     private int id;
     private String name;
     private String weekdayOpeningHours;
