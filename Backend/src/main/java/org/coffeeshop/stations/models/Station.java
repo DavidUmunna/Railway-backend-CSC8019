@@ -16,7 +16,6 @@ public class Station {
     @Column(name = "station_name",nullable = false)
     private String name;
 
-    //opening hours
     private String weekdayOpeningHours;
     private String saturdayOpeningHours;
     private boolean closedOnSunday = true;

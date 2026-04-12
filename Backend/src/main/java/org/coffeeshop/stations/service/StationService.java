@@ -1,12 +1,15 @@
 package org.coffeeshop.stations.service;
 
-import org.coffeeshop.stations.dtos.StationDtos;
+import org.coffeeshop.stations.dtos.StationDto;
 import org.coffeeshop.stations.models.Station;
 import org.coffeeshop.stations.repositories.StationRepository;
 import org.springframework.stereotype.Service;
-import java.time.LocalTime;
+
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class StationService {
@@ -17,6 +20,21 @@ public class StationService {
         this.stationRepository = stationRepository;
     }
 
+    // Return all stations as DTOs
+    public List<StationDto> getAllStations() {
+        return stationRepository.findAll().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    // Return one station by id as DTO
+    public StationDto getStationById(int stationId) {
+        Station station = stationRepository.findById(stationId)
+                .orElseThrow(() -> new IllegalArgumentException("Station not found"));
+        return convertToDto(station);
+    }
+
+    // Check whether a station is open at a given date and time
     public boolean isOpen(int stationId, LocalDateTime dateTime) {
         Station station = stationRepository.findById(stationId)
                 .orElseThrow(() -> new IllegalArgumentException("Station not found"));
@@ -32,17 +50,20 @@ public class StationService {
                 ? station.getSaturdayOpeningHours()
                 : station.getWeekdayOpeningHours();
 
-        if (hours == null || !hours.contains("-")) return false;
+        if (hours == null || !hours.contains("-")) {
+            return false;
+        }
 
         String[] parts = hours.split("-");
-        LocalTime open = LocalTime.parse(parts[0]);
-        LocalTime close = LocalTime.parse(parts[1]);
+        LocalTime open = LocalTime.parse(parts[0].trim());
+        LocalTime close = LocalTime.parse(parts[1].trim());
 
         return !time.isBefore(open) && !time.isAfter(close);
     }
 
-    public StationDtos convertToDto(Station station) {
-        StationDtos dto = new StationDtos();
+    // Convert Station entity to DTO
+    public StationDto convertToDto(Station station) {
+        StationDto dto = new StationDto();
         dto.setId(station.getId());
         dto.setName(station.getName());
         dto.setWeekdayOpeningHours(station.getWeekdayOpeningHours());
