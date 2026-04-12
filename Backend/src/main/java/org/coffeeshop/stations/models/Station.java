@@ -1,6 +1,8 @@
 package org.coffeeshop.stations.models;
 
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.List;
 import org.coffeeshop.purchaseorders.models.PurchaseOrder;
 
@@ -18,10 +20,11 @@ public class Station {
 
     private String weekdayOpeningHours;
     private String saturdayOpeningHours;
+
     private boolean closedOnSunday = true;
 
-    @OneToMany(mappedBy = "station")
-    private List<PurchaseOrder> orders; // TBC should initialize here as well? 
+    @OneToMany(mappedBy = "station", cascade = CascadeType.ALL)
+    private List<PurchaseOrder> orders = new ArrayList<>();
 
     public Station() {}
 
@@ -29,9 +32,7 @@ public class Station {
         return id;
     }
 
-    public String getName() {
-        return name;
-    }
+    public String getName() {return name;}
 
     public String getWeekdayOpeningHours() {return weekdayOpeningHours;}
     public void setWeekdayOpeningHours(String hours) { this.weekdayOpeningHours = hours; }

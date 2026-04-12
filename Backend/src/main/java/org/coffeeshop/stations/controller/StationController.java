@@ -16,15 +16,18 @@ public class StationController {
         this.stationService = stationService;
     }
 
-    // Get all stations
+    // Return all stations (used if frontend needs to add new locations)
     @GetMapping
     public List<StationDto> getAllStations() {
         return stationService.getAllStations();
     }
 
-    // Get one station by id
+    // Return a single station by id
     @GetMapping("/{id}")
     public StationDto getStation(@PathVariable int id) {
         return stationService.getStationById(id);
     }
+
+    // TBC:
+    // Could expose an endpoint to check if a station is open for a given pickup time
 }

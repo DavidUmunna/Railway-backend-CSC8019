@@ -20,21 +20,23 @@ public class StationService {
         this.stationRepository = stationRepository;
     }
 
-    // Return all stations as DTOs
+    // Used by controller to return station data to frontend
     public List<StationDto> getAllStations() {
         return stationRepository.findAll().stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
-    // Return one station by id as DTO
     public StationDto getStationById(int stationId) {
         Station station = stationRepository.findById(stationId)
                 .orElseThrow(() -> new IllegalArgumentException("Station not found"));
         return convertToDto(station);
     }
+    /*
+     * Check if a station is open at a given time
+     * Could be reused when validating customer pickup time
+     */
 
-    // Check whether a station is open at a given date and time
     public boolean isOpen(int stationId, LocalDateTime dateTime) {
         Station station = stationRepository.findById(stationId)
                 .orElseThrow(() -> new IllegalArgumentException("Station not found"));
@@ -42,10 +44,12 @@ public class StationService {
         DayOfWeek day = dateTime.getDayOfWeek();
         LocalTime time = dateTime.toLocalTime();
 
+        // Sunday rule from project brief
         if (day == DayOfWeek.SUNDAY && station.isClosedOnSunday()) {
             return false;
         }
 
+        // Saturday has different opening hours
         String hours = (day == DayOfWeek.SATURDAY)
                 ? station.getSaturdayOpeningHours()
                 : station.getWeekdayOpeningHours();
@@ -61,7 +65,6 @@ public class StationService {
         return !time.isBefore(open) && !time.isAfter(close);
     }
 
-    // Convert Station entity to DTO
     public StationDto convertToDto(Station station) {
         StationDto dto = new StationDto();
         dto.setId(station.getId());
@@ -71,4 +74,10 @@ public class StationService {
         dto.setClosedOnSunday(station.isClosedOnSunday());
         return dto;
     }
+    /*
+     * TBC:
+     * - validate pickup time when creating orders
+     * - allow updating opening hours
+     */
+
 }
