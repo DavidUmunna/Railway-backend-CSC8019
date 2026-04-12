@@ -1,7 +1,6 @@
 package org.coffeeshop.stations.models;
 
 import jakarta.persistence.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import org.coffeeshop.purchaseorders.models.PurchaseOrder;
@@ -28,11 +27,10 @@ public class Station {
 
     public Station() {}
 
-    public int getId() {
-        return id;
-    }
+    public int getId() {return id;}
 
     public String getName() {return name;}
+    public void setName(String name) {this.name = name;}
 
     public String getWeekdayOpeningHours() {return weekdayOpeningHours;}
     public void setWeekdayOpeningHours(String hours) { this.weekdayOpeningHours = hours; }
@@ -43,12 +41,6 @@ public class Station {
     public boolean isClosedOnSunday() { return closedOnSunday; }
     public void setClosedOnSunday(boolean closedOnSunday) { this.closedOnSunday = closedOnSunday; }
 
-    public List<PurchaseOrder> getOrders() {
-        return orders;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+    public List<PurchaseOrder> getOrders() {return orders;}
 
 }

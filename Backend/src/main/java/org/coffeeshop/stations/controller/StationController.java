@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/*
+ * Currently support Cramlington Station, but structure allows future expansion
+ */
 @RestController
 @RequestMapping("/api/stations")
 public class StationController {

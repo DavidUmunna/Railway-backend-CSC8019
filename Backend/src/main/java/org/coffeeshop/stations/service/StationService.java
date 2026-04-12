@@ -20,36 +20,36 @@ public class StationService {
         this.stationRepository = stationRepository;
     }
 
-    // Used by controller to return station data to frontend
+    // Get all stations
     public List<StationDto> getAllStations() {
         return stationRepository.findAll().stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
+    // Get station by id
     public StationDto getStationById(int stationId) {
         Station station = stationRepository.findById(stationId)
                 .orElseThrow(() -> new IllegalArgumentException("Station not found"));
         return convertToDto(station);
     }
-    /*
-     * Check if a station is open at a given time
-     * Could be reused when validating customer pickup time
-     */
 
+    /*
+     * Check if station is open at given time
+     */
     public boolean isOpen(int stationId, LocalDateTime dateTime) {
         Station station = stationRepository.findById(stationId)
-                .orElseThrow(() -> new IllegalArgumentException("Station not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Station not found!"));
 
         DayOfWeek day = dateTime.getDayOfWeek();
         LocalTime time = dateTime.toLocalTime();
 
-        // Sunday rule from project brief
+        // Sunday rule
         if (day == DayOfWeek.SUNDAY && station.isClosedOnSunday()) {
             return false;
         }
 
-        // Saturday has different opening hours
+        // Choose correct hours
         String hours = (day == DayOfWeek.SATURDAY)
                 ? station.getSaturdayOpeningHours()
                 : station.getWeekdayOpeningHours();
@@ -65,6 +65,36 @@ public class StationService {
         return !time.isBefore(open) && !time.isAfter(close);
     }
 
+    /*
+     * Validate pickup time when creating an order
+     * Throws error if time is outside opening hours
+     */
+    public void validatePickupTime(int stationId, LocalDateTime pickupTime) {
+        if (!isOpen(stationId, pickupTime)) {
+            throw new IllegalArgumentException("Invalid pickup time!");
+        }
+    }
+
+    /*
+     * Allow owner revise opening hours
+     */
+    public StationDto updateOpeningHours(int stationId,
+                                         String weekdayOpeningHours,
+                                         String saturdayOpeningHours,
+                                         boolean closedOnSunday) {
+
+        Station station = stationRepository.findById(stationId)
+                .orElseThrow(() -> new IllegalArgumentException("Station not found!"));
+
+        station.setWeekdayOpeningHours(weekdayOpeningHours);
+        station.setSaturdayOpeningHours(saturdayOpeningHours);
+        station.setClosedOnSunday(closedOnSunday);
+
+        Station updated = stationRepository.save(station);
+        return convertToDto(updated);
+    }
+
+    // Convert entity → DTO
     public StationDto convertToDto(Station station) {
         StationDto dto = new StationDto();
         dto.setId(station.getId());
@@ -74,10 +104,4 @@ public class StationService {
         dto.setClosedOnSunday(station.isClosedOnSunday());
         return dto;
     }
-    /*
-     * TBC:
-     * - validate pickup time when creating orders
-     * - allow updating opening hours
-     */
-
 }
