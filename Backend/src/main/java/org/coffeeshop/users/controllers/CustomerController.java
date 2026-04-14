@@ -16,8 +16,12 @@ import java.util.concurrent.CompletableFuture;
  * <p>
  * This controller delegates business logic to {@link CustomerService} and focuses on handling
  * HTTP requests and responses. All endpoints are versioned under {@code /api/v1/customers}.
- * Typical operations include creating new customers, retrieving existing customers,
+ * The operations include creating new customers, retrieving existing customers,
  * updating their details, and deleting them.
+ * 
+ * @author Umunna David
+ * @version 1.0
+ * @since 2026-04-12
  */
 @RestController
 @RequestMapping("/api/v1/customers")
@@ -39,8 +43,8 @@ public class CustomerController {
      * Creates a new customer based on the data provided in the request body.
      * <p>
      * The incoming {@link CustomerDto} is validated and passed to the {@link CustomerService},
-     * which persists the new customer in the underlying datastore. On success, the created
-     * customer representation (including any generated identifiers) is returned with
+     * which persists the new customer in the Repository. On success, the created
+     * customer  (including any generated identifiers) is returned with
      * HTTP status {@link HttpStatus#CREATED 201 (Created)}.
      *
      * @param dto the DTO containing the details of the customer to create; must not be {@code null}

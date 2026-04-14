@@ -10,8 +10,19 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import jakarta.persistence.EntityNotFoundException;
+import org.coffeeshop.Exceptions.UserExceptions.StaffServiceException;
+import org.coffeeshop.users.dtos.CreateStaffDto;
+import org.coffeeshop.users.dtos.StaffDto;
+import org.coffeeshop.users.models.Staff;
+import org.coffeeshop.users.repositories.StaffRepository;
+import org.springframework.dao.DataAccessException;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -19,6 +30,9 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Service for managing staff users in the coffee shop
  * also for implementing business logic
+ * @author Umunna David
+ * @version 1.0
+ * @since 2026-04-12
  *
  * */
 @Service
@@ -83,7 +97,8 @@ public class StaffService {
 
     public List<StaffDto> getAllStaff() {
         List<Staff> allStaff = staffRepository.findAll();
-        return toDto(allStaff);
+        List<Staff> unmodifiableStaff= Collections.unmodifiableList(allStaff);
+        return toDto(unmodifiableStaff);
     }
 
     /**
@@ -105,24 +120,6 @@ public class StaffService {
         }
     }
 
-    @Async
-    public CompletableFuture<StaffDto> findByUsername(String username) {
-    Staff staff = staffRepository.findByUsername(username)
-            .orElseThrow(() -> new EntityNotFoundException("staff not found: " + username));
-        return CompletableFuture.completedFuture(toDto(staff));
-    }
-
-
-    
-
-     /**
-     * this method deletes staff data by id
-     * @param id to locate the data by staff id
-     * @return  it returns a string confirmation message that user has been deleted
-     * @throws StaffServiceException if there was an error deleting the user
-     *
-     * */
-
 
     /**
      * this method deletes staff data by id
@@ -139,6 +136,19 @@ public class StaffService {
             return CompletableFuture.completedFuture("Staff deleted");
         } catch (DataAccessException e) {
             throw new StaffServiceException("Error deleting staff with id " + id, e);
+        }
+    }
+
+    @Async
+    public CompletableFuture<StaffDto> getStaffByUsername(String username) {
+        try {
+            Staff staff = staffRepository.findByUsername(username);
+            if (staff == null) {
+                throw new EntityNotFoundException("staff not found: " + username);
+            }
+            return CompletableFuture.completedFuture(toDto(staff));
+        } catch (DataAccessException e) {
+            throw new StaffServiceException("Database error while fetching staff by username", e);
         }
     }
 

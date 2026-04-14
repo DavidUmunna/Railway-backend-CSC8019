@@ -4,6 +4,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+
+/**
+ * this is adata transfer object class for the staff entity
+ * its main function is to ensure that only the necessary data is sent to the client and to provide a clear structure for the data being transferred
+ * it is made up of Attributes in the staff entity 
+ * 
+ * @author Umunna David
+ * @version 1.0 
+ * @since 2026-04-12
+ */
 public record StaffDto(
         @JsonProperty("id") Long id,
         @NotBlank

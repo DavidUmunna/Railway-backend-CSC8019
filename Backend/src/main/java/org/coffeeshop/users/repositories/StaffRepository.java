@@ -5,8 +5,6 @@ import org.coffeeshop.users.models.Staff;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.EnableAsync;
 
 
 public interface StaffRepository extends JpaRepository<Staff, Long> {

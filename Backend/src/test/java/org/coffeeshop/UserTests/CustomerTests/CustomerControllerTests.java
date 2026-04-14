@@ -1,6 +1,8 @@
 package org.coffeeshop.UserTests.CustomerTests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.persistence.EntityManager;
 import org.coffeeshop.users.dtos.CustomerDto;
 import org.coffeeshop.users.models.Customer;
 import org.coffeeshop.users.repositories.CustomerRepository;
@@ -19,6 +21,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.util.Objects;
+
+
+
+/**
+ * Test class for CustomerController.
+ * It uses Spring Boot's testing support to perform integration tests on the CustomerController endpoints.
+ * The tests cover creating, retrieving, and listing customers.
+ * all tests are transactional and will not persist in the database/store
+ * @author Umunna David
+ * @version 1.0
+ * @since 2026-04-12
+ */
 @SpringBootTest
 @AutoConfigureMockMvc
 class CustomerControllerTests {
@@ -30,6 +45,9 @@ class CustomerControllerTests {
     private CustomerRepository customerRepository;
 
     @Autowired
+    private EntityManager entityManager;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @BeforeEach
@@ -37,6 +55,13 @@ class CustomerControllerTests {
         customerRepository.deleteAll();
     }
 
+    /**
+     * this test asserts if  if a particular customer is created 
+     * it makes use of mockMvc to perform a post request
+     * which is expetcted to be created and expected to have all the customers data 
+     * saved in the right field  
+     * @throws Exception 
+     */
     @Test
     void createCustomer_returnsCreatedCustomer() throws Exception {
                 CustomerDto request = new CustomerDto(null, "Jane", "Grande", "07123456789");
@@ -56,8 +81,10 @@ class CustomerControllerTests {
 
     @Test
     void getAllCustomers_returnsList() throws Exception {
-                customerRepository.save(new Customer("Jane", "Grande", "07123456789"));
-                customerRepository.save(new Customer("John", "Doe", "07000000000"));
+        customerRepository.save(new Customer("Jane", "Grande", "07123456789"));
+        customerRepository.save(new Customer("John", "Doe", "07000000000"));
+        customerRepository.flush();
+        entityManager.clear();
 
         mockMvc.perform(get("/api/v1/customers/all")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -72,6 +99,8 @@ class CustomerControllerTests {
         Customer savedCustomer = customerRepository.save(
                 new Customer("Jane", "Grande", "07123456789")
         );
+        customerRepository.flush();
+        entityManager.clear();
 
         MvcResult results = mockMvc.perform(get("/api/v1/customers/{id}", savedCustomer.getId()))
                 .andExpect(request().asyncStarted())
@@ -84,11 +113,19 @@ class CustomerControllerTests {
                 .andExpect(jsonPath("$.customer_phone_number").value("07123456789"));
     }
 
+    /**
+     * This test asserts if a particular customer is updated successfully
+     * it makes use of mockMvc to perform a put request to update the customer details
+     * the request is expected to be successful and the response should contain the updated customer details
+     * @throws Exception
+     */
     @Test
     void updateCustomer_returnsUpdatedCustomer() throws Exception {
         Customer savedCustomer = customerRepository.save(
                 new Customer("Jane", "Grande", "07123456789")
         );
+        customerRepository.flush();
+        entityManager.clear();
 
         CustomerDto updatedCustomer = new CustomerDto(
                 savedCustomer.getId(),
@@ -110,17 +147,27 @@ class CustomerControllerTests {
                 .andExpect(jsonPath("$.customer_firstname").value("John"))
                 .andExpect(jsonPath("$.customer_lastname").value("Doe"))
                 .andExpect(jsonPath("$.customer_phone_number").value("07011112222"));
-
-        assertTrue(customerRepository.findById(savedCustomer.getId())
+        Long customerId = savedCustomer.getId();
+        Objects.requireNonNull(customerId, "Saved customer ID should not be null");
+        assertTrue(customerRepository.findById(customerId)
                 .map(customer -> "07011112222".equals(customer.getCustomerPhoneNumber()))
                 .orElse(false));
     }
 
+        /**
+         * This test asserts if a particular customer is deleted successfully
+         * it makes use of mockMvc to perform a delete request to delete the customer
+         * the request is expected to be successful and the response should contain a message confirming the deletion
+         * after the deletion, the test also checks that the customer no longer exists in the repository
+         * @throws Exception
+         */
     @Test
     void deleteCustomer_returnsStringMessage() throws Exception {
         Customer savedCustomer = customerRepository.save(
                 new Customer("Jane", "Grande", "07123456789")
         );
+        customerRepository.flush();
+        entityManager.clear();
 
         MvcResult result = mockMvc.perform(delete("/api/v1/customers/{id}", savedCustomer.getId()))
                 .andExpect(request().asyncStarted())
