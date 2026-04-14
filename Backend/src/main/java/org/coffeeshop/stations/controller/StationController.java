@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/stations") // 加上 v1 版本控制
+@RequestMapping("/api/v1/stations")
 public class StationController {
 
     private final StationService stationService;
