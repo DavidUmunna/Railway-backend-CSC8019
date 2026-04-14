@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -30,7 +29,6 @@ public class CustomerService {
      */
     public CustomerDto createCustomer(CustomerDto dto) {
         try {
-            Objects.requireNonNull(dto, "CustomerDto must not be null");
             Customer newCustomer = fromDtoCreate(dto);
             Customer saved = customerRepository.save(newCustomer);
             return toDto(saved);
@@ -52,7 +50,6 @@ public class CustomerService {
     @Async
     public CompletableFuture<CustomerDto> createCustomerAsync(CustomerDto dto) {
         try {
-            Objects.requireNonNull(dto, "CustomerDto must not be null");
             Customer newCustomer = fromDtoCreate(dto);
             Customer saved = customerRepository.save(newCustomer);
             return CompletableFuture.completedFuture(toDto(saved));
