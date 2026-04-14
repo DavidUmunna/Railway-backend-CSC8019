@@ -1,7 +1,7 @@
 package org.coffeeshop.security;
 
-import org.coffeeshop.Users.models.Staff;
-import org.coffeeshop.Users.repositorys.StaffRepository;
+import org.coffeeshop.users.models.Staff;
+import org.coffeeshop.users.repositories.StaffRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -57,6 +57,7 @@ public  class Staff {
 
 
 
+
     // === getters/setters ===
 
     public Long getStaffId() {
@@ -100,4 +101,8 @@ public  class Staff {
                 + "staff lastname:"+getLastName()+"\n"
                 + "staff role:"+getRole()+"\n";
     }
+
+    
+    
 }
+
