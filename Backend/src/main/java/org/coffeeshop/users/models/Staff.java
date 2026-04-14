@@ -3,6 +3,16 @@ package org.coffeeshop.users.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
+
+/**
+ * this class is a representation of the staff entity in the database
+ * it is made up of  the atributes inside the staff entity and it is annotated with @Entity to indicate that it is a JPA entity
+ * the @Table annotation is used to specify the name of the table in the database that this entity maps to
+ * 
+ * @author Umunna David
+ * @version 1.0
+ * @since 2026-04-12
+ */
 @Entity
 @Table(name = "staff")
 public  class Staff {

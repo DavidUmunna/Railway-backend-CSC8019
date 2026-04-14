@@ -22,6 +22,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+
+/**
+ * Test class for StaffController.
+ * It uses Spring Boot's testing support to perform integration tests on the StaffController endpoints.
+ * The tests cover creating, retrieving, updating, and deleting staff members.
+ * 
+ * @author Umunna David
+ * @version 1.0
+ * @since 2026-04-12
+ */
 @SpringBootTest
 @AutoConfigureMockMvc
 class StaffControllerTests {
