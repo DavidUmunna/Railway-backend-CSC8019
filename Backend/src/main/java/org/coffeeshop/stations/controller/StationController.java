@@ -6,11 +6,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/*
- * Currently support Cramlington Station, but structure allows future expansion
- */
 @RestController
-@RequestMapping("/api/stations")
+@RequestMapping("/api/v1/stations") // 加上 v1 版本控制
 public class StationController {
 
     private final StationService stationService;
@@ -19,18 +16,13 @@ public class StationController {
         this.stationService = stationService;
     }
 
-    // Return all stations (used if frontend needs to add new locations)
     @GetMapping
     public List<StationDto> getAllStations() {
         return stationService.getAllStations();
     }
 
-    // Return a single station by id
     @GetMapping("/{id}")
     public StationDto getStation(@PathVariable int id) {
         return stationService.getStationById(id);
     }
-
-    // TBC:
-    // Could expose an endpoint to check if a station is open for a given pickup time
 }

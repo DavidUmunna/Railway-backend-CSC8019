@@ -9,7 +9,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class StationService {
@@ -20,43 +19,32 @@ public class StationService {
         this.stationRepository = stationRepository;
     }
 
-    // Get all stations
     public List<StationDto> getAllStations() {
         return stationRepository.findAll().stream()
                 .map(this::convertToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
-    // Get station by id
     public StationDto getStationById(int stationId) {
         Station station = stationRepository.findById(stationId)
                 .orElseThrow(() -> new IllegalArgumentException("Station not found"));
         return convertToDto(station);
     }
 
-    /*
-     * Check if station is open at given time
-     */
     public boolean isOpen(int stationId, LocalDateTime dateTime) {
         Station station = stationRepository.findById(stationId)
-                .orElseThrow(() -> new IllegalArgumentException("Station not found!"));
+                .orElseThrow(() -> new IllegalArgumentException("Station not found"));
 
         DayOfWeek day = dateTime.getDayOfWeek();
         LocalTime time = dateTime.toLocalTime();
 
-        // Sunday rule
-        if (day == DayOfWeek.SUNDAY && station.isClosedOnSunday()) {
-            return false;
-        }
+        if (day == DayOfWeek.SUNDAY && station.isClosedOnSunday()) return false;
 
-        // Choose correct hours
         String hours = (day == DayOfWeek.SATURDAY)
                 ? station.getSaturdayOpeningHours()
                 : station.getWeekdayOpeningHours();
 
-        if (hours == null || !hours.contains("-")) {
-            return false;
-        }
+        if (hours == null || !hours.contains("-")) return false;
 
         String[] parts = hours.split("-");
         LocalTime open = LocalTime.parse(parts[0].trim());
@@ -65,43 +53,30 @@ public class StationService {
         return !time.isBefore(open) && !time.isAfter(close);
     }
 
-    /*
-     * Validate pickup time when creating an order
-     * Throws error if time is outside opening hours
-     */
     public void validatePickupTime(int stationId, LocalDateTime pickupTime) {
         if (!isOpen(stationId, pickupTime)) {
             throw new IllegalArgumentException("Invalid pickup time!");
         }
     }
 
-    /*
-     * Allow owner revise opening hours
-     */
-    public StationDto updateOpeningHours(int stationId,
-                                         String weekdayOpeningHours,
-                                         String saturdayOpeningHours,
-                                         boolean closedOnSunday) {
-
+    public StationDto updateOpeningHours(int stationId, String weekday, String saturday, boolean sunday) {
         Station station = stationRepository.findById(stationId)
-                .orElseThrow(() -> new IllegalArgumentException("Station not found!"));
+                .orElseThrow(() -> new IllegalArgumentException("Station not found"));
 
-        station.setWeekdayOpeningHours(weekdayOpeningHours);
-        station.setSaturdayOpeningHours(saturdayOpeningHours);
-        station.setClosedOnSunday(closedOnSunday);
+        station.setWeekdayOpeningHours(weekday);
+        station.setSaturdayOpeningHours(saturday);
+        station.setClosedOnSunday(sunday);
 
-        Station updated = stationRepository.save(station);
-        return convertToDto(updated);
+        return convertToDto(stationRepository.save(station));
     }
 
-    // Convert entity → DTO
     public StationDto convertToDto(Station station) {
-        StationDto dto = new StationDto();
-        dto.setId(station.getId());
-        dto.setName(station.getName());
-        dto.setWeekdayOpeningHours(station.getWeekdayOpeningHours());
-        dto.setSaturdayOpeningHours(station.getSaturdayOpeningHours());
-        dto.setClosedOnSunday(station.isClosedOnSunday());
-        return dto;
+        return new StationDto(
+                station.getId(),
+                station.getName(),
+                station.getWeekdayOpeningHours(),
+                station.getSaturdayOpeningHours(),
+                station.isClosedOnSunday()
+        );
     }
 }
