@@ -142,10 +142,8 @@ public class StaffService {
     @Async
     public CompletableFuture<StaffDto> getStaffByUsername(String username) {
         try {
-            Staff staff = staffRepository.findByUsername(username);
-            if (staff == null) {
-                throw new EntityNotFoundException("staff not found: " + username);
-            }
+            Staff staff = staffRepository.findByUsername(username)
+                    .orElseThrow(() -> new EntityNotFoundException("staff not found: " + username));
             return CompletableFuture.completedFuture(toDto(staff));
         } catch (DataAccessException e) {
             throw new StaffServiceException("Database error while fetching staff by username", e);
