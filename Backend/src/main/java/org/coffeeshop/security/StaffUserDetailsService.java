@@ -41,7 +41,6 @@ public class StaffUserDetailsService implements UserDetailsService {
                 .username(staff.getUsername())
                 .password(staff.getPasswordHash())
                 .authorities(List.of(new SimpleGrantedAuthority(role)))
-                .disabled(!staff.isActive())
                 .build();
     }
 }
