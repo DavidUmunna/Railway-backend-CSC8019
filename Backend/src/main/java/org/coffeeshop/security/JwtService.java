@@ -26,8 +26,8 @@ public class JwtService {
     private final long jwtExpirationMs;
 
     public JwtService(
-            @Value("${app.jwt.secret}") String jwtSecret,
-            @Value("${app.jwt.expiration-ms:3600000}") long jwtExpirationMs) {
+            @Value("${jwt.secret}") String jwtSecret,
+            @Value("${jwt.expiration-ms:3600000}") long jwtExpirationMs) {
         this.signingKey = Keys.hmacShaKeyFor(validateSecret(jwtSecret));
         this.jwtExpirationMs = validateExpiration(jwtExpirationMs);
     }

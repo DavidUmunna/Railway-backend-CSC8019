@@ -1,5 +1,4 @@
 package org.coffeeshop.users.repositories;
-import java.util.function.BooleanSupplier;
 import java.util.Optional;
 import org.coffeeshop.users.models.Staff;
 import org.jetbrains.annotations.NotNull;

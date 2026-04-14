@@ -10,17 +10,6 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import jakarta.persistence.EntityNotFoundException;
-import org.coffeeshop.Exceptions.UserExceptions.StaffServiceException;
-import org.coffeeshop.users.dtos.CreateStaffDto;
-import org.coffeeshop.users.dtos.StaffDto;
-import org.coffeeshop.users.models.Staff;
-import org.coffeeshop.users.repositories.StaffRepository;
-import org.springframework.dao.DataAccessException;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -44,7 +33,7 @@ public class StaffService {
     /**
     * this is the staff service Constructor
     * it takes the repository and the password encoder as parameters
-    * @param repo  this is the staff repository reference which is called
+    * @param staffRepository  this is the staff repository reference which is called
      *              whenever database interaction is needed
      * @param passwordEncoder this is used to ensure the password is encoded when
      *                        the staff user is created
