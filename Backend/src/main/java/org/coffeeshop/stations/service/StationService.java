@@ -27,13 +27,13 @@ public class StationService {
 
     public StationDto getStationById(int stationId) {
         Station station = stationRepository.findById(stationId)
-                .orElseThrow(() -> new IllegalArgumentException("Station not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Station not found!"));
         return convertToDto(station);
     }
 
     public boolean isOpen(int stationId, LocalDateTime dateTime) {
         Station station = stationRepository.findById(stationId)
-                .orElseThrow(() -> new IllegalArgumentException("Station not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Station not found!"));
 
         DayOfWeek day = dateTime.getDayOfWeek();
         LocalTime time = dateTime.toLocalTime();
@@ -61,11 +61,9 @@ public class StationService {
 
     public StationDto updateOpeningHours(int stationId, String weekday, String saturday, boolean sunday) {
         Station station = stationRepository.findById(stationId)
-                .orElseThrow(() -> new IllegalArgumentException("Station not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Station not found!"));
 
-        station.setWeekdayOpeningHours(weekday);
-        station.setSaturdayOpeningHours(saturday);
-        station.setClosedOnSunday(sunday);
+        station.updateSchedule(weekday, saturday, sunday);
 
         return convertToDto(stationRepository.save(station));
     }
