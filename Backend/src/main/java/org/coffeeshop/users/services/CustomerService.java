@@ -8,7 +8,7 @@ import org.coffeeshop.users.repositories.CustomerRepository;
 import org.springframework.dao.DataAccessException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import java.util.Collections;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,15 +16,6 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-
-/**
- * this Service implementation is responsible for managing customer users in the coffee shop
- * and for implementing business logic related to customer operations.
- * @author Umunna David
- * @version 1.0
- * @since 2026-04-12
- *
- * */
 @Service
 public class CustomerService {
 
@@ -39,7 +30,8 @@ public class CustomerService {
      */
     public CustomerDto createCustomer(CustomerDto dto) {
         try {
-            Customer newCustomer = Objects.requireNonNull(fromDtoCreate(dto), "Customer cannot be null");
+            Objects.requireNonNull(dto, "CustomerDto must not be null");
+            Customer newCustomer = fromDtoCreate(dto);
             Customer saved = customerRepository.save(newCustomer);
             return toDto(saved);
         } catch (DataAccessException e) {
@@ -47,33 +39,21 @@ public class CustomerService {
         }
     }
 
-
-    /**
-     * Find all customers (sync, like StaffService. FindAll).
-     * @return an unmodifiable list of all customers as DTOs
-     */
-
     public List<CustomerDto> findAllCustomers() {
-        List<Customer> customers = customerRepository.findAll(); 
-        List<Customer> unmodifiableCustomers=Collections.unmodifiableList(customers);
-        return unmodifiableCustomers.stream()
+        List<Customer> customers = customerRepository.findAll(); // List<Customer> if JpaRepository
+        return customers.stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
 
     /**
-     * creates a new cutomer asynchronously, similar to the create method but wrapped in a CompletableFuture.
-     *  This allows the controller to handle the request without blocking the thread while waiting
-     *  for the database operation to complete. The method also includes error handling to throw a CustomerServiceException 
-     * if there is an issue during the creation process.
-     * 
-     * @return a CompletableFuture containing the created CustomerDto
-     * @throws CustomerServiceException if there is an error during customer creation
+     * Optionally, keep an async variant if you really need it.
      */
     @Async
     public CompletableFuture<CustomerDto> createCustomerAsync(CustomerDto dto) {
         try {
-            Customer newCustomer = Objects.requireNonNull(fromDtoCreate(dto), "Customer cannot be null");
+            Objects.requireNonNull(dto, "CustomerDto must not be null");
+            Customer newCustomer = fromDtoCreate(dto);
             Customer saved = customerRepository.save(newCustomer);
             return CompletableFuture.completedFuture(toDto(saved));
         } catch (DataAccessException e) {
@@ -83,14 +63,10 @@ public class CustomerService {
 
     /**
      * Find customer by id asynchronously.
-     * @param id the ID of the customer to find
-     * @return a CompletableFuture containing the found CustomerDto
-     * @throws CustomerServiceException if there is an error during the find operation
      */
     @Async
     public CompletableFuture<CustomerDto> findCustomerById(Long id) {
         try {
-            Objects.requireNonNull(id, "Customer ID cannot be null");
             Customer customer = customerRepository.findById(id)
                     .orElseThrow(() -> new EntityNotFoundException("Customer not found: " + id));
             return CompletableFuture.completedFuture(toDto(customer));
@@ -99,17 +75,9 @@ public class CustomerService {
         }
     }
 
-    /**
-    * Update an existing customer asynchronously.
-    * @param id the ID of the customer to update
-    * @param dto the CustomerDto containing updated information
-    * @return a CompletableFuture containing the updated CustomerDto
-    * @throws CustomerServiceException if there is an error during the update operation
-    */
     @Async
     public CompletableFuture<CustomerDto> updateCustomer(Long id, CustomerDto dto) {
         try {
-            Objects.requireNonNull(id, "Customer ID cannot be null");
             Customer existing = customerRepository.findById(id)
                     .orElseThrow(() -> new EntityNotFoundException("Customer not found: " + id));
 
@@ -126,16 +94,10 @@ public class CustomerService {
             throw new CustomerServiceException("Could not update customer with id " + id, e);
         }
     }
-    /**
-    * Delete a customer by ID asynchronously.
-    * @param id the ID of the customer to delete
-    * @return a CompletableFuture containing a success message upon deletion
-    * @throws CustomerServiceException if there is an error during the delete operation
-    */
+
     @Async
     public CompletableFuture<String> deleteCustomer(Long id) {
         try {
-            Objects.requireNonNull(id, "Customer ID cannot be null");
             customerRepository.deleteById(id);
             customerRepository.flush();
             Map<String, String> resultMessage = new HashMap<>();
@@ -147,10 +109,9 @@ public class CustomerService {
     }
 
     /**
-     * Convert a Customer entity to a CustomerDto.
-     * @param customer the Customer entity to convert
-     * @return the corresponding CustomerDto
+     * Mapping helpers, similar to StaffService.
      */
+
     private CustomerDto toDto(Customer customer) {
         return new CustomerDto(
                 customer.getId(),
@@ -160,11 +121,7 @@ public class CustomerService {
         );
     }
 
-    /**
-     * Convert a CustomerDto to a Customer entity for creation.
-     * @param customerDto the CustomerDto to convert
-     * @return the corresponding Customer entity
-     */
+    // For create if you add an update path later, you can mirror Staff.fromDto
     private Customer fromDtoCreate(CustomerDto customerDto) {
         return new Customer(
                 customerDto.customerFirstName(),
