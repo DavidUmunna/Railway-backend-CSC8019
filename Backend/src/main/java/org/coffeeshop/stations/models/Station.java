@@ -14,8 +14,11 @@ public class Station {
     @Column(name = "station_name", nullable = false)
     private String name;
 
+    @Column(name="weekday_opening_hours")
     private String weekdayOpeningHours;
+    @Column(name="saturday_opening_hours")
     private String saturdayOpeningHours;
+
     private boolean closedOnSunday = true;
 
     public Station() {}

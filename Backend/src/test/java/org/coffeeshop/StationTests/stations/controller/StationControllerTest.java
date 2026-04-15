@@ -1,5 +1,7 @@
-package org.coffeeshop.UserTests.StationTests.stations.controller;
+package org.coffeeshop.StationTests.stations.controller;
 
+import org.coffeeshop.security.JwtAuthenticationFilter;
+import org.coffeeshop.security.JwtService;
 import org.coffeeshop.stations.controller.StationController;
 import org.coffeeshop.stations.dtos.StationDto;
 import org.coffeeshop.stations.service.StationService;
@@ -21,6 +23,10 @@ class StationControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+    @MockBean
+    JwtService jwtService;
+    @MockBean
+    JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @MockBean
     private StationService stationService;
