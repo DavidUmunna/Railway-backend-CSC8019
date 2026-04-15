@@ -1,12 +1,6 @@
 package org.coffeeshop.stations.models;
 
 import jakarta.persistence.*;
-// import org.coffeeshop.purchaseorder.model.PurchaseOrder;
-
-// import java.util.ArrayList;
-import java.util.List;
-
-import org.coffeeshop.purchaseorders.models.PurchaseOrder;
 
 @Entity
 @Table(name = "station")
@@ -17,29 +11,39 @@ public class Station {
     @Column(name = "station_id")
     private int id;
 
-    @Column(name = "station_name")
+    @Column(name = "station_name", nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "station")
-    private List<PurchaseOrder> orders; // TBC should initialize here as well? 
+    private String weekdayOpeningHours;
+    private String saturdayOpeningHours;
+    private boolean closedOnSunday = true;
 
     public Station() {}
 
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public List<PurchaseOrder> getOrders() {
-        return orders;
-    }
-
-    public void setName(String name) {
+    public Station(String name, String weekdayOpeningHours, String saturdayOpeningHours, boolean closedOnSunday) {
         this.name = name;
+        this.weekdayOpeningHours = weekdayOpeningHours;
+        this.saturdayOpeningHours = saturdayOpeningHours;
+        this.closedOnSunday = closedOnSunday;
     }
 
+    public void updateSchedule(String weekday, String saturday, boolean sunday) {
+        this.weekdayOpeningHours = weekday;
+        this.saturdayOpeningHours = saturday;
+        this.closedOnSunday = sunday;
+    }
 
+    public int getId() { return id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public String getWeekdayOpeningHours() { return weekdayOpeningHours; }
+    public void setWeekdayOpeningHours(String hours) { this.weekdayOpeningHours = hours; }
+
+    public String getSaturdayOpeningHours() { return saturdayOpeningHours; }
+    public void setSaturdayOpeningHours(String hours) { this.saturdayOpeningHours = hours; }
+
+    public boolean isClosedOnSunday() { return closedOnSunday; }
+    public void setClosedOnSunday(boolean closedOnSunday) { this.closedOnSunday = closedOnSunday; }
 }
