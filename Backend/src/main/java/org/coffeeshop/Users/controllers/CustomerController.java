@@ -1,7 +1,7 @@
 package org.coffeeshop.users.controllers;
 
 import org.coffeeshop.users.dtos.CustomerDto;
-import org.coffeeshop.users.service.CustomerService;
+import org.coffeeshop.users.services.CustomerService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +18,10 @@ import java.util.concurrent.CompletableFuture;
  * HTTP requests and responses. All endpoints are versioned under {@code /api/v1/customers}.
  * Typical operations include creating new customers, retrieving existing customers,
  * updating their details, and deleting them.
+ * 
+ * @author Umunna David
+ * @version 1.0
+ * @since 2026-04-12
  */
 @RestController
 @RequestMapping("/api/v1/customers")

@@ -1,4 +1,4 @@
-package org.coffeeshop.users.service;
+package org.coffeeshop.users.services;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.coffeeshop.Exceptions.UserExceptions.CustomerServiceException;

@@ -1,13 +1,13 @@
 package org.coffeeshop.users.controllers;
 
-import org.coffeeshop.users.dtos.CreateStaffDto;
-import org.coffeeshop.users.dtos.StaffDto;
-import org.coffeeshop.users.service.StaffService;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
-
+import org.coffeeshop.users.dtos.CreateStaffDto;
+import org.coffeeshop.users.dtos.StaffDto;
+import org.coffeeshop.users.services.StaffService;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -17,6 +17,10 @@ import java.util.concurrent.CompletableFuture;
  * <p>
  * This controller exposes the staff API used by the frontend or external clients.
  * It delegates business logic to {@link StaffService} and converts service results into HTTP responses.
+ * 
+ * @author Umunna David
+ * @version 1.0
+ * @since 2026-04-12
  */
 @RestController
 @RequestMapping("/api/v1/staff")
@@ -108,4 +112,5 @@ public class StaffController {
                     return ResponseEntity.ok(body);
                 });
     }
+
 }
