@@ -22,7 +22,7 @@ public class StationController {
     }
 
     @GetMapping("/{id}")
-    public StationDto getStation(@PathVariable int id) {
+    public StationDto getStation(@PathVariable("id") int id) {
         return stationService.getStationById(id);
     }
 }
