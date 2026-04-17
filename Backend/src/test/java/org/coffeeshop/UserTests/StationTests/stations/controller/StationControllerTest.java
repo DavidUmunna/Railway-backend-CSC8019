@@ -2,7 +2,7 @@ package org.coffeeshop.UserTests.StationTests.stations.controller;
 
 import org.coffeeshop.stations.controller.StationController;
 import org.coffeeshop.stations.dtos.StationDto;
-import org.coffeeshop.stations.service.StationService;
+import org.coffeeshop.stations.services.StationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
