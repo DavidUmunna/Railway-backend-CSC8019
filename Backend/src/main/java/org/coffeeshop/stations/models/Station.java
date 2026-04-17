@@ -21,20 +21,17 @@ public class Station {
     private String saturdayOpeningHours;
 
     private boolean closedOnSunday = true;
-
     protected Station() {}
 
-    public Station(String name, String weekdayOpeningHours, String saturdayOpeningHours, boolean closedOnSunday) {
+    public Station(String name, String weekdayOpeningHours, String saturdayOpeningHours) {
         this.name = name;
         this.weekdayOpeningHours = weekdayOpeningHours;
         this.saturdayOpeningHours = saturdayOpeningHours;
-        this.closedOnSunday = closedOnSunday;
     }
 
-    public void updateSchedule(String weekday, String saturday, boolean sunday) {
+    public void updateSchedule(String weekday, String saturday) {
         this.weekdayOpeningHours = weekday;
         this.saturdayOpeningHours = saturday;
-        this.closedOnSunday = sunday;
     }
 
     public Long getId() { return id; }

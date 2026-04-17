@@ -63,7 +63,7 @@ public class StationService {
         Station station = stationRepository.findById(stationId)
                 .orElseThrow(() -> new IllegalArgumentException("Station not found!"));
 
-        station.updateSchedule(weekday, saturday, sunday);
+        station.updateSchedule(weekday, saturday);
 
         return convertToDto(stationRepository.save(station));
     }

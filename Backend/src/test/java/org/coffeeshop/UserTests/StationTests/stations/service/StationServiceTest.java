@@ -33,7 +33,7 @@ class StationServiceTest {
     @Test
     void shouldReturnAllStations() {
         // Arrange
-        Station mockStation = new Station("Cramlington", "08:00-18:00", "09:00-17:00", false);
+        Station mockStation = new Station("Cramlington", "08:00-18:00", "09:00-17:00");
 
         when(stationRepository.findAll()).thenReturn(List.of(mockStation));
 
@@ -48,7 +48,7 @@ class StationServiceTest {
     @Test
     void shouldReturnTrueWhenStationIsOpen() {
         // Arrange
-        Station mockStation = new Station("Cramlington", "08:00-18:00", "09:00-17:00", false);
+        Station mockStation = new Station("Cramlington", "08:00-18:00", "09:00-17:00");
 
         when(stationRepository.findById(1L)).thenReturn(Optional.of(mockStation));
 
