@@ -56,7 +56,7 @@ class AuthSecurityIntegrationTests {
                 }
                 """;
 
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isOk())
@@ -127,7 +127,7 @@ class AuthSecurityIntegrationTests {
     private String loginAndGetToken(String username, String password) throws Exception {
         String requestJson = objectMapper.writeValueAsString(new LoginRequest(username, password));
 
-        MvcResult result = mockMvc.perform(post("/api/auth/login")
+        MvcResult result = mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isOk())
