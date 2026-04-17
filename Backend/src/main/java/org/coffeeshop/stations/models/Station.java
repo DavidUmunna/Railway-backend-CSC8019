@@ -19,14 +19,20 @@ public class Station {
     @Column(name="saturday_opening_hours")
     private String saturdayOpeningHours;
 
+    @Column(name="closed_on_sunday")
+    private boolean closedOnSunday;
+
     public Station() {}
 
-    public Station(String name, String weekdayOpeningHours, String saturdayOpeningHours) {
+    public Station(String name, String weekdayOpeningHours, String saturdayOpeningHours, boolean closedOnSunday) {
         this.name = name;
         this.weekdayOpeningHours = weekdayOpeningHours;
         this.saturdayOpeningHours = saturdayOpeningHours;
-
+        this.closedOnSunday = closedOnSunday;
     }
+
+  
+       
 
     public void updateSchedule(String weekday, String saturday) {
         this.weekdayOpeningHours = weekday;
@@ -44,7 +50,6 @@ public class Station {
 
 
     public boolean isClosedOnSunday() {
-        boolean closedOnSunday = true;
         return closedOnSunday; }
 
 }
