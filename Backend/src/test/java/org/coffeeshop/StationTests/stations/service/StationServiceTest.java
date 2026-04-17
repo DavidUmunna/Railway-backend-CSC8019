@@ -30,10 +30,18 @@ class StationServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
+    /**
+     * Tests that getAllStations() returns a list of StationDto objects based on the mocked StationRepository data.
+     * @author Christy Zheng
+     * @version 1.0
+     * @since 14/04/2026
+     * @ModifiedBy Umunna David
+     * @since 17/04/2026
+     */
     @Test
     void shouldReturnAllStations() {
         // Arrange
-        Station mockStation = new Station("Cramlington","6:30-19:00","7:00-18:00");
+        Station mockStation = new Station("Cramlington","06:30-19:00","07:00-18:00");
 
         when(stationRepository.findAll()).thenReturn(List.of(mockStation));
 
@@ -47,8 +55,8 @@ class StationServiceTest {
 
     @Test
     void shouldReturnTrueWhenStationIsOpen() {
-        // Arrange: simulate a station open Mon-Fri 08:00-18:00
-        Station mockStation = new Station("Cramlington","6:30-19:00","7:00-18:00");
+        // Arrange: simulate a station open Mon-Fri 06:30-19:00
+        Station mockStation = new Station("Cramlington","06:30-19:00","07:00-18:00");
 
         when(stationRepository.findById(1L)).thenReturn(Optional.of(mockStation));
 

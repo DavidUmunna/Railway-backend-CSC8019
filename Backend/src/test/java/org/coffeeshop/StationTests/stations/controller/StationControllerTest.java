@@ -1,16 +1,16 @@
 package org.coffeeshop.StationTests.stations.controller;
 
-import org.coffeeshop.security.JwtAuthenticationFilter;
-import org.coffeeshop.security.JwtService;
 import org.coffeeshop.stations.controller.StationController;
 import org.coffeeshop.stations.dtos.StationDto;
 import org.coffeeshop.stations.services.StationService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
@@ -18,18 +18,27 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(StationController.class)
+
+/**
+ * Unit tests for StationController using MockMvc to simulate HTTP requests and responses.
+ * @author Christy Zheng
+ * @version 1.0
+ * @since 14/04/2026
+ * @ModifiedBy Umunna David
+ * @since 17/04/2026
+ */
+@ExtendWith(MockitoExtension.class)
 class StationControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
-    @MockBean
-    JwtService jwtService;
-    @MockBean
-    JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    @MockBean
+    @Mock
     private StationService stationService;
+
+    @BeforeEach
+    void setup() {
+        this.mockMvc = MockMvcBuilders.standaloneSetup(new StationController(stationService)).build();
+    }
 
     @Test
     void shouldReturnAllStationsFromApi() throws Exception {

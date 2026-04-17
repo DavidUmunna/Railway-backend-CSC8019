@@ -18,6 +18,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 /**
  * Configures authentication, authorization, and JWT filter chain for the API.
+ * @Author willian
+ * @version 1.0
+ * @since 15/04/2026
+ * 
+ * @ModifiedBy Umunna David
+ * @since 17/04/2026
+ * 
  */
 public class SecurityConfig {
 
@@ -78,10 +85,10 @@ public class SecurityConfig {
                         .accessDeniedHandler(restAccessDeniedHandler)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/login", "/gate", "/error").permitAll()
+                        .requestMatchers("/api/v1/auth/**", "/gate", "/error").permitAll()
                         .requestMatchers("/api/v1/customers/**").permitAll()
                         .requestMatchers("/api/v1/staff/**").hasRole("ADMIN")
-                        .anyRequest().permitAll()
+                        .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
