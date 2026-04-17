@@ -72,13 +72,13 @@ public class StaffService {
      * @throws EntityNotFoundException if the staff user could not be found
      * */
 
-    @Async
-    public CompletableFuture<StaffDto> getStaffById(Long id) {
+    
+    public StaffDto getStaffById(Long id) {
         try {
             Staff staff = staffRepository.findById(id)
                     .orElseThrow(() -> new EntityNotFoundException("staff not found: " + id));
             //returns completed Future type to controller
-            return CompletableFuture.completedFuture(toDto(staff));
+            return toDto(staff);
         } catch (DataAccessException e) {
             throw new StaffServiceException("Database error while fetching staff", e);
         }
@@ -101,13 +101,13 @@ public class StaffService {
      * @throws StaffServiceException if there was an error updating the user
      * */
     
-    @Async
-    public CompletableFuture<StaffDto> updateStaff(Long id, StaffDto dto) {
+    
+    public StaffDto updateStaff(Long id, StaffDto dto) {
         try {
             Staff staff = fromDto(id, dto);
 
             Staff updatedStaff = staffRepository.save(staff);
-            return CompletableFuture.completedFuture(toDto(updatedStaff));
+            return toDto(updatedStaff);
         } catch (DataAccessException e) {
             throw new StaffServiceException("error updating user ", e);
         }
@@ -121,23 +121,23 @@ public class StaffService {
      * @throws StaffServiceException if there was an error deleting the user
      *
      * */
-    @Async
-    public CompletableFuture<String> deleteStaff(Long id) {
+    
+    public String deleteStaff(Long id) {
         try {
             staffRepository.deleteById(id);
             staffRepository.flush();
-            return CompletableFuture.completedFuture("Staff deleted");
+            return "Staff deleted";
         } catch (DataAccessException e) {
             throw new StaffServiceException("Error deleting staff with id " + id, e);
         }
     }
 
-    @Async
-    public CompletableFuture<StaffDto> getStaffByUsername(String username) {
+
+    public StaffDto getStaffByUsername(String username) {
         try {
             Staff staff = staffRepository.findByUsername(username)
                     .orElseThrow(() -> new EntityNotFoundException("staff not found: " + username));
-            return CompletableFuture.completedFuture(toDto(staff));
+            return toDto(staff);
         } catch (DataAccessException e) {
             throw new StaffServiceException("Database error while fetching staff by username", e);
         }

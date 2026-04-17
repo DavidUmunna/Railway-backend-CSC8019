@@ -67,7 +67,7 @@ public class CustomerController {
      */
     @GetMapping("/all")
     public ResponseEntity<List<CustomerDto>> getAllCustomers() {
-        return ResponseEntity.ok(customerService.findAllCustomers());
+        return new ResponseEntity<>(customerService.findAllCustomers(), HttpStatus.ACCEPTED);
     }
 
     /**
@@ -84,9 +84,8 @@ public class CustomerController {
      *         the customer DTO, or an error if the customer cannot be found
      */
     @GetMapping("/{id}")
-    public CompletableFuture<ResponseEntity<CustomerDto>> getCustomerById(@PathVariable("id") Long id) {
-        return customerService.findCustomerById(id)
-                .thenApply(ResponseEntity::ok);
+    public ResponseEntity<CustomerDto> getCustomerById(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(customerService.findCustomerById(id));
     }
 
     /**
@@ -104,12 +103,11 @@ public class CustomerController {
      *         the updated customer DTO
      */
     @PutMapping("/{id}")
-    public CompletableFuture<ResponseEntity<CustomerDto>> updateCustomer(
+    public ResponseEntity<CustomerDto> updateCustomer(
             @PathVariable("id") Long id,
             @Valid @RequestBody CustomerDto dto) {
 
-        return customerService.updateCustomer(id, dto)
-                .thenApply(ResponseEntity::ok);
+        return ResponseEntity.ok(customerService.updateCustomer(id, dto));
     }
 
     /**
@@ -127,11 +125,10 @@ public class CustomerController {
      *         a JSON object with a {@code "message"} field describing the outcome
      */
     @DeleteMapping("/{id}")
-    public CompletableFuture<ResponseEntity<Map<String, String>>> deleteCustomer(@PathVariable("id") Long id) {
-        return customerService.deleteCustomer(id)
-                .thenApply(msg -> {
-                    Map<String, String> body = Map.of("message", msg);
-                    return ResponseEntity.ok(body);
-                });
+    public ResponseEntity<Map<String, String>> deleteCustomer(@PathVariable("id") Long id) {
+        String msg = customerService.deleteCustomer(id);
+        Map<String, String> body = Map.of("message", msg);
+        return ResponseEntity.ok(body);
     }
+    
 }
