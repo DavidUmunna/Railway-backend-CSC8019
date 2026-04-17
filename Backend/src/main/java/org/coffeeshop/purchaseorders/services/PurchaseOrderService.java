@@ -21,7 +21,10 @@ import org.coffeeshop.stations.repositories.StationRepository;
 import org.coffeeshop.users.models.Customer;
 import org.coffeeshop.users.repositories.CustomerRepository;
 import org.springframework.stereotype.Service;
-
+/**
+ * @ModifiedBy Umunna David
+ * @since 17/04/2026
+ */
 @Service
 public class PurchaseOrderService {
     private final PurchaseOrderRepository orderRepository;
@@ -70,7 +73,7 @@ public class PurchaseOrderService {
 
         Station station =
                 stationRepository
-                        .getStationById(orderDto.stationId())
+                        .findById(orderDto.stationId())
                         .orElseThrow(
                                 () ->
                                         new EntityNotFoundException(
