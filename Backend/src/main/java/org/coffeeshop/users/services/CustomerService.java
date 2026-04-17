@@ -35,7 +35,8 @@ public class CustomerService {
     }
 
     /**
-     * Create a new customer (sync, like StaffService. Create).
+     * Create a new customer from the provided DTO.
+      * @param dto the customer data transfer object containing the information needed to create a new customer
      */
     public CustomerDto createCustomer(CustomerDto dto) {
         try {
@@ -54,19 +55,7 @@ public class CustomerService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Optionally, keep an async variant if you really need it.
-     */
-    @Async
-    public CompletableFuture<CustomerDto> createCustomerAsync(CustomerDto dto) {
-        try {
-            Customer newCustomer = fromDtoCreate(dto);
-            Customer saved = customerRepository.save(newCustomer);
-            return CompletableFuture.completedFuture(toDto(saved));
-        } catch (DataAccessException e) {
-            throw new CustomerServiceException("Could not create customer", e);
-        }
-    }
+   
 
     /**
      * Find customer by id asynchronously.
