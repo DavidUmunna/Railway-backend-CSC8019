@@ -4,7 +4,7 @@ import org.coffeeshop.security.JwtAuthenticationFilter;
 import org.coffeeshop.security.JwtService;
 import org.coffeeshop.stations.controller.StationController;
 import org.coffeeshop.stations.dtos.StationDto;
-import org.coffeeshop.stations.service.StationService;
+import org.coffeeshop.stations.services.StationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -34,7 +34,7 @@ class StationControllerTest {
     @Test
     void shouldReturnAllStationsFromApi() throws Exception {
         // Arrange
-        StationDto mockDto = new StationDto(1, "Cramlington", "08:00-18:00", "09:00-17:00", true);
+        StationDto mockDto = new StationDto(1L, "Cramlington", "08:00-18:00", "09:00-17:00", true);
         when(stationService.getAllStations()).thenReturn(List.of(mockDto));
 
         // Act & Assert
@@ -47,13 +47,13 @@ class StationControllerTest {
     @Test
     void shouldReturnStationByIdFromApi() throws Exception {
         // Arrange
-        StationDto mockDto = new StationDto(1, "Cramlington", "08:00-18:00", "09:00-17:00", true);
-        when(stationService.getStationById(1)).thenReturn(mockDto);
+        StationDto mockDto = new StationDto(1L, "Cramlington", "08:00-18:00", "09:00-17:00", true);
+        when(stationService.getStationById(1L)).thenReturn(mockDto);
 
         // Act & Assert
         mockMvc.perform(get("/api/v1/stations/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.name").value("Cramlington"));
     }
 }

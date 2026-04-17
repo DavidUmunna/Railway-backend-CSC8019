@@ -1,8 +1,9 @@
-package org.coffeeshop.Exceptions;
+package org.coffeeshop.exceptions;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.coffeeshop.Exceptions.UserExceptions.CustomerServiceException;
-import org.coffeeshop.Exceptions.UserExceptions.StaffServiceException;
+
+import org.coffeeshop.exceptions.UserExceptions.CustomerServiceException;
+import org.coffeeshop.exceptions.UserExceptions.StaffServiceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

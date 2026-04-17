@@ -3,7 +3,7 @@ package org.coffeeshop.StationTests.stations.service;
 import org.coffeeshop.stations.dtos.StationDto;
 import org.coffeeshop.stations.models.Station;
 import org.coffeeshop.stations.repositories.StationRepository;
-import org.coffeeshop.stations.service.StationService;
+import org.coffeeshop.stations.services.StationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -33,8 +33,8 @@ class StationServiceTest {
     @Test
     void shouldReturnAllStations() {
         // Arrange
-        Station mockStation = new Station();
-        mockStation.setName("Cramlington");
+        Station mockStation = new Station("Cramlington","6:30-19:00","7:00-18:00");
+
         when(stationRepository.findAll()).thenReturn(List.of(mockStation));
 
         // Act
@@ -48,13 +48,13 @@ class StationServiceTest {
     @Test
     void shouldReturnTrueWhenStationIsOpen() {
         // Arrange: simulate a station open Mon-Fri 08:00-18:00
-        Station mockStation = new Station();
-        mockStation.setWeekdayOpeningHours("08:00-18:00");
-        when(stationRepository.findById(1)).thenReturn(Optional.of(mockStation));
+        Station mockStation = new Station("Cramlington","6:30-19:00","7:00-18:00");
+
+        when(stationRepository.findById(1L)).thenReturn(Optional.of(mockStation));
 
         // Act: test Monday 2026-04-13 at 10:00 AM
         LocalDateTime mondayTenAm = LocalDateTime.of(2026, 4, 13, 10, 0);
-        boolean isOpen = stationService.isOpen(1, mondayTenAm);
+        boolean isOpen = stationService.isOpen(1L, mondayTenAm);
 
         // Assert
         assertTrue(isOpen, "Station should be open at this time");
@@ -63,11 +63,11 @@ class StationServiceTest {
     @Test
     void shouldThrowExceptionWhenIdNotFound() {
         // Arrange
-        when(stationRepository.findById(999)).thenReturn(Optional.empty());
+        when(stationRepository.findById(999L)).thenReturn(Optional.empty());
 
         // Assert
         assertThrows(IllegalArgumentException.class, () -> {
-            stationService.getStationById(999);
+            stationService.getStationById(999L);
         });
     }
 }

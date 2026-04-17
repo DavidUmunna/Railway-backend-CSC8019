@@ -1,4 +1,4 @@
-package org.coffeeshop.Exceptions.UserExceptions;
+package org.coffeeshop.exceptions.UserExceptions;
 
 public class CustomerServiceException extends RuntimeException {
     public CustomerServiceException(String message) {

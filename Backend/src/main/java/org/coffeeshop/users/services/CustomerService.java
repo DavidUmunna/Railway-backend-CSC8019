@@ -1,7 +1,9 @@
 package org.coffeeshop.users.services;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.coffeeshop.Exceptions.UserExceptions.CustomerServiceException;
+
+import org.coffeeshop.exceptions.UserExceptions.CustomerServiceException;
+import org.coffeeshop.users.dtos.CreateCustomerDto;
 import org.coffeeshop.users.dtos.CustomerDto;
 import org.coffeeshop.users.models.Customer;
 import org.coffeeshop.users.repositories.CustomerRepository;
@@ -27,7 +29,7 @@ public class CustomerService {
     /**
      * Create a new customer (sync, like StaffService. Create).
      */
-    public CustomerDto createCustomer(CustomerDto dto) {
+    /*public CustomerDto createCustomer(CustomerDto dto) {
         try {
             Customer newCustomer = fromDtoCreate(dto);
             Customer saved = customerRepository.save(newCustomer);
@@ -35,7 +37,7 @@ public class CustomerService {
         } catch (DataAccessException e) {
             throw new CustomerServiceException("Could not create customer", e);
         }
-    }
+    }*/
 
     public List<CustomerDto> findAllCustomers() {
         List<Customer> customers = customerRepository.findAll(); // List<Customer> if JpaRepository
@@ -48,7 +50,7 @@ public class CustomerService {
      * Optionally, keep an async variant if you really need it.
      */
     @Async
-    public CompletableFuture<CustomerDto> createCustomerAsync(CustomerDto dto) {
+    public CompletableFuture<CustomerDto> createCustomer(CreateCustomerDto dto) {
         try {
             Customer newCustomer = fromDtoCreate(dto);
             Customer saved = customerRepository.save(newCustomer);
@@ -119,7 +121,7 @@ public class CustomerService {
     }
 
     // For create if you add an update path later, you can mirror Staff.fromDto
-    private Customer fromDtoCreate(CustomerDto customerDto) {
+    private Customer fromDtoCreate(CreateCustomerDto customerDto) {
         return new Customer(
                 customerDto.customerFirstName(),
                 customerDto.customerLastName(),

@@ -65,6 +65,20 @@ class AuthSecurityIntegrationTests {
                 .andExpect(jsonPath("$.username").value("admin@example.com"))
                 .andExpect(jsonPath("$.role").value("ROLE_ADMIN"));
     }
+    @Test
+    void login_rejectsInvalidCredentials() throws Exception {
+        String requestJson = """
+                {
+                "username": "admin@example.com",
+                "password": "wrongpassword"
+                }
+                """;
+
+        mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+                .andExpect(status().isUnauthorized());
+    }
 
     @Test
     void createStaff_requiresAuthentication() throws Exception {
