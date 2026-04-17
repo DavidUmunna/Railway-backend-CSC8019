@@ -15,15 +15,6 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-
-/****
- * Service for managing customer users in the coffee shop
- * also for implementing business logic
- * @author Umunna David
- * @version 1.0
- * @since 2026-04-12
- *
- * */
 @Service
 public class CustomerService {
 
