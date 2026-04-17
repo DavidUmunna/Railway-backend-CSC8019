@@ -1,7 +1,8 @@
+
 package org.coffeeshop.users.services;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.coffeeshop.Exceptions.UserExceptions.CustomerServiceException;
+import org.coffeeshop.exceptions.UserExceptions.CustomerServiceException;
 import org.coffeeshop.users.dtos.CustomerDto;
 import org.coffeeshop.users.models.Customer;
 import org.coffeeshop.users.repositories.CustomerRepository;
@@ -25,7 +26,8 @@ public class CustomerService {
     }
 
     /**
-     * Create a new customer (sync, like StaffService. Create).
+     * Create a new customer from the provided DTO.
+      * @param dto the customer data transfer object containing the information needed to create a new customer
      */
     public CustomerDto createCustomer(CustomerDto dto) {
         try {
@@ -44,36 +46,24 @@ public class CustomerService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Optionally, keep an async variant if you really need it.
-     */
-    @Async
-    public CompletableFuture<CustomerDto> createCustomerAsync(CustomerDto dto) {
-        try {
-            Customer newCustomer = fromDtoCreate(dto);
-            Customer saved = customerRepository.save(newCustomer);
-            return CompletableFuture.completedFuture(toDto(saved));
-        } catch (DataAccessException e) {
-            throw new CustomerServiceException("Could not create customer", e);
-        }
-    }
+   
 
     /**
      * Find customer by id asynchronously.
      */
-    @Async
-    public CompletableFuture<CustomerDto> findCustomerById(Long id) {
+    
+    public CustomerDto findCustomerById(Long id) {
         try {
             Customer customer = customerRepository.findById(id)
                     .orElseThrow(() -> new EntityNotFoundException("Customer not found: " + id));
-            return CompletableFuture.completedFuture(toDto(customer));
+            return toDto(customer);
         } catch (DataAccessException e) {
             throw new CustomerServiceException("Could not find customer with id " + id, e);
         }
     }
 
-    @Async
-    public CompletableFuture<CustomerDto> updateCustomer(Long id, CustomerDto dto) {
+    
+    public CustomerDto updateCustomer(Long id, CustomerDto dto) {
         try {
             Customer existing = customerRepository.findById(id)
                     .orElseThrow(() -> new EntityNotFoundException("Customer not found: " + id));
@@ -86,20 +76,18 @@ public class CustomerService {
                 );
 
             Customer saved = customerRepository.save(updated);
-            return CompletableFuture.completedFuture(toDto(saved));
+            return toDto(saved);
         } catch (DataAccessException e) {
             throw new CustomerServiceException("Could not update customer with id " + id, e);
         }
     }
 
-    @Async
-    public CompletableFuture<String> deleteCustomer(Long id) {
+    
+    public String deleteCustomer(Long id) {
         try {
             customerRepository.deleteById(id);
             customerRepository.flush();
-            Map<String, String> resultMessage = new HashMap<>();
-            resultMessage.put("message", "Customer Deleted");
-            return CompletableFuture.completedFuture(resultMessage.get("message"));
+          return "Customer Deleted Successfully";
         } catch (DataAccessException e) {
             throw new CustomerServiceException("Error deleting customer with id " + id, e);
         }

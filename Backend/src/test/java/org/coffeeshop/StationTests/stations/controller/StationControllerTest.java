@@ -5,7 +5,7 @@ import org.coffeeshop.security.JwtAuthenticationFilter;
 import org.coffeeshop.security.JwtService;
 import org.coffeeshop.stations.controller.StationController;
 import org.coffeeshop.stations.dtos.StationDto;
-import org.coffeeshop.stations.service.StationService;
+import org.coffeeshop.stations.services.StationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -55,7 +55,7 @@ class StationControllerTest {
         // Act & Assert
         mockMvc.perform(get("/api/v1/stations/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.name").value("Cramlington"));
     }
 }

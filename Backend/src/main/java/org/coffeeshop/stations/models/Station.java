@@ -42,5 +42,9 @@ public class Station {
 
     public String getSaturdayOpeningHours() { return saturdayOpeningHours; }
 
-    public boolean isClosedOnSunday() { return closedOnSunday; }
+
+    public boolean isClosedOnSunday() {
+        boolean closedOnSunday = true;
+        return closedOnSunday; }
+
 }

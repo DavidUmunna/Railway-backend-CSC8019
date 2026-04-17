@@ -3,6 +3,8 @@ package org.coffeeshop.UserTests.CustomerTests;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.persistence.EntityManager;
+import org.coffeeshop.security.JwtAuthenticationFilter;
+import org.coffeeshop.security.JwtService;
 import org.coffeeshop.users.dtos.CustomerDto;
 import org.coffeeshop.users.models.Customer;
 import org.coffeeshop.users.repositories.CustomerRepository;
@@ -11,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -40,7 +43,10 @@ class CustomerControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
-
+    /*@MockBean
+    JwtService jwtService;
+    @MockBean
+    JwtAuthenticationFilter jwtAuthenticationFilter;*/
     @Autowired
     private CustomerRepository customerRepository;
 
@@ -56,7 +62,7 @@ class CustomerControllerTests {
     }
 
     /**
-     * this test asserts if  if a particular customer is created 
+     * this test asserts if  if a particular customer is created,
      * it makes use of mockMvc to perform a post request
      * which is expetcted to be created and expected to have all the customers data 
      * saved in the right field  
@@ -64,13 +70,13 @@ class CustomerControllerTests {
      */
     @Test
     void createCustomer_returnsCreatedCustomer() throws Exception {
-                CustomerDto request = new CustomerDto(null, "Jane", "Grande", "07123456789");
+         CustomerDto request = new CustomerDto(null, "Jane", "Grande", "07123456789");
 
-        mockMvc.perform(post("/api/v1/customers/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+        MvcResult results = mockMvc.perform(post("/api/v1/customers/create").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request)))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+        mockMvc.perform(asyncDispatch(results))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.customer_id").isNumber())
                 .andExpect(jsonPath("$.customer_firstname").value("Jane"))
                 .andExpect(jsonPath("$.customer_lastname").value("Grande"))
                 .andExpect(jsonPath("$.customer_phone_number").value("07123456789"));

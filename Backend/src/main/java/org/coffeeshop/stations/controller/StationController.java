@@ -1,7 +1,7 @@
 package org.coffeeshop.stations.controller;
 
 import org.coffeeshop.stations.dtos.StationDto;
-import org.coffeeshop.stations.service.StationService;
+import org.coffeeshop.stations.services.StationService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

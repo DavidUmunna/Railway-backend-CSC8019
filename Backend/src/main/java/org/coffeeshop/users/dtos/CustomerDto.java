@@ -1,7 +1,5 @@
 package org.coffeeshop.users.dtos;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 
 /**
  * this is a data transfer object class for the customer entity
@@ -13,16 +11,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @since 2026-04-12
  */
 public record CustomerDto(
-        @JsonProperty("customer_id") Long customerId,
-        @JsonProperty("customer_firstname") String customerFirstName,
-        @JsonProperty("customer_lastname") String customerLastName,
-        @JsonProperty("customer_phone_number") String customerPhoneNumber
+        Long customerId,
+        String customerFirstName,
+        String customerLastName,
+        String customerPhoneNumber
 ) {
 
-    @Override
-    public String toString() {
-        return "customer firstname : " + customerFirstName + "\n"
-                + "customer lastname : " + customerLastName + "\n"
-                + "phone number : " + customerPhoneNumber + "\n";
-    }
 }

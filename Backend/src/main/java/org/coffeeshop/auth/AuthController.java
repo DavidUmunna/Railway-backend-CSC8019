@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/auth")
 /**
  * Handles authentication endpoints.
+ * @author willian
+ * @version 1.0
  */
 public class AuthController {
 
@@ -52,4 +54,6 @@ public class AuthController {
 
         return ResponseEntity.ok(new AuthResponsedto(token, userDetails.getUsername(), role));
     }
+
+
 }
