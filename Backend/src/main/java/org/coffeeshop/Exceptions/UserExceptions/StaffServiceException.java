@@ -1,4 +1,4 @@
-package org.coffeeshop.Exceptions.UserExceptions;
+package org.coffeeshop.exceptions.UserExceptions;
 
 public class StaffServiceException extends  RuntimeException {
     public StaffServiceException(String message) {

@@ -3,7 +3,7 @@ package org.coffeeshop.StationTests.stations.service;
 import org.coffeeshop.stations.dtos.StationDto;
 import org.coffeeshop.stations.models.Station;
 import org.coffeeshop.stations.repositories.StationRepository;
-import org.coffeeshop.stations.service.StationService;
+import org.coffeeshop.stations.services.StationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -33,7 +33,7 @@ class StationServiceTest {
     @Test
     void shouldReturnAllStations() {
         // Arrange
-        Station mockStation = new Station("Cramlington", "08:00-18:00", "09:00-17:00", false);
+        Station mockStation = new Station("Cramlington","6:30-19:00","7:00-18:00");
 
         when(stationRepository.findAll()).thenReturn(List.of(mockStation));
 
@@ -47,8 +47,10 @@ class StationServiceTest {
 
     @Test
     void shouldReturnTrueWhenStationIsOpen() {
-        // Arrange
-        Station mockStation = new Station("Cramlington", "08:00-18:00", "09:00-17:00", false);
+        // Arrange: simulate a station open Mon-Fri 08:00-18:00
+        Station mockStation = new Station("Cramlington","6:30-19:00","7:00-18:00");
+
+        when(stationRepository.findById(1L)).thenReturn(Optional.of(mockStation));
 
         when(stationRepository.findById(1L)).thenReturn(Optional.of(mockStation));
 

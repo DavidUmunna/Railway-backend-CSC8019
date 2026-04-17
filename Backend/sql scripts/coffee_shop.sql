@@ -2,16 +2,17 @@ CREATE TABLE customer (
     customer_id INT AUTO_INCREMENT PRIMARY KEY,
     customer_firstname VARCHAR(50) NOT NULL,
     customer_lastname VARCHAR(50) NOT NULL,
-    customer_email VARCHAR(150),
-    customer_phone_number VARCHAR(20)
+    customer_phone_number VARCHAR(14)
 );
 
 CREATE TABLE station(
     station_id INT PRIMARY KEY,
-    station_name VARCHAR(100)
+    station_name VARCHAR(100),
+    weekday_opening_hours VARCHAR(55),
+    saturday_opening_hours VARCHAR(55)
 );
 
-CREATE TABLE purchaseorder (
+CREATE TABLE purchase_order (
     order_id INT AUTO_INCREMENT PRIMARY KEY,
     customer_id INT,
     order_date DATE NOT NULL,
@@ -46,7 +47,7 @@ CREATE TABLE order_item (
     unit_price DECIMAL(8,2) DEFAULT 0.00 NOT NULL,
     line_total DECIMAL(8,2) DEFAULT 0.00 NOT NULL,
     PRIMARY KEY (purchase_order_id, menu_item_type_id),
-    FOREIGN KEY (purchase_order_id) REFERENCES purchaseorder(order_id),
+    FOREIGN KEY (purchase_order_id) REFERENCES purchase_order(order_id),
     FOREIGN KEY (menu_item_type_id) REFERENCES menu_item_type(menu_item_type_id)
 );
 

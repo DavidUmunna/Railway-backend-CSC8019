@@ -56,7 +56,7 @@ class AuthSecurityIntegrationTests {
                 }
                 """;
 
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isOk())
@@ -64,6 +64,20 @@ class AuthSecurityIntegrationTests {
                 .andExpect(jsonPath("$.tokenType").value("Bearer"))
                 .andExpect(jsonPath("$.username").value("admin@example.com"))
                 .andExpect(jsonPath("$.role").value("ROLE_ADMIN"));
+    }
+    @Test
+    void login_rejectsInvalidCredentials() throws Exception {
+        String requestJson = """
+                {
+                "username": "admin@example.com",
+                "password": "wrongpassword"
+                }
+                """;
+
+        mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -113,7 +127,7 @@ class AuthSecurityIntegrationTests {
     private String loginAndGetToken(String username, String password) throws Exception {
         String requestJson = objectMapper.writeValueAsString(new LoginRequest(username, password));
 
-        MvcResult result = mockMvc.perform(post("/api/auth/login")
+        MvcResult result = mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isOk())

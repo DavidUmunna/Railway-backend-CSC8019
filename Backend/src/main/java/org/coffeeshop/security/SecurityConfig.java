@@ -4,6 +4,7 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -25,7 +26,7 @@ public class SecurityConfig {
     private final StaffUserDetailsService userDetailsService;
     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
     private final RestAccessDeniedHandler restAccessDeniedHandler;
-    @Bean
+    /*@Bean
     public AuthenticationManager authenticationManager(
             StaffUserDetailsService userDetailsService,
             PasswordEncoder passwordEncoder) {
@@ -33,7 +34,7 @@ public class SecurityConfig {
         provider.setUserDetailsService(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder);
         return new ProviderManager(provider);
-    }
+    }*/
     public SecurityConfig(
             JwtAuthenticationFilter jwtAuthenticationFilter,
             StaffUserDetailsService userDetailsService,

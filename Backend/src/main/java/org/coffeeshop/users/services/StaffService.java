@@ -1,7 +1,8 @@
 package org.coffeeshop.users.services;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.coffeeshop.Exceptions.UserExceptions.StaffServiceException;
+
+import org.coffeeshop.exceptions.UserExceptions.StaffServiceException;
 import org.coffeeshop.users.dtos.CreateStaffDto;
 import org.coffeeshop.users.dtos.StaffDto;
 import org.coffeeshop.users.models.Staff;
@@ -38,6 +39,7 @@ public class StaffService {
      * @param passwordEncoder this is used to ensure the password is encoded when
      *                        the staff user is created
     * */
+
     public StaffService(StaffRepository staffRepository, PasswordEncoder passwordEncoder) {
         this.staffRepository = staffRepository;
         this.passwordEncoder = passwordEncoder;
@@ -50,6 +52,7 @@ public class StaffService {
      * @return method also returns a staff dto
      * @throws StaffServiceException if staff entity could not be created
      * */
+
     public StaffDto create(CreateStaffDto dto) {
         try {
             Staff staff = fromCreateDto(dto);
@@ -68,14 +71,14 @@ public class StaffService {
      * @throws StaffServiceException if error in database
      * @throws EntityNotFoundException if the staff user could not be found
      * */
-    @Async
-    // get staff by id
-    public CompletableFuture<StaffDto> getStaffById(Long id) {
+
+    
+    public StaffDto getStaffById(Long id) {
         try {
             Staff staff = staffRepository.findById(id)
                     .orElseThrow(() -> new EntityNotFoundException("staff not found: " + id));
             //returns completed Future type to controller
-            return CompletableFuture.completedFuture(toDto(staff));
+            return toDto(staff);
         } catch (DataAccessException e) {
             throw new StaffServiceException("Database error while fetching staff", e);
         }
@@ -97,13 +100,14 @@ public class StaffService {
      * @return it returns a staffDto promise
      * @throws StaffServiceException if there was an error updating the user
      * */
-    @Async
-    public CompletableFuture<StaffDto> updateStaff(Long id, StaffDto dto) {
+    
+    
+    public StaffDto updateStaff(Long id, StaffDto dto) {
         try {
             Staff staff = fromDto(id, dto);
 
             Staff updatedStaff = staffRepository.save(staff);
-            return CompletableFuture.completedFuture(toDto(updatedStaff));
+            return toDto(updatedStaff);
         } catch (DataAccessException e) {
             throw new StaffServiceException("error updating user ", e);
         }
@@ -117,23 +121,23 @@ public class StaffService {
      * @throws StaffServiceException if there was an error deleting the user
      *
      * */
-    @Async
-    public CompletableFuture<String> deleteStaff(Long id) {
+    
+    public String deleteStaff(Long id) {
         try {
             staffRepository.deleteById(id);
             staffRepository.flush();
-            return CompletableFuture.completedFuture("Staff deleted");
+            return "Staff deleted";
         } catch (DataAccessException e) {
             throw new StaffServiceException("Error deleting staff with id " + id, e);
         }
     }
 
-    @Async
-    public CompletableFuture<StaffDto> getStaffByUsername(String username) {
+
+    public StaffDto getStaffByUsername(String username) {
         try {
             Staff staff = staffRepository.findByUsername(username)
                     .orElseThrow(() -> new EntityNotFoundException("staff not found: " + username));
-            return CompletableFuture.completedFuture(toDto(staff));
+            return toDto(staff);
         } catch (DataAccessException e) {
             throw new StaffServiceException("Database error while fetching staff by username", e);
         }

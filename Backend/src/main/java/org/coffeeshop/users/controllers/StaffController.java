@@ -74,9 +74,9 @@ public class StaffController {
      * @return a response containing the matching staff record
      */
     @GetMapping("/{id}")
-    public CompletableFuture<ResponseEntity<StaffDto>> getStaffById(@PathVariable("id") Long id) {
-        CompletableFuture<StaffDto> staffData = staffService.getStaffById(id);
-        return staffData.thenApply(ResponseEntity::ok);
+    public ResponseEntity<StaffDto> getStaffById(@PathVariable("id") Long id) {
+        StaffDto staffData = staffService.getStaffById(id);
+        return ResponseEntity.ok(staffData);
     }
 
     /**
@@ -90,9 +90,9 @@ public class StaffController {
      * @return a response containing the updated staff record
      */
     @PutMapping("/update/{id}")
-    public CompletableFuture<ResponseEntity<StaffDto>> updateStaff(@PathVariable("id") Long id, @Valid @RequestBody StaffDto staffDto) {
-        CompletableFuture<StaffDto> staffData = staffService.updateStaff(id, staffDto);
-        return staffData.thenApply(ResponseEntity::ok);
+    public ResponseEntity<StaffDto> updateStaff(@PathVariable("id") Long id, @Valid @RequestBody StaffDto staffDto) {
+        StaffDto staffData = staffService.updateStaff(id, staffDto);
+        return ResponseEntity.ok(staffData);
     }
 
     /**
@@ -105,12 +105,12 @@ public class StaffController {
      * @return a response containing a confirmation message
      */
     @DeleteMapping("/{id}")
-    public CompletableFuture<ResponseEntity<Map<String, String>>> deleteStaff(@PathVariable("id") Long id) {
-        return staffService.deleteStaff(id)
-                .thenApply(msg -> {
-                    Map<String, String> body = Map.of("message", msg);
-                    return ResponseEntity.ok(body);
-                });
+    public ResponseEntity<Map<String, String>> deleteStaff(@PathVariable("id") Long id) {
+        String msg = staffService.deleteStaff(id);
+        Map<String, String> body = Map.of("message", msg);
+        return ResponseEntity.ok(body);
     }
+
+    
 
 }

@@ -52,6 +52,12 @@ class StaffControllerTests {
         staffRepository.deleteAll();
     }
 
+    /**
+     * Test for creating a staff member via the controller.
+     * 
+     * @throws Exception
+     */
+
     @Test
     void createStaff_persistsToDb() throws Exception {
         CreateStaffDto request = new CreateStaffDto(
@@ -170,6 +176,12 @@ class StaffControllerTests {
         assertFalse(staffRepository.existsById(savedStaff.getStaffId()));
     }
 
+    /**
+     * this test asserts that the request body id does not override the path id 
+     * during an update operation. the aim is to ensure that the path id remains authoritative 
+     * and that the staff record identified by the path id is the one that gets updated, even if the body contains a different id.
+     * @throws Exception
+     */
     @Test
     void updateStaff_pathIdIsAuthoritative_whenBodyIdDiffers() throws Exception {
         // Create two staff members
