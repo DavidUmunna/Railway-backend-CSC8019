@@ -3,14 +3,13 @@ package org.coffeeshop.purchaseorders.models;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name="order_item")
+@Table(name = "order_item")
 public class OrderItem {
 
-    @EmbeddedId
-    private OrderItemKey id;
-    
+    @EmbeddedId private OrderItemKey id;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("purchaseOrderId") 
+    @MapsId("purchaseOrderId")
     @JoinColumn(name = "purchase_order_id", insertable = false, updatable = false)
     private PurchaseOrder purchaseOrder;
 
@@ -19,39 +18,32 @@ public class OrderItem {
     @JoinColumn(name = "menu_item_type_id", insertable = false, updatable = false)
     private MenuItemType menuItemType;
 
-    @Column (name = "quantity")
+    @Column(name = "quantity")
     private int quantity;
-    
-    @Column (name = "unit_price")
+
+    @Column(name = "unit_price")
     private double unitPrice;
 
-    @Column (name = "line_total")
+    @Column(name = "line_total")
     private double lineTotal;
 
-    public OrderItem() {}
+    protected OrderItem() {}
 
-    public void setId(OrderItemKey id) {
-        this.id = id;
-    }
-
-    public void setPurchaseOrder(PurchaseOrder purchaseOrder) {
+    public OrderItem(
+            PurchaseOrder purchaseOrder,
+            MenuItemType menuItemType,
+            int quantity,
+            double unitPrice,
+            double lineTotal) {
         this.purchaseOrder = purchaseOrder;
-    }
-
-    public void setMenuItemType(MenuItemType menuItemType) {
         this.menuItemType = menuItemType;
+        this.quantity = quantity;
+        this.unitPrice = unitPrice;
+        this.lineTotal = lineTotal;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-    
-    public void setUnitPrice(double unitPrice) {
-        this.unitPrice = unitPrice;
-    }
-    
-    public void setLineTotal(double lineTotal) {
-        this.lineTotal = lineTotal;
+    public OrderItem(MenuItemType menuItemType, int quantity, double unitPrice, double lineTotal) {
+        this(null, menuItemType, quantity, unitPrice, lineTotal);
     }
 
     public OrderItemKey getId() {
@@ -61,7 +53,7 @@ public class OrderItem {
     public PurchaseOrder getPurchaseOrder() {
         return purchaseOrder;
     }
-    
+
     public MenuItemType getMenuItemType() {
         return menuItemType;
     }

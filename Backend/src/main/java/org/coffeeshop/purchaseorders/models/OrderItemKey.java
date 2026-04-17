@@ -1,21 +1,23 @@
 package org.coffeeshop.purchaseorders.models;
 
+import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
-import jakarta.persistence.Embeddable;
 
 @Embeddable
 public class OrderItemKey implements Serializable {
     private Long purchaseOrderId;
     private Long menuItemTypeId;
 
-    public OrderItemKey() {}
+    protected OrderItemKey() {}
 
     public OrderItemKey(Long purchaseOrderId, Long menuItemTypeId) {
         this.purchaseOrderId = purchaseOrderId;
         this.menuItemTypeId = menuItemTypeId;
     }
 
+    // not sure if these setters are needed or removed
+    // TODO write tests and decide
     public void setPurchaseOrderId(Long purchaseOrderId) {
         this.purchaseOrderId = purchaseOrderId;
     }
@@ -40,9 +42,8 @@ public class OrderItemKey implements Serializable {
         OrderItemKey other = (OrderItemKey) obj;
 
         return Objects.equals(other.purchaseOrderId, purchaseOrderId)
-            && Objects.equals(other.menuItemTypeId, menuItemTypeId);
+                && Objects.equals(other.menuItemTypeId, menuItemTypeId);
     }
-
 
     @Override
     public int hashCode() {
