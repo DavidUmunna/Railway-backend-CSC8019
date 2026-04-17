@@ -33,28 +33,28 @@ class StationServiceTest {
     @Test
     void shouldReturnAllStations() {
         // Arrange
-        Station mockStation = new Station();
-        mockStation.setName("Cramlington");
+        Station mockStation = new Station("Cramlington", "08:00-18:00", "09:00-17:00", false);
+
         when(stationRepository.findAll()).thenReturn(List.of(mockStation));
 
         // Act
         List<StationDto> result = stationService.getAllStations();
 
-        // Assert (Record uses .name() to access)
+        // Assert
         assertEquals(1, result.size());
         assertEquals("Cramlington", result.get(0).name());
     }
 
     @Test
     void shouldReturnTrueWhenStationIsOpen() {
-        // Arrange: simulate a station open Mon-Fri 08:00-18:00
-        Station mockStation = new Station();
-        mockStation.setWeekdayOpeningHours("08:00-18:00");
-        when(stationRepository.findById(1)).thenReturn(Optional.of(mockStation));
+        // Arrange
+        Station mockStation = new Station("Cramlington", "08:00-18:00", "09:00-17:00", false);
 
-        // Act: test Monday 2026-04-13 at 10:00 AM
+        when(stationRepository.findById(1L)).thenReturn(Optional.of(mockStation));
+
+        // Act
         LocalDateTime mondayTenAm = LocalDateTime.of(2026, 4, 13, 10, 0);
-        boolean isOpen = stationService.isOpen(1, mondayTenAm);
+        boolean isOpen = stationService.isOpen(1L, mondayTenAm);
 
         // Assert
         assertTrue(isOpen, "Station should be open at this time");
@@ -63,11 +63,11 @@ class StationServiceTest {
     @Test
     void shouldThrowExceptionWhenIdNotFound() {
         // Arrange
-        when(stationRepository.findById(999)).thenReturn(Optional.empty());
+        when(stationRepository.findById(999L)).thenReturn(Optional.empty());
 
         // Assert
         assertThrows(IllegalArgumentException.class, () -> {
-            stationService.getStationById(999);
+            stationService.getStationById(999L);
         });
     }
 }

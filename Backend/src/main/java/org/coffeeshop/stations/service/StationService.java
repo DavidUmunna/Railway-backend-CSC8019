@@ -25,13 +25,13 @@ public class StationService {
                 .toList();
     }
 
-    public StationDto getStationById(int stationId) {
+    public StationDto getStationById(Long stationId) {
         Station station = stationRepository.findById(stationId)
                 .orElseThrow(() -> new IllegalArgumentException("Station not found!"));
         return convertToDto(station);
     }
 
-    public boolean isOpen(int stationId, LocalDateTime dateTime) {
+    public boolean isOpen(Long stationId, LocalDateTime dateTime) {
         Station station = stationRepository.findById(stationId)
                 .orElseThrow(() -> new IllegalArgumentException("Station not found!"));
 
@@ -53,13 +53,13 @@ public class StationService {
         return !time.isBefore(open) && !time.isAfter(close);
     }
 
-    public void validatePickupTime(int stationId, LocalDateTime pickupTime) {
+    public void validatePickupTime(Long stationId, LocalDateTime pickupTime) {
         if (!isOpen(stationId, pickupTime)) {
             throw new IllegalArgumentException("Invalid pickup time!");
         }
     }
 
-    public StationDto updateOpeningHours(int stationId, String weekday, String saturday, boolean sunday) {
+    public StationDto updateOpeningHours(Long stationId, String weekday, String saturday, boolean sunday) {
         Station station = stationRepository.findById(stationId)
                 .orElseThrow(() -> new IllegalArgumentException("Station not found!"));
 

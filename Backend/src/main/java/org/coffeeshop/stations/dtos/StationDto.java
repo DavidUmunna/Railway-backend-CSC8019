@@ -1,7 +1,7 @@
 package org.coffeeshop.stations.dtos;
 
 public record StationDto(
-        int id,
+        Long id,
         String name,
         String weekdayOpeningHours,
         String saturdayOpeningHours,

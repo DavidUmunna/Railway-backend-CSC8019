@@ -32,7 +32,7 @@ class StationControllerTest {
     @WithMockUser
     void shouldReturnAllStationsFromApi() throws Exception {
         // Arrange
-        StationDto mockDto = new StationDto(1, "Cramlington", "08:00-18:00", "09:00-17:00", true);
+        StationDto mockDto = new StationDto(1L, "Cramlington", "08:00-18:00", "09:00-17:00", true);
         when(stationService.getAllStations()).thenReturn(List.of(mockDto));
 
         // Act & Assert
@@ -46,8 +46,8 @@ class StationControllerTest {
     @WithMockUser
     void shouldReturnStationByIdFromApi() throws Exception {
         // Arrange
-        StationDto mockDto = new StationDto(1, "Cramlington", "08:00-18:00", "09:00-17:00", true);
-        when(stationService.getStationById(1)).thenReturn(mockDto);
+        StationDto mockDto = new StationDto(1L, "Cramlington", "08:00-18:00", "09:00-17:00", true);
+        when(stationService.getStationById(1L)).thenReturn(mockDto);
 
         // Act & Assert
         mockMvc.perform(get("/api/v1/stations/1"))
