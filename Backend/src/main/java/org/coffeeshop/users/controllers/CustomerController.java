@@ -66,7 +66,7 @@ public class CustomerController {
      */
     @GetMapping("/all")
     public ResponseEntity<List<CustomerDto>> getAllCustomers() {
-        return new ResponseEntity<>(customerService.findAllCustomers(), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(customerService.findAllCustomers(), HttpStatus.OK);
     }
 
     /**

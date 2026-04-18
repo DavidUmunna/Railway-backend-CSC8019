@@ -75,9 +75,10 @@ class CustomerControllerTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.customer_firstname").value("Jane"))
-                .andExpect(jsonPath("$.customer_lastname").value("Grande"))
-                .andExpect(jsonPath("$.customer_phone_number").value("07123456789"));
+                .andExpect(jsonPath("$.customerId").isNumber())
+                .andExpect(jsonPath("$.customerFirstName").value("Jane"))
+                .andExpect(jsonPath("$.customerLastName").value("Grande"))
+                .andExpect(jsonPath("$.customerPhoneNumber").value("07123456789"));
 
         assertTrue(customerRepository.findAll().stream()
                 .anyMatch(customer -> "07123456789".equals(customer.getCustomerPhoneNumber())));
@@ -95,7 +96,7 @@ class CustomerControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[*].customer_phone_number", containsInAnyOrder("07123456789", "07000000000")));
+                .andExpect(jsonPath("$[*].customerPhoneNumber", containsInAnyOrder("07123456789", "07000000000")));
     }
 
     @Test
@@ -108,9 +109,9 @@ class CustomerControllerTests {
 
         mockMvc.perform(get("/api/v1/customers/{id}", savedCustomer.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.customer_id").value(savedCustomer.getId()))
-                .andExpect(jsonPath("$.customer_firstname").value("Jane"))
-                .andExpect(jsonPath("$.customer_phone_number").value("07123456789"));
+                .andExpect(jsonPath("$.customerId").value(savedCustomer.getId()))
+                .andExpect(jsonPath("$.customerFirstName").value("Jane"))
+                .andExpect(jsonPath("$.customerPhoneNumber").value("07123456789"));
     }
 
     /**
@@ -135,18 +136,16 @@ class CustomerControllerTests {
         );
 
         String json = objectMapper.writeValueAsString(updatedCustomer);
-        MvcResult results = mockMvc.perform(put("/api/v1/customers/{id}", savedCustomer.getId())
+
+
+        mockMvc.perform(put("/api/v1/customers/{id}", savedCustomer.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                
-                .andReturn();
-
-        mockMvc.perform(results)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.customer_id").value(savedCustomer.getId()))
-                .andExpect(jsonPath("$.customer_firstname").value("John"))
-                .andExpect(jsonPath("$.customer_lastname").value("Doe"))
-                .andExpect(jsonPath("$.customer_phone_number").value("07011112222"));
+                .andExpect(jsonPath("$.customerId").value(savedCustomer.getId()))
+                .andExpect(jsonPath("$.customerFirstName").value("John"))
+                .andExpect(jsonPath("$.customerLastName").value("Doe"))
+                .andExpect(jsonPath("$.customerPhoneNumber").value("07011112222"));
         Long customerId = savedCustomer.getId();
         Objects.requireNonNull(customerId, "Saved customer ID should not be null");
         assertTrue(customerRepository.findById(customerId)
@@ -171,7 +170,7 @@ class CustomerControllerTests {
 
         mockMvc.perform(delete("/api/v1/customers/{id}", savedCustomer.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Customer Deleted"));
+                .andExpect(jsonPath("$.message").value("Customer Deleted Successfully"));
 
         assertFalse(customerRepository.existsById(savedCustomer.getId()));
     }

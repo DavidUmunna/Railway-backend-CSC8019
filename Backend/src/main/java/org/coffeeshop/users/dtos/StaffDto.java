@@ -2,6 +2,7 @@ package org.coffeeshop.users.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 
@@ -15,7 +16,7 @@ import jakarta.validation.constraints.Size;
  * @since 2026-04-12
  */
 public record StaffDto(
-        @NotBlank
+        @NotNull
         Long id,
         @NotBlank
         @Size(min = 3, max = 50)
