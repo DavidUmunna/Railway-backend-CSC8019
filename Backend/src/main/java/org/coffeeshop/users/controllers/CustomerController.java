@@ -9,7 +9,6 @@ import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * REST controller that exposes CRUD endpoints for managing customers in the Coffee Shop system.
@@ -73,15 +72,12 @@ public class CustomerController {
     /**
      * Retrieves a single customer by its unique identifier.
      * <p>
-     * The lookup is performed asynchronously via {@link CustomerService#findCustomerById(Long)},
-     * and the resulting {@link CustomerDto} is wrapped in a {@link ResponseEntity} when the
-     * computation completes. If the customer does not exist, the service layer is expected
-     * to handle this case (for example, by throwing an exception that is mapped to a
-     * {@code 404 Not Found} response).
+     * The request is delegated to {@link CustomerService#findCustomerById(Long)}.
+     * If the customer does not exist, the service layer is expected to handle this case
+     * (for example, by throwing an exception that is mapped to a {@code 404 Not Found} response).
      *
      * @param id the unique identifier of the customer to retrieve; must not be {@code null}
-     * @return a {@link CompletableFuture} that completes with an HTTP 200 (OK) response containing
-     *         the customer DTO, or an error if the customer cannot be found
+     * @return an HTTP 200 (OK) response containing the customer DTO
      */
     @GetMapping("/{id}")
     public ResponseEntity<CustomerDto> getCustomerById(@PathVariable("id") Long id) {
@@ -92,15 +88,14 @@ public class CustomerController {
      * Updates an existing customer with new details.
      * <p>
      * The method delegates to {@link CustomerService#updateCustomer(Long, CustomerDto)} to apply
-     * the update asynchronously. On success, the updated {@link CustomerDto} is returned with
+     * the update. On success, the updated {@link CustomerDto} is returned with
      * HTTP status {@link HttpStatus#OK 200 (OK)}. If the customer does not exist, the service
      * layer should signal this appropriately (for example, by throwing an exception that
      * results in a {@code 404 Not Found} response).
      *
      * @param id  the unique identifier of the customer to update; must not be {@code null}
      * @param dto the DTO containing the updated customer details; must not be {@code null}
-     * @return a {@link CompletableFuture} that completes with an HTTP 200 (OK) response containing
-     *         the updated customer DTO
+     * @return an HTTP 200 (OK) response containing the updated customer DTO
      */
     @PutMapping("/{id}")
     public ResponseEntity<CustomerDto> updateCustomer(
@@ -113,16 +108,16 @@ public class CustomerController {
     /**
      * Deletes an existing customer identified by the given id.
      * <p>
-    * The deletion is performed asynchronously via {@link CustomerService#deleteCustomer(Long)},
-     * which returns a human-readable message describing the result. This message is wrapped
-     * in a JSON object under the {@code "message"} key and returned with HTTP status
-     * {@link HttpStatus#OK 200 (OK)}. If the customer does not exist, the service layer
-     * should handle this case (for example, by raising an exception that maps to a
+     * The deletion is performed by {@link CustomerService#deleteCustomer(Long)}, which returns
+     * a human-readable message describing the result. This message is wrapped in a JSON object
+     * under the {@code "message"} key and returned with HTTP status
+     * {@link HttpStatus#OK 200 (OK)}. If the customer does not exist, the service layer should
+     * handle this case (for example, by raising an exception that maps to a
      * {@code 404 Not Found} response).
      *
      * @param id the unique identifier of the customer to delete; must not be {@code null}
-     * @return a {@link CompletableFuture} that completes with an HTTP 200 (OK) response containing
-     *         a JSON object with a {@code "message"} field describing the outcome
+     * @return an HTTP 200 (OK) response containing a JSON object with a {@code "message"}
+     *         field describing the outcome
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, String>> deleteCustomer(@PathVariable("id") Long id) {

@@ -16,7 +16,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -72,10 +71,9 @@ class CustomerControllerTests {
     void createCustomer_returnsCreatedCustomer() throws Exception {
          CustomerDto request = new CustomerDto(null, "Jane", "Grande", "07123456789");
 
-        MvcResult results = mockMvc.perform(post("/api/v1/customers/create").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request)))
-                .andExpect(request().asyncStarted())
-                .andReturn();
-        mockMvc.perform(asyncDispatch(results))
+        mockMvc.perform(post("/api/v1/customers/create")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.customer_firstname").value("Jane"))
                 .andExpect(jsonPath("$.customer_lastname").value("Grande"))
@@ -108,11 +106,7 @@ class CustomerControllerTests {
         customerRepository.flush();
         entityManager.clear();
 
-        MvcResult results = mockMvc.perform(get("/api/v1/customers/{id}", savedCustomer.getId()))
-                .andExpect(request().asyncStarted())
-                .andReturn();
-
-        mockMvc.perform(asyncDispatch(results))
+        mockMvc.perform(get("/api/v1/customers/{id}", savedCustomer.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.customer_id").value(savedCustomer.getId()))
                 .andExpect(jsonPath("$.customer_firstname").value("Jane"))
@@ -144,10 +138,10 @@ class CustomerControllerTests {
         MvcResult results = mockMvc.perform(put("/api/v1/customers/{id}", savedCustomer.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(request().asyncStarted())
+                
                 .andReturn();
 
-        mockMvc.perform(asyncDispatch(results))
+        mockMvc.perform(results)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.customer_id").value(savedCustomer.getId()))
                 .andExpect(jsonPath("$.customer_firstname").value("John"))
@@ -175,11 +169,7 @@ class CustomerControllerTests {
         customerRepository.flush();
         entityManager.clear();
 
-        MvcResult result = mockMvc.perform(delete("/api/v1/customers/{id}", savedCustomer.getId()))
-                .andExpect(request().asyncStarted())
-                .andReturn();
-
-        mockMvc.perform(asyncDispatch(result))
+        mockMvc.perform(delete("/api/v1/customers/{id}", savedCustomer.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Customer Deleted"));
 

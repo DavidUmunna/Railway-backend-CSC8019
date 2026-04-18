@@ -10,7 +10,6 @@ import org.coffeeshop.users.dtos.StaffDto;
 import org.coffeeshop.users.services.StaffService;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * Handles HTTP requests related to staff management.
@@ -67,8 +66,9 @@ public class StaffController {
     /**
      * Retrieves a staff member by ID.
      * <p>
-     * The service call is asynchronous, so this method returns a {@link CompletableFuture}
-     * that completes when the staff record is available.
+     * The request is delegated to {@link StaffService#getStaffById(Long)}. If the staff member
+     * cannot be found, the service layer is expected to throw an exception that is mapped to
+     * an appropriate HTTP error response.
      *
      * @param id the ID of the staff member to retrieve
      * @return a response containing the matching staff record
@@ -83,7 +83,7 @@ public class StaffController {
      * Updates an existing staff member.
      * <p>
      * The staff ID is provided in the path, and the updated details are supplied in the request body.
-     * The service performs the update asynchronously and returns the updated record.
+     * The service applies the change and returns the updated record.
      *
      * @param id the ID of the staff member to update
      * @param staffDto the updated staff details

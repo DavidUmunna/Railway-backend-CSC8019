@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.Map;
 
@@ -95,11 +94,7 @@ class StaffControllerTests {
                 new Staff("barista1@example.com", "Alex", "Brown", "staff_user", "encoded-password")
         );
 
-        MvcResult results = mockMvc.perform(get("/api/v1/staff/{id}", savedStaff.getStaffId()))
-                .andExpect(request().asyncStarted())
-                .andReturn();
-
-        mockMvc.perform(asyncDispatch(results))
+        mockMvc.perform(get("/api/v1/staff/{id}", savedStaff.getStaffId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(savedStaff.getStaffId()))
                 .andExpect(jsonPath("$.username").value("barista1@example.com"))
@@ -140,13 +135,9 @@ class StaffControllerTests {
         );
 
         String json = objectMapper.writeValueAsString(updatedStaff);
-        MvcResult results = mockMvc.perform(put("/api/v1/staff/update/{id}", updatedStaff.id())
+        mockMvc.perform(put("/api/v1/staff/update/{id}", updatedStaff.id())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(request().asyncStarted())
-                .andReturn();
-
-        mockMvc.perform(asyncDispatch(results))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(savedStaff.getStaffId()))
                 .andExpect(jsonPath("$.username").value("staff.updated@example.com"))
@@ -165,11 +156,7 @@ class StaffControllerTests {
                 new Staff("staff.delete@example.com", "Delete", "Me", "staff_user", "encoded-password")
         );
 
-        MvcResult result = mockMvc.perform(delete("/api/v1/staff/{id}", savedStaff.getStaffId()))
-                .andExpect(request().asyncStarted())
-                .andReturn();
-
-        mockMvc.perform(asyncDispatch(result))
+        mockMvc.perform(delete("/api/v1/staff/{id}", savedStaff.getStaffId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Staff deleted"));
 
@@ -203,13 +190,9 @@ class StaffControllerTests {
         );
 
         String json = objectMapper.writeValueAsString(bodyWithDifferentId);
-        MvcResult results = mockMvc.perform(put("/api/v1/staff/update/{id}", target.getStaffId())
+        mockMvc.perform(put("/api/v1/staff/update/{id}", target.getStaffId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(request().asyncStarted())
-                .andReturn();
-
-        mockMvc.perform(asyncDispatch(results))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(target.getStaffId()))
                 .andExpect(jsonPath("$.username").value("staff.updated@example.com"));
