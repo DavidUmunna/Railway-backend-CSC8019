@@ -12,8 +12,8 @@ public class Application {
         SpringApplication.run(Application.class, args);
     }
 
-    @GetMapping("/hello")
-    public String hello() {
-        return "Hello from Spring backend!";
+    @GetMapping("/gate")
+    public String gate() {
+        return "This is team 2 backend";
     }
 }

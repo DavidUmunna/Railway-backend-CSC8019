@@ -1,12 +1,12 @@
-# CSC8019
+# CSC8019 Coffee Shop Backend
 
-# Contributing & Git Workflow
+## Contributing & Git Workflow
 
-**Main branch is PROTECTED.** Direct pushes to `main` are **blocked** by GitHub settings. All changes require pull requests.
+**Main branch is PROTECTED.** Direct pushes to `main` are blocked by GitHub settings. All changes require pull requests.
 
 ## Branch Structure
 
-- `main`  – production (protected, deploys to prod)
+- `main` – production (protected, deploys to prod)
 - `develop` – integration / staging (default for features)
 
 ---
@@ -19,39 +19,30 @@ cd <REPO_NAME>
 git checkout develop
 ```
 
-##  Workflow
+## Workflow
 
-start from development do not push to main 
+Start from `develop`; do not push directly to `main`.
+
 ```bash
-
-git checkout development
-git pull origin development
-```
-
-
-create feature branch when adding anew feature to the app
-```bash
+git checkout develop
+git pull origin develop
 git checkout -b feature/<short-description>
 # e.g.: git checkout -b feature/user-auth
-
-
 ```
 
-## sql scripts usage
-the sql scripts are going to be used to connect to our backend java application and  get data from the database
-- use mysql workbench to create start server
-- use [coffee_shop.sql](sql%20scripts) to create the database tables on your machine
-- use [get_Status_names.sql](sql%20scripts) to create a sql function that gets status names
-- use [inprogress_orders.sql](sql%20scripts) to create a procedure for getting orders with 'in progress' status
-- use [Ready_order_views.sql](sql%20scripts) to create a tabular view of all ready orders i.e; orders  with status completed
+## SQL scripts usage
+The SQL scripts are provided for database setup and reporting.
+- use MySQL Workbench to start the server
+- use `Backend/sql scripts/coffee_shop.sql` to create database tables
+- use `Backend/sql scripts/getStatusNames.sql` or similar script to create helper functions
+- use `Backend/sql scripts/inprogress_orders.sql` to create a procedure for orders with `IN PROGRESS` status
+- use `Backend/sql scripts/Ready_orders_view.sql` to create a view of ready orders
 
-you can still add more functions and procedures that are relevant and useful
+You can add more stored procedures, views, or helper functions as needed.
 
+Always commit with a clear description.
 
-
-Always commit with description
-
-Multi‑station coffee kiosk backend (e.g. Cramlington, Newcastle) sharing a **single database**.  
+Multi-station coffee kiosk backend (e.g. Cramlington, Newcastle) sharing a **single database**.
 Stations are separated logically using `station_id` on orders.
 
 ---
@@ -59,10 +50,10 @@ Stations are separated logically using `station_id` on orders.
 ## High‑Level Backend Flow
 
 ```text
-Frontend  →  DTO  →  Controller  →  Service  →  Entity/SQL  →  DB
+Frontend  →  DTO  →  Controller  →  Service  →  Repository  →  DB
    ↑                        ↓           ↓            ↑
-   └────────────── DTO (response)  ←  Entity/SQL  ←─┘
-DTOs: What the API exposes (request/response shapes, validation, no JPA annotations)[web:421][web:555].
+   └────────────── DTO (response)  ← Repository  ←─┘
+DTOs: What the API exposes (request/response shapes, validation, no JPA annotations).
 
 Entities: How we store data in the database (JPA mappings, relationships).
 
@@ -75,40 +66,40 @@ Repositories / SQL: Data access (Spring Data JPA + stored procedures / views).
 This separation keeps the API stable while allowing us to change database details independently.
 ```
 
-## project structure
-```text 
-├───sql scripts
-├───src
-│   ├────main
-│   ├───java
-│   │   └───org
-│   │       └───coffeeshop
-│   │           ├───auth
-│   │           │   ├───controller
-│   │           │   ├───dto
-│   │           │   └───service
-│   │           ├───PurchaseOrders
-│   │           │   ├───controllers
-│   │           │   ├───DTO
-│   │           │   ├───models
-│   │           │   ├───repository
-│   │           │   └───service
-│   │           ├───security
-│   │           ├───station
-│   │           │   ├───controller
-│   │           │   ├───dto
-│   │           │   ├───model
-│   │           │   ├───repository
-│   │           │   └───service
-│   │           └───Users
-│   │               ├───controller
-│   │               ├───dto
-│   │               ├───model
-│   │               ├───repository
-│   │               └───service
-│   └───resources
-└───test
-    └───java
+## Project structure
+```text
+Backend/
+├── src
+│   ├── main
+│   │   ├── java
+│   │   │   └── org.coffeeshop
+│   │   │       ├── auth
+│   │   │       │   ├── dtos
+│   │   │       │   └── AuthController.java
+│   │   │       ├── security
+│   │   │       │   ├── SecurityConfig.java
+│   │   │       │   ├── JwtAuthenticationFilter.java
+│   │   │       │   └── JwtService.java
+│   │   │       ├── stations
+│   │   │       │   ├── controller
+│   │   │       │   ├── dtos
+│   │   │       │   ├── models
+│   │   │       │   ├── repositories
+│   │   │       │   └── services
+│   │   │       └── users
+│   │   │           ├── controllers
+│   │   │           ├── dtos
+│   │   │           ├── models
+│   │   │           ├── repositories
+│   │   │           └── services
+│   └── resources
+│       └── application.properties
+└── test
+    └── java
+        └── org.coffeeshop
+            ├── SecurityTests
+            ├── StationTests
+            └── UserTests
 
 
 
@@ -120,7 +111,7 @@ This separation keeps the API stable while allowing us to change database detail
 
 # Staff Workflow – CoffeeShop API
 
-This module provides the backend workflow for managing staff in the CoffeeShop application. It exposes REST endpoints for creating staff, persists staff data using Spring Data JPA, and securely stores passwords using a `PasswordEncoder` (BCrypt). [web:835][web:838]
+This module provides the backend workflow for managing staff in the CoffeeShop application. It exposes REST endpoints for creating staff, persists staff data using Spring Data JPA, and securely stores passwords using a `PasswordEncoder` (BCrypt). 
 
 ## Tech Stack
 
@@ -129,46 +120,54 @@ This module provides the backend workflow for managing staff in the CoffeeShop a
 - Spring Security `PasswordEncoder` (BCrypt)
 - JPA/Hibernate
 - MySQL (or any configured relational DB)
-- JUnit 5, Spring Boot Test, MockMvc for tests [web:833][web:840]
+- JUnit 5, Spring Boot Test, MockMvc for tests 
 
 ## Package Structure
 
-- `org.coffeeshop.staff.model` – `Staff` JPA entity
-- `org.coffeeshop.staff.dto` – `StaffDto` used for requests/responses
-- `org.coffeeshop.staff.repository` – `StaffRepository` (extends `JpaRepository`)
-- `org.coffeeshop.staff.service` – `StaffService` with business logic
-- `org.coffeeshop.staff.controller` – `StaffController` REST endpoints
-- `org.coffeeshop.security` – `SecurityConfig` with `PasswordEncoder` bean
-- `org.coffeeshop.staff.controller` – `StaffController` REST endpoints
-- `org.coffeeshop.staff.controller` (test) – `StaffControllerTest` using `@WebMvcTest` [web:838][web:841]
+- `org.coffeeshop.auth` – authentication endpoints and login DTOs
+- `org.coffeeshop.security` – JWT filter, security configuration, auth provider, and password encoder
+- `org.coffeeshop.users.controllers` – staff and customer REST controllers
+- `org.coffeeshop.users.dtos` – request and response DTOs for users/staff
+- `org.coffeeshop.users.services` – business logic for users and staff
+- `org.coffeeshop.users.repositories` – JPA repositories for users and staff
+- `org.coffeeshop.stations` – station APIs, models, services, and repositories
+- `org.coffeeshop.SecurityTests` – integration tests for authentication and authorization
+- `org.coffeeshop.UserTests.StaffTests` – staff controller integration tests
+- `org.coffeeshop.StationTests` – station controller/service tests
+
+## Current Backend Security State
+
+- Authentication is handled via JWT.
+- Login is available at `POST /api/v1/auth/login`.
+- `/api/v1/staff/**` endpoints require a valid JWT and `ADMIN` role.
+- `/api/v1/customers/**` is currently public.
+- All other non-whitelisted routes require authentication.
 
 ## Staff Entity
 
 Core fields (typical example):
 
 - `id` (Long)
-- `email` (unique, used as username for login)
+- `username` (unique, used for login)
 - `firstName`
 - `lastName`
-- `role` (e.g. `BARISTA`, `MANAGER`)
-- `active` (boolean)
-- `passwordHash` (BCrypt hash, never plain text) [web:792]
+- `role` (`staff_user` or `Admin`)
+- `passwordHash` (BCrypt hash, never plain text) 
 
 ## DTO
 
 `StaffDto` is used as the API contract:
 
-- Request: includes `email` (acts as username) and `password` (plain text) for creation.
-- Response: **excludes** `password`, returns other staff details and generated `id`. [web:659]
+- Request: includes `username` and `password` (plain text) for creation.
+- Response: **excludes** `password`, returns other staff details and generated `id`. 
 
 Example DTO fields:
 
 - `id`
-- `email`
+- `username`
 - `firstName`
 - `lastName`
 - `role`
-- `active`
 - `password` (request only)
 
 ## Security and Password Encoding

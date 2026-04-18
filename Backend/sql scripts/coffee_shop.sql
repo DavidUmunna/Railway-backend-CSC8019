@@ -1,39 +1,55 @@
 CREATE TABLE customer (
     customer_id INT AUTO_INCREMENT PRIMARY KEY,
-    customer_name CHAR(100) NOT NULL,
-    customer_email VARCHAR(150) NOT NULL,
-    customer_phone_number VARCHAR(20)
+    customer_firstname VARCHAR(50) NOT NULL,
+    customer_lastname VARCHAR(50) NOT NULL,
+    customer_phone_number VARCHAR(14)
 );
 
-CREATE TABLE purchaseorder (
+CREATE TABLE station(
+    station_id INT PRIMARY KEY,
+    station_name VARCHAR(100),
+    weekday_opening_hours VARCHAR(55),
+    saturday_opening_hours VARCHAR(55),
+    closed_on_sunday BOOLEAN
+);
+
+CREATE TABLE purchase_order (
     order_id INT AUTO_INCREMENT PRIMARY KEY,
-    customer_id INT NOT NULL,
+    customer_id INT,
     order_date DATE NOT NULL,
     pickup_time TIME NOT NULL,
-    order_status ENUM('Accepted','In Progress','Collected','Completed') NOT NULL ,
-    station_id INT NOT NULL ,
+    order_status ENUM('Accepted','In Progress','Collected','Completed') NOT NULL,
+    station_id INT,
     total_amount DECIMAL(8,2) DEFAULT 0.00 NOT NULL,
     FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
-    FOREIGN KEY  (station_id) REFERENCES station(station_id)
+    FOREIGN KEY (station_id) REFERENCES station(station_id)
 );
 
 CREATE TABLE menu_item (
     menu_item_id INT AUTO_INCREMENT PRIMARY KEY,
     item_name VARCHAR(150) NOT NULL,
     item_description VARCHAR(300),
-    item_price DECIMAL(8,2),
-    isavailable BOOLEAN DEFAULT TRUE
+    is_available BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE menu_item_type(
+    menu_item_type_id INT AUTO_INCREMENT PRIMARY KEY,
+    menu_item_id INT,
+    size_name ENUM('Regular','Large'),
+    price DECIMAL(8,2) DEFAULT 0.00 NOT NULL,
+    is_available BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (menu_item_id) REFERENCES menu_item(menu_item_id)
 );
 
 CREATE TABLE order_item (
-    purchase_order_id INT NOT NULL,
-    menu_item_id INT NOT NULL,
+    purchase_order_id INT,
+    menu_item_type_id INT,
     quantity INT,
-    unit_price DECIMAL(7,2) DEFAULT 0.00 NOT NULL,
+    unit_price DECIMAL(8,2) DEFAULT 0.00 NOT NULL,
     line_total DECIMAL(8,2) DEFAULT 0.00 NOT NULL,
-    PRIMARY KEY (purchase_order_id, menu_item_id),  
-    FOREIGN KEY (purchase_order_id) REFERENCES purchaseorder(order_id),
-    FOREIGN KEY (menu_item_id) REFERENCES menu_item(menu_item_id)
+    PRIMARY KEY (purchase_order_id, menu_item_type_id),
+    FOREIGN KEY (purchase_order_id) REFERENCES purchase_order(order_id),
+    FOREIGN KEY (menu_item_type_id) REFERENCES menu_item_type(menu_item_type_id)
 );
 
 CREATE TABLE staff (
@@ -45,10 +61,10 @@ CREATE TABLE staff (
 );
 
 CREATE TABLE order_staff_relation (
-    order_id INT NOT NULL,
-    staff_id INT NOT NULL,
+    order_id INT,
+    staff_id INT,
     PRIMARY KEY (order_id, staff_id),
-    FOREIGN KEY (order_id) REFERENCES purchaseorder(order_id) ON DELETE CASCADE,
+    FOREIGN KEY (order_id) REFERENCES purchase_order(order_id) ON DELETE CASCADE,
     FOREIGN KEY (staff_id) REFERENCES staff(staff_id) ON DELETE RESTRICT
 );
 
