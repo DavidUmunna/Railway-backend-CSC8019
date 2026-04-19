@@ -1,4 +1,4 @@
-package org.coffeeshop.StationTests.stations.service;
+package org.coffeeshop.stations.services;
 
 import org.coffeeshop.stations.dtos.StationDto;
 import org.coffeeshop.stations.models.Station;

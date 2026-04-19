@@ -1,9 +1,9 @@
-package org.coffeeshop.StationTests.stations.controller;
+package org.coffeeshop.stations.controllers;
 
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.coffeeshop.security.JwtAuthenticationFilter;
 import org.coffeeshop.security.JwtService;
-import org.coffeeshop.stations.controller.StationController;
+import org.coffeeshop.stations.controllers.StationController;
 import org.coffeeshop.stations.dtos.StationDto;
 import org.coffeeshop.stations.services.StationService;
 import org.junit.jupiter.api.Test;
