@@ -1,4 +1,4 @@
-package org.coffeeshop.UserTests.CustomerTests;
+package org.coffeeshop.usertests.customertests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

@@ -1,4 +1,4 @@
-package org.coffeeshop.UserTests.StaffTests;
+package org.coffeeshop.usertests.stafftests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.coffeeshop.users.dtos.CreateStaffDto;

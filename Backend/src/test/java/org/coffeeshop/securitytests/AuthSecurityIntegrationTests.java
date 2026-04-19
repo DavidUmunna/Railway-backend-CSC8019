@@ -1,4 +1,4 @@
-package org.coffeeshop.SecurityTests;
+package org.coffeeshop.securitytests;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
