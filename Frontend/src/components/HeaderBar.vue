@@ -38,4 +38,20 @@ h1 {
   margin: 0;
   letter-spacing: 1px;
 }
+
+@media (max-width: 768px) {
+  .header-content {
+    padding: 12px 14px;
+    gap: 8px;
+  }
+
+  .logo {
+    width: 24px;
+  }
+
+  h1 {
+    font-size: 1rem;
+    letter-spacing: 0.3px;
+  }
+}
 </style>

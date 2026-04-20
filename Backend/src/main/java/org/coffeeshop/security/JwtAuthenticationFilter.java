@@ -22,6 +22,10 @@ import java.io.IOException;
 @Component
 /**
  * Authenticates requests by parsing Bearer tokens and populating security context.
+ * @author willian
+ * @modifiedBy Umunna David
+ * improved error handling to clear security context on invalid tokens or disabled accounts
+ * @since 20/04/2026
  */
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -64,11 +68,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             username = jwtService.extractUsername(jwt);
         } catch (JwtException | IllegalArgumentException ex) {
-            authenticationEntryPoint.commence(
-                    request,
-                    response,
-                    new BadCredentialsException("Invalid or expired token", ex)
-            );
+            SecurityContextHolder.clearContext();
+            filterChain.doFilter(request, response);
             return;
         }
 
@@ -77,20 +78,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
                 if (!userDetails.isEnabled()) {
-                    authenticationEntryPoint.commence(
-                            request,
-                            response,
-                            new DisabledException("User account is disabled")
-                    );
+                    SecurityContextHolder.clearContext();
+                    filterChain.doFilter(request, response);
                     return;
                 }
 
                 if (!jwtService.isTokenValid(jwt, userDetails)) {
-                    authenticationEntryPoint.commence(
-                            request,
-                            response,
-                            new BadCredentialsException("Invalid or expired token")
-                    );
+                    SecurityContextHolder.clearContext();
+                    filterChain.doFilter(request, response);
                     return;
                 }
 
@@ -102,11 +97,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             } catch (UsernameNotFoundException ex) {
-                authenticationEntryPoint.commence(
-                        request,
-                        response,
-                        new BadCredentialsException("Invalid or expired token", ex)
-                );
+                SecurityContextHolder.clearContext();
+                filterChain.doFilter(request, response);
                 return;
             }
         }
