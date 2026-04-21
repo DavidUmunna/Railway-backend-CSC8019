@@ -20,8 +20,10 @@ public class Station {
     @Column(name="saturday_opening_hours")
     private String saturdayOpeningHours;
 
+    @Column(name="closed_on_sunday")
     private boolean closedOnSunday;
-    protected Station() {}
+
+    public Station() {}
 
     public Station(String name, String weekdayOpeningHours, String saturdayOpeningHours, boolean closedOnSunday) {
         this.name = name;
@@ -45,7 +47,6 @@ public class Station {
     public String getSaturdayOpeningHours() { return saturdayOpeningHours; }
 
     public boolean isClosedOnSunday() {
-        boolean closedOnSunday = true;
         return closedOnSunday; }
 
 }

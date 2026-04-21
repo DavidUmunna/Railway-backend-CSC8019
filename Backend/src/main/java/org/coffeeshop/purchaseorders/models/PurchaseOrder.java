@@ -1,67 +1,68 @@
 package org.coffeeshop.purchaseorders.models;
 
+import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
-
 import org.coffeeshop.stations.models.Station;
 import org.coffeeshop.users.models.Customer;
-
-import jakarta.persistence.*;
 
 @Entity
 @Table(name = "purchase_order")
 public class PurchaseOrder {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="order_id")
+    @Column(name = "order_id")
     private Long orderId;
 
     @ManyToOne
-    @JoinColumn(name="customer_id")
+    @JoinColumn(name = "customer_id")
     private Customer customer;
 
     @ManyToOne
-    @JoinColumn(name="station_id")
+    @JoinColumn(name = "station_id")
     private Station station;
 
-    @Column(name="order_date")
+    @Column(name = "order_date")
     private LocalDate orderDate;
 
-    @Column(name="pickup_time")
+    @Column(name = "pickup_time")
     private LocalTime pickupTime;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="order_status")
-    private OrderStatus orderStatus; 
+    @Column(name = "order_status")
+    private OrderStatus orderStatus;
 
-    @Column(name="total_amount")
+    @Column(name = "total_amount")
     private double totalAmount;
-    
-    public PurchaseOrder() {} 
 
-    public void setCustomer(Customer customer) {
+    protected PurchaseOrder() {}
+
+    public PurchaseOrder(
+            Long orderId,
+            Customer customer,
+            Station station,
+            LocalDate orderDate,
+            LocalTime pickupTime,
+            OrderStatus orderStatus,
+            double totalAmount) {
+        this.orderId = orderId;
         this.customer = customer;
-    }
-    
-    public void setOrderDate(LocalDate orderDate) {
-        this.orderDate = orderDate;
-    }
-    
-    public void setPickUpTime(LocalTime pickupTime) {
-        this.pickupTime = pickupTime;
-    }
-
-    public void setOrderStatus(OrderStatus orderStatus) {
-        this.orderStatus = orderStatus;
-    }
-
-    public void setStation(Station station) {
         this.station = station;
-    }
-    
-    public void setTotalAmount(double totalAmount) {
+        this.orderDate = orderDate;
+        this.pickupTime = pickupTime;
+        this.orderStatus = orderStatus;
         this.totalAmount = totalAmount;
+    }
+
+    public PurchaseOrder(
+            Customer customer,
+            Station station,
+            LocalDate orderDate,
+            LocalTime pickupTime,
+            OrderStatus orderStatus,
+            double totalAmount) {
+        this(null, customer, station, orderDate, pickupTime, orderStatus, totalAmount);
     }
 
     public Long getPurchaseOrderId() {

@@ -1,4 +1,4 @@
-package org.coffeeshop.SecurityTests;
+package org.coffeeshop.securitytests;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,10 +15,21 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+
+
+/**
+ * Integration tests for authentication and authorization of the API.
+ * @author willian
+ * @version 1.0
+ * @since 15/04/2026
+ * @ModifiedBy Umunna David
+ * @since 17/04/2026
+ */
 @SpringBootTest
 @AutoConfigureMockMvc
 class AuthSecurityIntegrationTests {
@@ -120,6 +131,33 @@ class AuthSecurityIntegrationTests {
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(createStaffRequestJson()))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value("Access denied"));
+    }
+
+    @Test
+    void getAllStaff_requiresAuthentication() throws Exception {
+        mockMvc.perform(get("/api/v1/staff/all")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message").exists());
+    }
+
+    @Test
+    void getAllStaff_forbidsNonAdminToken() throws Exception {
+        staffRepository.save(new Staff(
+                "barista2@example.com",
+                "Barista",
+                "User",
+                "STAFF_USER",
+                passwordEncoder.encode("Barista123!")
+        ));
+
+        String token = loginAndGetToken("barista2@example.com", "Barista123!");
+
+        mockMvc.perform(get("/api/v1/staff/all")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value("Access denied"));
     }

@@ -1,14 +1,13 @@
 package org.coffeeshop.purchaseorders.models;
 
-import java.util.List;
-
 import jakarta.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "menu_item")
 public class MenuItem {
-    
-    @Id 
+
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "menu_item_id")
     private Long menuItemId;
@@ -18,25 +17,36 @@ public class MenuItem {
 
     @Column(name = "item_name")
     private String name;
-    
+
     @Column(name = "item_description")
     private String description;
-    
+
     @Column(name = "is_available")
     private boolean isAvailable;
 
-    public MenuItem() {}
+    protected MenuItem() {}
 
-    public void setItemName(String name) {
+    public MenuItem(
+            Long menuItemId,
+            String name,
+            String description,
+            boolean isAvailable) {
+        this.menuItemId = menuItemId;
         this.name = name;
-    }
-
-    public void setIsAvailable(boolean isAvailable) {
+        this.description = description;
         this.isAvailable = isAvailable;
     }
-    
+
+    public MenuItem(String name, String description, boolean isAvailable) {
+        this(null, name, description, isAvailable);
+    }
+
     public Long getMenuItemId() {
         return menuItemId;
+    }
+
+    public List<MenuItemType> getMenuItems() {
+        return menuItems;
     }
 
     public String getName() {

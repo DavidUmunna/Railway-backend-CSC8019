@@ -1,10 +1,8 @@
-package org.coffeeshop.UserTests.CustomerTests;
+package org.coffeeshop.usertests.customertests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.persistence.EntityManager;
-import org.coffeeshop.security.JwtAuthenticationFilter;
-import org.coffeeshop.security.JwtService;
 import org.coffeeshop.users.dtos.CustomerDto;
 import org.coffeeshop.users.models.Customer;
 import org.coffeeshop.users.repositories.CustomerRepository;
@@ -13,10 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -72,14 +68,14 @@ class CustomerControllerTests {
     void createCustomer_returnsCreatedCustomer() throws Exception {
          CustomerDto request = new CustomerDto(null, "Jane", "Grande", "07123456789");
 
-        MvcResult results = mockMvc.perform(post("/api/v1/customers/create").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request)))
-                .andExpect(request().asyncStarted())
-                .andReturn();
-        mockMvc.perform(asyncDispatch(results))
+        mockMvc.perform(post("/api/v1/customers/create")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.customer_firstname").value("Jane"))
-                .andExpect(jsonPath("$.customer_lastname").value("Grande"))
-                .andExpect(jsonPath("$.customer_phone_number").value("07123456789"));
+                .andExpect(jsonPath("$.customerId").isNumber())
+                .andExpect(jsonPath("$.customerFirstName").value("Jane"))
+                .andExpect(jsonPath("$.customerLastName").value("Grande"))
+                .andExpect(jsonPath("$.customerPhoneNumber").value("07123456789"));
 
         assertTrue(customerRepository.findAll().stream()
                 .anyMatch(customer -> "07123456789".equals(customer.getCustomerPhoneNumber())));
@@ -97,7 +93,7 @@ class CustomerControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[*].customer_phone_number", containsInAnyOrder("07123456789", "07000000000")));
+                .andExpect(jsonPath("$[*].customerPhoneNumber", containsInAnyOrder("07123456789", "07000000000")));
     }
 
     @Test
@@ -108,15 +104,11 @@ class CustomerControllerTests {
         customerRepository.flush();
         entityManager.clear();
 
-        MvcResult results = mockMvc.perform(get("/api/v1/customers/{id}", savedCustomer.getId()))
-                .andExpect(request().asyncStarted())
-                .andReturn();
-
-        mockMvc.perform(asyncDispatch(results))
+        mockMvc.perform(get("/api/v1/customers/{id}", savedCustomer.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.customer_id").value(savedCustomer.getId()))
-                .andExpect(jsonPath("$.customer_firstname").value("Jane"))
-                .andExpect(jsonPath("$.customer_phone_number").value("07123456789"));
+                .andExpect(jsonPath("$.customerId").value(savedCustomer.getId()))
+                .andExpect(jsonPath("$.customerFirstName").value("Jane"))
+                .andExpect(jsonPath("$.customerPhoneNumber").value("07123456789"));
     }
 
     /**
@@ -141,18 +133,16 @@ class CustomerControllerTests {
         );
 
         String json = objectMapper.writeValueAsString(updatedCustomer);
-        MvcResult results = mockMvc.perform(put("/api/v1/customers/{id}", savedCustomer.getId())
+
+
+        mockMvc.perform(put("/api/v1/customers/{id}", savedCustomer.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(request().asyncStarted())
-                .andReturn();
-
-        mockMvc.perform(asyncDispatch(results))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.customer_id").value(savedCustomer.getId()))
-                .andExpect(jsonPath("$.customer_firstname").value("John"))
-                .andExpect(jsonPath("$.customer_lastname").value("Doe"))
-                .andExpect(jsonPath("$.customer_phone_number").value("07011112222"));
+                .andExpect(jsonPath("$.customerId").value(savedCustomer.getId()))
+                .andExpect(jsonPath("$.customerFirstName").value("John"))
+                .andExpect(jsonPath("$.customerLastName").value("Doe"))
+                .andExpect(jsonPath("$.customerPhoneNumber").value("07011112222"));
         Long customerId = savedCustomer.getId();
         Objects.requireNonNull(customerId, "Saved customer ID should not be null");
         assertTrue(customerRepository.findById(customerId)
@@ -175,13 +165,9 @@ class CustomerControllerTests {
         customerRepository.flush();
         entityManager.clear();
 
-        MvcResult result = mockMvc.perform(delete("/api/v1/customers/{id}", savedCustomer.getId()))
-                .andExpect(request().asyncStarted())
-                .andReturn();
-
-        mockMvc.perform(asyncDispatch(result))
+        mockMvc.perform(delete("/api/v1/customers/{id}", savedCustomer.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Customer Deleted"));
+                .andExpect(jsonPath("$.message").value("Customer Deleted Successfully"));
 
         assertFalse(customerRepository.existsById(savedCustomer.getId()));
     }

@@ -2,19 +2,17 @@ package org.coffeeshop.users.services;
 
 import jakarta.persistence.EntityNotFoundException;
 
-import org.coffeeshop.exceptions.UserExceptions.StaffServiceException;
+import org.coffeeshop.exceptions.userexceptions.StaffServiceException;
 import org.coffeeshop.users.dtos.CreateStaffDto;
 import org.coffeeshop.users.dtos.StaffDto;
 import org.coffeeshop.users.models.Staff;
 import org.coffeeshop.users.repositories.StaffRepository;
 import org.springframework.dao.DataAccessException;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 
 /**
@@ -65,14 +63,13 @@ public class StaffService {
     }
 
     /**
-     * this method gets staff data by id and does it asynchronously to avoid code blocking
-     * @param id is the id of the staff user
-     * @return it returns a promise that the staff data will be retrieved
-     * @throws StaffServiceException if error in database
-     * @throws EntityNotFoundException if the staff user could not be found
-     * */
-
-    
+     * Retrieves staff data by ID.
+     *
+     * @param id the staff user ID
+     * @return the corresponding staff DTO
+     * @throws StaffServiceException if a database error occurs
+     * @throws EntityNotFoundException if the staff user cannot be found
+     */
     public StaffDto getStaffById(Long id) {
         try {
             Staff staff = staffRepository.findById(id)

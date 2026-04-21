@@ -2,18 +2,14 @@
 package org.coffeeshop.users.services;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.coffeeshop.exceptions.UserExceptions.CustomerServiceException;
+import org.coffeeshop.exceptions.userexceptions.CustomerServiceException;
 import org.coffeeshop.users.dtos.CustomerDto;
 import org.coffeeshop.users.models.Customer;
 import org.coffeeshop.users.repositories.CustomerRepository;
 import org.springframework.dao.DataAccessException;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,9 +45,8 @@ public class CustomerService {
    
 
     /**
-     * Find customer by id asynchronously.
+     * Find customer by id.
      */
-    
     public CustomerDto findCustomerById(Long id) {
         try {
             Customer customer = customerRepository.findById(id)

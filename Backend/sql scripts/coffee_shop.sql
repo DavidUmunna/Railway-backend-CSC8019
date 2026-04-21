@@ -9,7 +9,8 @@ CREATE TABLE station(
     station_id INT PRIMARY KEY,
     station_name VARCHAR(100),
     weekday_opening_hours VARCHAR(55),
-    saturday_opening_hours VARCHAR(55)
+    saturday_opening_hours VARCHAR(55),
+    closed_on_sunday BOOLEAN
 );
 
 CREATE TABLE purchase_order (
