@@ -1,4 +1,4 @@
-package org.coffeeshop.stations.controller;
+package org.coffeeshop.stations.controllers;
 
 import org.coffeeshop.stations.dtos.StationDto;
 import org.coffeeshop.stations.services.StationService;
