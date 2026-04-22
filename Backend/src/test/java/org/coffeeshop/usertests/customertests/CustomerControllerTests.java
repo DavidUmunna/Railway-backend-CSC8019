@@ -1,10 +1,8 @@
-package org.coffeeshop.UserTests.CustomerTests;
+package org.coffeeshop.usertests.customertests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.persistence.EntityManager;
-import org.coffeeshop.security.JwtAuthenticationFilter;
-import org.coffeeshop.security.JwtService;
 import org.coffeeshop.users.dtos.CustomerDto;
 import org.coffeeshop.users.models.Customer;
 import org.coffeeshop.users.repositories.CustomerRepository;
@@ -13,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 

@@ -2,7 +2,7 @@ package org.coffeeshop.users.services;
 
 import jakarta.persistence.EntityNotFoundException;
 
-import org.coffeeshop.exceptions.UserExceptions.StaffServiceException;
+import org.coffeeshop.exceptions.userexceptions.StaffServiceException;
 import org.coffeeshop.users.dtos.CreateStaffDto;
 import org.coffeeshop.users.dtos.StaffDto;
 import org.coffeeshop.users.models.Staff;

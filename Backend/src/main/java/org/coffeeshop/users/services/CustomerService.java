@@ -2,7 +2,7 @@
 package org.coffeeshop.users.services;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.coffeeshop.exceptions.UserExceptions.CustomerServiceException;
+import org.coffeeshop.exceptions.userexceptions.CustomerServiceException;
 import org.coffeeshop.users.dtos.CustomerDto;
 import org.coffeeshop.users.models.Customer;
 import org.coffeeshop.users.repositories.CustomerRepository;
@@ -12,15 +12,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
-/****
- * Service for managing customer users in the coffee shop
- * also for implementing business logic
- * @author Umunna David
- * @version 1.0
- * @since 2026-04-12
- *
- * */
 @Service
 public class CustomerService {
 
