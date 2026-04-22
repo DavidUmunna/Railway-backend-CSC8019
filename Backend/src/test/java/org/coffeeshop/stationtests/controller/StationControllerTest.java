@@ -1,6 +1,6 @@
 package org.coffeeshop.stationtests.controller;
 
-import org.coffeeshop.stations.controller.StationController;
+import org.coffeeshop.stations.controllers.StationController;
 import org.coffeeshop.stations.dtos.StationDto;
 import org.coffeeshop.stations.services.StationService;
 import org.junit.jupiter.api.BeforeEach;

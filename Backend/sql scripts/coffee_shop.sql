@@ -13,15 +13,25 @@ CREATE TABLE station(
     closed_on_sunday BOOLEAN
 );
 
+CREATE TABLE staff (
+    staff_id INT AUTO_INCREMENT PRIMARY KEY,
+    staff_name VARCHAR(100),
+    staff_role CHAR(150),
+    username CHAR(150),
+    password VARCHAR(300)
+);
+
 CREATE TABLE purchase_order (
     order_id INT AUTO_INCREMENT PRIMARY KEY,
     customer_id INT,
+    staff_id INT,
     order_date DATE NOT NULL,
     pickup_time TIME NOT NULL,
-    order_status ENUM('Accepted','In Progress','Collected','Completed') NOT NULL,
+    order_status ENUM('ACCEPTED','IN_PROGRESS','COMPLETED', 'COLLECTED', 'CANCELLED') NOT NULL,
     station_id INT,
     total_amount DECIMAL(8,2) DEFAULT 0.00 NOT NULL,
     FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
+    FOREIGN KEY (staff_id) REFERENCES staff(staff_id),
     FOREIGN KEY (station_id) REFERENCES station(station_id)
 );
 
@@ -52,23 +62,10 @@ CREATE TABLE order_item (
     FOREIGN KEY (menu_item_type_id) REFERENCES menu_item_type(menu_item_type_id)
 );
 
-CREATE TABLE staff (
-    staff_id INT AUTO_INCREMENT PRIMARY KEY,
-    staff_name VARCHAR(100),
-    staff_role CHAR(150),
-    username CHAR(150),
-    password VARCHAR(300)
-);
-
 CREATE TABLE order_staff_relation (
     order_id INT,
     staff_id INT,
     PRIMARY KEY (order_id, staff_id),
     FOREIGN KEY (order_id) REFERENCES purchase_order(order_id) ON DELETE CASCADE,
     FOREIGN KEY (staff_id) REFERENCES staff(staff_id) ON DELETE RESTRICT
-);
-
-CREATE TABLE station(
-    station_id INT NOT NULL,
-    station_name varchar(100)
 );
