@@ -1,0 +1,428 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run Backend via Wrapper",
+			"type": "shell",
+			"command": "Backend\\mvnw.cmd",
+			"args": [
+				"-f",
+				"Backend\\pom.xml",
+				"spring-boot:run"
+			],
+			"isBackground": true
+		},
+		{
+			"label": "Download Valid Wrapper Jar",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"Invoke-WebRequest -Uri \"https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.3.4/maven-wrapper-3.3.4.jar\" -OutFile \"Backend/.mvn/wrapper/maven-wrapper.jar\""
+			],
+			"isBackground": false
+		},
+		{
+			"label": "Run Backend via Wrapper",
+			"type": "shell",
+			"command": "Backend\\mvnw.cmd",
+			"args": [
+				"-f",
+				"Backend\\pom.xml",
+				"spring-boot:run"
+			],
+			"isBackground": false
+		},
+		{
+			"label": "Inspect Wrapper Manifest",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"jar tf Backend/.mvn/wrapper/maven-wrapper.jar | Select-String -Pattern \"META-INF/MANIFEST.MF|MavenWrapperMain\" | Out-String"
+			],
+			"isBackground": false
+		},
+		{
+			"label": "Inspect Wrapper Entries",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/c",
+				"jar tf Backend\\.mvn\\wrapper\\maven-wrapper.jar | findstr /I \"MANIFEST MavenWrapperMain\""
+			],
+			"isBackground": false
+		},
+		{
+			"label": "Download Takari Wrapper Jar",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"Invoke-WebRequest -Uri \"https://repo.maven.apache.org/maven2/io/takari/maven-wrapper/0.5.6/maven-wrapper-0.5.6.jar\" -OutFile \"Backend/.mvn/wrapper/maven-wrapper.jar\""
+			],
+			"isBackground": false
+		},
+		{
+			"label": "Run Backend via Wrapper",
+			"type": "shell",
+			"command": "Backend\\mvnw.cmd",
+			"args": [
+				"-f",
+				"Backend\\pom.xml",
+				"spring-boot:run"
+			],
+			"isBackground": false
+		},
+		{
+			"label": "Check Wrapper Jar Header",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"$b = Get-Content -Path \"Backend/.mvn/wrapper/maven-wrapper.jar\" -Encoding Byte -TotalCount 8; [System.BitConverter]::ToString($b)"
+			],
+			"isBackground": false
+		},
+		{
+			"label": "Run Backend via Wrapper",
+			"type": "shell",
+			"command": "Backend\\mvnw.cmd",
+			"args": [
+				"-f",
+				"Backend\\pom.xml",
+				"spring-boot:run"
+			],
+			"isBackground": false
+		},
+		{
+			"label": "Run Backend via Wrapper",
+			"type": "shell",
+			"command": "Backend\\mvnw.cmd",
+			"args": [
+				"-f",
+				"Backend\\pom.xml",
+				"spring-boot:run"
+			],
+			"isBackground": false
+		},
+		{
+			"label": "Run Backend on 8081",
+			"type": "shell",
+			"command": "Backend\\mvnw.cmd",
+			"args": [
+				"-f",
+				"Backend\\pom.xml",
+				"spring-boot:run",
+				"-Dspring-boot.run.arguments=--server.port=8081"
+			],
+			"isBackground": false
+		},
+		{
+			"label": "Run Backend 8081 Cmd",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/c",
+				"Backend\\mvnw.cmd -f Backend\\pom.xml spring-boot:run \"-Dspring-boot.run.arguments=--server.port=8081\""
+			],
+			"isBackground": false
+		},
+		{
+			"label": "Run Backend Spring Boot",
+			"type": "shell",
+			"command": "Backend\\mvnw.cmd",
+			"args": [
+				"-f",
+				"Backend\\pom.xml",
+				"spring-boot:run"
+			],
+			"isBackground": true
+		},
+		{
+			"label": "Run Backend Spring Boot",
+			"type": "shell",
+			"command": "Backend\\mvnw.cmd",
+			"args": [
+				"-f",
+				"Backend\\pom.xml",
+				"spring-boot:run"
+			],
+			"isBackground": true
+		},
+		{
+			"label": "Run Backend Spring Boot 8081",
+			"type": "shell",
+			"command": "Backend\\mvnw.cmd",
+			"args": [
+				"-f",
+				"Backend\\pom.xml",
+				"spring-boot:run",
+				"-Dspring-boot.run.arguments=--server.port=8081"
+			],
+			"isBackground": true
+		},
+		{
+			"label": "Run Backend Spring Boot 8081 Cmd",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/c",
+				"Backend\\mvnw.cmd -f Backend\\pom.xml spring-boot:run \"-Dspring-boot.run.arguments=--server.port=8081\""
+			],
+			"isBackground": true
+		},
+		{
+			"label": "Inspect MySQL staff schema",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/c",
+				"mysql -uroot -pChimaroke135# -D coffee_shop -e \"SHOW CREATE TABLE staff; SHOW CREATE TABLE purchase_order;\""
+			]
+		},
+		{
+			"label": "Inspect MySQL schema quoted",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/c",
+				"mysql --user=root --password=\"Chimaroke135#\" --database=coffee_shop --execute=\"SHOW CREATE TABLE staff; SHOW CREATE TABLE purchase_order;\""
+			]
+		},
+		{
+			"label": "Inspect MySQL schema via env",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"$env:MYSQL_PWD='Chimaroke135#'; mysql -uroot -D coffee_shop -e \"SHOW CREATE TABLE staff; SHOW CREATE TABLE purchase_order;\""
+			]
+		},
+		{
+			"label": "Fix staff_id fk mismatch",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/v:on",
+				"/c",
+				"set MYSQL_PWD=Chimaroke135#&& mysql -uroot -D coffee_shop -e \"SET FOREIGN_KEY_CHECKS=0; ALTER TABLE purchase_order DROP FOREIGN KEY FK23upy3r934qc2vha9ydkko40d; ALTER TABLE staff MODIFY staff_id BIGINT NOT NULL AUTO_INCREMENT; ALTER TABLE purchase_order MODIFY staff_id BIGINT NULL; ALTER TABLE purchase_order ADD CONSTRAINT FK23upy3r934qc2vha9ydkko40d FOREIGN KEY (staff_id) REFERENCES staff(staff_id); SET FOREIGN_KEY_CHECKS=1;\""
+			]
+		},
+		{
+			"label": "Apply staff fk sql patch",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/v:on",
+				"/c",
+				"set MYSQL_PWD=Chimaroke135#&& mysql -uroot coffee_shop < Backend\\fix_staff_fk.sql"
+			]
+		},
+		{
+			"label": "Inspect actual staff fk",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/v:on",
+				"/c",
+				"set MYSQL_PWD=Chimaroke135#&& mysql -uroot coffee_shop < Backend\\inspect_staff_fk.sql"
+			]
+		},
+		{
+			"label": "Apply staff id type fix",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/v:on",
+				"/c",
+				"set MYSQL_PWD=Chimaroke135#&& mysql -uroot coffee_shop < Backend\\fix_staff_id_type.sql"
+			]
+		},
+		{
+			"label": "Inspect order_staff_relation",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/v:on",
+				"/c",
+				"set MYSQL_PWD=Chimaroke135#&& mysql -uroot coffee_shop < Backend\\inspect_order_staff_relation.sql"
+			]
+		},
+		{
+			"label": "Apply staff id and legacy fk fix",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/v:on",
+				"/c",
+				"set MYSQL_PWD=Chimaroke135#&& mysql -uroot coffee_shop < Backend\\fix_staff_id_with_legacy_fk.sql"
+			]
+		},
+		{
+			"label": "Run Backend verify FK fix",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/c",
+				"Backend\\mvnw.cmd -f Backend\\pom.xml spring-boot:run \"-Dspring-boot.run.arguments=--server.port=8081\""
+			],
+			"isBackground": true
+		},
+		{
+			"label": "Inspect customer fk mismatch",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/v:on",
+				"/c",
+				"set MYSQL_PWD=Chimaroke135#&& mysql -uroot coffee_shop < Backend\\inspect_customer_fk.sql"
+			]
+		},
+		{
+			"label": "Apply customer id fix",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/v:on",
+				"/c",
+				"set MYSQL_PWD=Chimaroke135#&& mysql -uroot coffee_shop < Backend\\fix_customer_id_with_legacy_fk.sql"
+			]
+		},
+		{
+			"label": "Kill process on 8081",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"$conn = Get-NetTCPConnection -LocalPort 8081 -State Listen -ErrorAction SilentlyContinue; if ($conn) { Stop-Process -Id $conn.OwningProcess -Force; Write-Output \"Killed process $($conn.OwningProcess) on 8081\" } else { Write-Output \"No process on 8081\" }"
+			]
+		},
+		{
+			"label": "Run Backend verify all fk fixes",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/c",
+				"Backend\\mvnw.cmd -f Backend\\pom.xml spring-boot:run \"-Dspring-boot.run.arguments=--server.port=8081\""
+			],
+			"isBackground": true
+		},
+		{
+			"label": "Inspect order_item fks",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/v:on",
+				"/c",
+				"set MYSQL_PWD=Chimaroke135#&& mysql -uroot coffee_shop < Backend\\inspect_order_item_fk.sql"
+			]
+		},
+		{
+			"label": "Apply order_item fk fix",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/v:on",
+				"/c",
+				"set MYSQL_PWD=Chimaroke135#&& mysql -uroot coffee_shop < Backend\\fix_order_item_purchase_fk.sql"
+			]
+		},
+		{
+			"label": "Kill 8081 again",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"$conn = Get-NetTCPConnection -LocalPort 8081 -State Listen -ErrorAction SilentlyContinue; if ($conn) { Stop-Process -Id $conn.OwningProcess -Force; Write-Output \"Killed process $($conn.OwningProcess) on 8081\" } else { Write-Output \"No process on 8081\" }"
+			]
+		},
+		{
+			"label": "Run Backend final verify",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/c",
+				"Backend\\mvnw.cmd -f Backend\\pom.xml spring-boot:run \"-Dspring-boot.run.arguments=--server.port=8081\""
+			],
+			"isBackground": true
+		},
+		{
+			"label": "Apply order_item menu type fk fix",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/v:on",
+				"/c",
+				"set MYSQL_PWD=Chimaroke135#&& mysql -uroot coffee_shop < Backend\\fix_order_item_menu_type_fk.sql"
+			]
+		},
+		{
+			"label": "Inspect menu_item_type schema",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/v:on",
+				"/c",
+				"set MYSQL_PWD=Chimaroke135#&& mysql -uroot coffee_shop < Backend\\inspect_menu_item_type.sql"
+			]
+		},
+		{
+			"label": "Inspect menu item schema",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/v:on",
+				"/c",
+				"set MYSQL_PWD=Chimaroke135#&& mysql -uroot coffee_shop < Backend\\inspect_menu_item.sql"
+			]
+		},
+		{
+			"label": "Apply menu id type fixes",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/v:on",
+				"/c",
+				"set MYSQL_PWD=Chimaroke135#&& mysql -uroot coffee_shop < Backend\\fix_menu_id_types.sql"
+			]
+		},
+		{
+			"label": "Apply menu id fixes retry",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/v:on",
+				"/c",
+				"set MYSQL_PWD=Chimaroke135#&& mysql -uroot coffee_shop < Backend\\fix_menu_id_types_retry.sql"
+			]
+		},
+		{
+			"label": "Kill 8081 final",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-NoProfile",
+				"-Command",
+				"$conn = Get-NetTCPConnection -LocalPort 8081 -State Listen -ErrorAction SilentlyContinue; if ($conn) { Stop-Process -Id $conn.OwningProcess -Force; Write-Output \"Killed process $($conn.OwningProcess) on 8081\" } else { Write-Output \"No process on 8081\" }"
+			]
+		},
+		{
+			"label": "Run Backend post-fix verify",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/c",
+				"Backend\\mvnw.cmd -f Backend\\pom.xml spring-boot:run \"-Dspring-boot.run.arguments=--server.port=8081\""
+			],
+			"isBackground": true
+		}
+	]
+}
