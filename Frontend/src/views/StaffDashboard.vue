@@ -1,5 +1,12 @@
 <template>
   <div class="staff-dashboard">
+
+    <div class="staff-greeting">
+      <div class="greeting-content">
+        <h2>Good day! Every cup you make brings a smile to someone!</h2>
+      </div>
+    </div>
+
     <h1>Kiosk Management Dashboard</h1>
     
     <div class="order-grid">
@@ -69,14 +76,10 @@
 <script setup>
 import { useCartStore } from '../store/cart';
 
-// Access the shared global state
+//Access the shared global state
 const cart = useCartStore();
 
-/**
- * Updates the status of a specific order.
- * @param {Number} id - The unique order ID.
- * @param {String} newStatus - The target status (e.g., 'Accepted', 'Ready').
- */
+//Update the status of a specific order
 const updateOrderStatus = (id, newStatus) => {
   const order = cart.orderHistory.find(o => o.id === id);
   if (order) {
@@ -91,6 +94,7 @@ const updateOrderStatus = (id, newStatus) => {
   padding: 20px;
   max-width: 800px;
   margin: 0 auto;
+
 }
 
 /* Order Card Styling */
@@ -101,6 +105,22 @@ const updateOrderStatus = (id, newStatus) => {
   margin-bottom: 20px; 
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.staff-greeting {
+  background: white;
+  border-left: 6px solid #6F4E37;
+  padding: 20px;
+  margin-bottom: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.greeting-content h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #4a3728;
+  font-style: italic; 
 }
 
 .order-header {
@@ -154,9 +174,7 @@ const updateOrderStatus = (id, newStatus) => {
   background-color: #e2e6ea;
 }
 
-/* Disabled State (Crucial for UI/UX)
-  Greys out buttons and changes cursor when action is not allowed.
-*/
+/* Disabled State */
 .status-actions button:disabled {
   background-color: #e9ecef !important;
   color: #adb5bd !important;
@@ -165,7 +183,7 @@ const updateOrderStatus = (id, newStatus) => {
   opacity: 0.8;
 }
 
-/* Optional: Status Text Colors */
+/* Status Text Colors */
 .status-indicator strong.pending { color: #f0ad4e; }
 .status-indicator strong.accepted { color: #28a745; }
 .status-indicator strong.cancelled { color: #dc3545; }

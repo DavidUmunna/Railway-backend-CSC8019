@@ -27,13 +27,15 @@
   </div>
 </template>
 
+
 <script setup>
+//Shopping cart page component
 import { useCartStore } from '../store/cart';
 
-// Access the centralized store
+//Access the centralized store for cart state and actions
 const cart = useCartStore();
 
-// Event emitted to App.vue to switch navigation tabs
+//Event emitted to App.vue to switch navigation tabs
 defineEmits(['changeTab']);
 </script>
 

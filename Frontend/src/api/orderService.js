@@ -2,29 +2,29 @@ import axios from 'axios';
 
 // Base configuration for Axios
 const apiClient = axios.create({
-  baseURL: '/api', // This should match your backend server address
+  baseURL: '/api', 
   headers: {
     'Content-Type': 'application/json'
   }
 });
 
 export default {
-  // Get the coffee menu from backend [cite: 9]
+  //Fetch the full coffee menu.
   getMenu() {
     return apiClient.get('/menu');
   },
   
-  // Submit a new order [cite: 11, 12]
+  //Submit a new order
   createOrder(orderData) {
     return apiClient.post('/orders', orderData);
   },
 
-  // Get all orders (for Staff Dashboard) [cite: 13]
+  //Get all orders for staff dashboard
   getAllOrders() {
     return apiClient.get('/orders');
   },
 
-  // Update order status (Staff Action) 
+  //Update order status
   updateOrderStatus(orderId, status) {
     return apiClient.patch(`/orders/${orderId}/status`, { status });
   }

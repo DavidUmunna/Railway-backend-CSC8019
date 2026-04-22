@@ -19,7 +19,9 @@
 </template>
 
 <script setup>
+//Component Props
 defineProps(['activeTab', 'cartCount']);
+//Component Emits
 defineEmits(['changeTab', 'toggleCart']);
 </script>
 
@@ -35,5 +37,6 @@ defineEmits(['changeTab', 'toggleCart']);
   border-top: 1px solid #ddd;
 }
 .bottom-nav button { flex: 1; border: none; background: none; }
+/* Primary brand color for the active state */
 .bottom-nav button.active { color: #6F4E37; font-weight: bold; }
 </style>

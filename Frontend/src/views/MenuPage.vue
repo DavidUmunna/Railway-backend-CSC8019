@@ -26,10 +26,7 @@
 <script setup>
 import { useCartStore } from '../store/cart';
 
-/**
- * Menu data mock-up.
- * 'largePrice' is null if the large size is unavailable for a specific item.
- */
+//Menu data 
 const menuData = [
   { id: 1, name: 'Americano', regularPrice: 1.50, largePrice: 2.00 },
   { id: 2, name: 'Americano with milk', regularPrice: 2.00, largePrice: 2.50 },
@@ -40,21 +37,17 @@ const menuData = [
   { id: 7, name: 'Mineral Water', regularPrice: 1.00, largePrice: null }
 ];
 
-// Initialize Pinia store to manage cart state
+//Initialize Pinia store to manage cart state
 const cart = useCartStore();
 
-/**
- * Handles the 'Add to Cart' action.
- * @param {Object} item - The product being added.
- * @param {String} size - Selected size ('Regular' or 'Large').
- */
+//Handles the 'Add to Cart' action.
 const handleAdd = (item, size) => {
   cart.addToCart(item, size);
 };
 </script>
 
 <style scoped>
-/* Base container style: horizontal layout for desktop */
+/* Base container style */
 .coffee-card { 
   display: flex; 
   justify-content: space-between; 
@@ -82,7 +75,7 @@ const handleAdd = (item, size) => {
   background: #503928;
 }
 
-/* Responsive layout: switch to vertical stack for small screens */
+/* Responsive layout */
 @media (max-width: 480px) {
   .coffee-card {
     flex-direction: column; 

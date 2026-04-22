@@ -43,13 +43,13 @@
 import { ref } from 'vue';
 import { useCartStore } from '../store/cart';
 
-// Access the shared cart state
+//Access the shared cart state
 const cart = useCartStore();
 
-// Local state for the selected time
+//Local state for the selected time
 const selectedTime = ref('');
 
-// Define the event to tell App.vue to switch tabs
+//Define the event to tell App.vue to switch tabs
 const emit = defineEmits(['changeTab']);
 
 /**
@@ -57,23 +57,23 @@ const emit = defineEmits(['changeTab']);
  * Ensures the cart is not empty and a pick-up time is selected.
  */
 const handleConfirm = () => {
-  // 1. Check for empty cart
+  //Check for empty cart
   if (cart.items.length === 0) {
     alert('Your cart is empty. Please add items before placing an order.');
     return;
   }
 
-  // 2. Check for missing pick-up time
+  //Check for missing pick-up time
   if (!selectedTime.value) {
     alert('Please select a pick-up time!');
     return;
   }
   
-  // 3. Update store with time and submit order
+  //Update store with time and submit order
   cart.selectedTime = selectedTime.value;
   cart.submitOrder(); 
   
-  // 4. Feedback and navigation
+  //Feedback and navigation
   alert('Order placed successfully!');
   emit('changeTab', 'orders');
 };

@@ -10,7 +10,8 @@
 
 <style scoped>
 .header-bar {
-  background-color: #4a3728; /* Coffee brown */
+  /* Coffee-themed dark brown background */
+  background-color: #4a3728;
   color: #f4ece2;
   padding: 1rem;
   text-align: center;

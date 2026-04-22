@@ -15,8 +15,8 @@ body {
 
 .main-content {
   padding: 15px;
-  padding-bottom: 80px; /* Space for BottomNav */
-  max-width: 600px; /* Mobile centric view  */
+  padding-bottom: 80px; 
+  max-width: 600px; 
   margin: 0 auto;
 }
 
@@ -29,7 +29,6 @@ button:active {
   opacity: 0.7;
 }
 
-/* Status colors based on brief requirements [cite: 16] */
 .status-accepted { color: #2196F3; }
 .status-in-progress { color: #FF9800; }
 .status-ready { color: #4CAF50; font-weight: bold; }

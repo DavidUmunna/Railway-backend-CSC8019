@@ -29,7 +29,7 @@
 <script setup>
 import { useCartStore } from '../store/cart';
 
-// Access the centralized cart store
+//Access the centralized cart store
 const cart = useCartStore();
 </script>
 
@@ -50,8 +50,6 @@ const cart = useCartStore();
 .details { font-size: 0.9rem; color: #555; }
 .item-list { margin: 5px 0 0 0; padding-left: 20px; }
 .empty-state { text-align: center; margin-top: 50px; color: #888; }
-
-/* Status-specific color coding */
 .status-confirmed { color: green; font-weight: bold; }
 .status-in_progress { color: orange; font-weight: bold; }
 .status-cancelled { color: red; font-weight: bold; }
