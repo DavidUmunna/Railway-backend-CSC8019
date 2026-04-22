@@ -312,10 +312,10 @@ class PurchaseOrderControllerTests {
             Station station = saveTestStation();
 
             MenuItem latte = menuItemRepository.save(new MenuItem("Latte", "Espresso with steamed milk", true));
-            MenuItemType regLatte = menuItemTypeRepository.save(new MenuItemType(latte, MenuItemSize.REGULAR, 2.50, true));
+            MenuItemType regLatte = menuItemTypeRepository.save(new MenuItemType(latte, MenuItemSize.Regular, 2.50, true));
             
             MenuItem americano = menuItemRepository.save(new MenuItem("Americano", "Espresso with boiled water", true));
-            MenuItemType regAmericano = menuItemTypeRepository.save(new MenuItemType(americano, MenuItemSize.REGULAR, 1.50, true));
+            MenuItemType regAmericano = menuItemTypeRepository.save(new MenuItemType(americano, MenuItemSize.Regular, 1.50, true));
 
             int latteQuantity = 1;
             int americanoQuantity = 2;
@@ -888,8 +888,8 @@ class PurchaseOrderControllerTests {
      */
     private MenuItemType saveTestMenuItemType() {
         MenuItem latte = menuItemRepository.save(new MenuItem("Latte", "Espresso with steamed milk", true));
-        MenuItemType regular = menuItemTypeRepository.save(new MenuItemType(latte, MenuItemSize.REGULAR, 2.50, true));
-        menuItemTypeRepository.save(new MenuItemType(latte, MenuItemSize.LARGE, 3.00, true));
+        MenuItemType regular = menuItemTypeRepository.save(new MenuItemType(latte, MenuItemSize.Regular, 2.50, true));
+        menuItemTypeRepository.save(new MenuItemType(latte, MenuItemSize.Large, 3.00, true));
         return regular;
     }
 
