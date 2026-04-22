@@ -14,15 +14,34 @@ import org.springframework.stereotype.Component;
  * added component annotation to enable automatic execution on application startup
  */
 @Component
+/**
+ * Seeds the database with initial menu items and their size variants on application startup.
+ * Only inserts data if the menu item table is empty.
+ * @author Kulagina Tatiana
+ * @version 1.0
+ * @since 2026-04-18
+ */
 public class MenuItemDataLoader implements CommandLineRunner {
     private final MenuItemRepository menuItemRepository;
     private final MenuItemTypeRepository menuItemTypeRepository;
 
+    /**
+     * Constructs the data loader with the required repositories.
+     *
+     * @param menuItemRepository     the repository for menu item entities
+     * @param menuItemTypeRepository the repository for menu item type entities
+     */
     public MenuItemDataLoader(MenuItemRepository menuItemRepository, MenuItemTypeRepository menuItemTypeRepository) {
         this.menuItemRepository = menuItemRepository;
         this.menuItemTypeRepository = menuItemTypeRepository;
     }
 
+    /**
+     * Seeds the database with predefined menu items and their size variants.
+     * Only inserts data if the menu item table is currently empty.
+     *
+     * @param args application startup arguments (unused)
+     */
     @Override
     public void run(String... args) {
         if (menuItemRepository.count() > 0) {

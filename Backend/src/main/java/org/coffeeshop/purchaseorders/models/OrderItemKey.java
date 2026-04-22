@@ -4,25 +4,33 @@ import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * Composite primary key for {@link OrderItem}, consisting of
+ * a purchase order ID and a menu item type ID.
+ * Implements {@code Serializable} as required by JPA for composite keys.
+ * @author Kulagina Tatiana
+ * @version 1.0
+ * @since 2026-04-18
+ */
 @Embeddable
 public class OrderItemKey implements Serializable {
+    /** The ID of the parent purchase order. */
     private Long purchaseOrderId;
+
+    /** The ID of the associated menu item type. */
     private Long menuItemTypeId;
 
+    /** No-arg constructor required by JPA. */
     protected OrderItemKey() {}
 
+    /**
+     * Constructs a composite key from the given IDs.
+     *
+     * @param purchaseOrderId the purchase order ID
+     * @param menuItemTypeId  the menu item type ID
+     */
     public OrderItemKey(Long purchaseOrderId, Long menuItemTypeId) {
         this.purchaseOrderId = purchaseOrderId;
-        this.menuItemTypeId = menuItemTypeId;
-    }
-
-    // not sure if these setters are needed or removed
-    // TODO write tests and decide
-    public void setPurchaseOrderId(Long purchaseOrderId) {
-        this.purchaseOrderId = purchaseOrderId;
-    }
-
-    public void setMenuItemTypeId(Long menuItemTypeId) {
         this.menuItemTypeId = menuItemTypeId;
     }
 

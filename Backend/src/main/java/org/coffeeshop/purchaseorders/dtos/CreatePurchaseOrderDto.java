@@ -6,6 +6,18 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalTime;
 import java.util.List;
 
+/**
+ * Request DTO for creating a new purchase order.
+ * Contains customer and station references, pickup time, and a list of order items.
+ *
+ * @param customerId  the ID of the customer placing the order (must not be null)
+ * @param stationId   the ID of the station preparing the order (must not be null)
+ * @param pickupTime  the requested pickup time (must not be null)
+ * @param orderItems  the list of order items (must not be empty, each item validated)
+ * @author Kulagina Tatiana
+ * @version 1.0
+ * @since 2026-04-18
+ */
 public record CreatePurchaseOrderDto(
         @NotNull Long customerId,
         @NotNull Long stationId,

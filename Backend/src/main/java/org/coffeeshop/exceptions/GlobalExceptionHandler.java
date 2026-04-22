@@ -1,7 +1,7 @@
 package org.coffeeshop.exceptions;
 
 import jakarta.persistence.EntityNotFoundException;
-
+import org.coffeeshop.exceptions.purchaseorderexceptions.InvalidOrderStatusTransition;
 import org.coffeeshop.exceptions.userexceptions.CustomerServiceException;
 import org.coffeeshop.exceptions.userexceptions.StaffServiceException;
 import org.springframework.http.HttpStatus;
@@ -19,6 +19,10 @@ import java.util.NoSuchElementException;
 /**
  * this is the global exceptin handler for the whistlestop coffee shop application
  * it is responsible for handling exceptions thrown by the servce and controller layers
+ * @author Umunna David
+ * @version 1.0
+ * @modified Kulagina Tatiana
+ * @since 2026-04-19
 */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -92,5 +96,14 @@ public class GlobalExceptionHandler {
      @ExceptionHandler({EntityNotFoundException.class, NoSuchElementException.class})
     public ResponseEntity<Map<String, String>> handleNotFound(RuntimeException ex) {
         return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+    
+    /**
+     * Handles InvalidOrderStatusTransition, which indicate that a requested order status transition is prohibited.
+     * Returns a 409 Conflict response with the exception message.
+     */
+    @ExceptionHandler(InvalidOrderStatusTransition.class)
+    public ResponseEntity<Map<String, String>> handleInvalidTransition(InvalidOrderStatusTransition ex) {
+        return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
     }
 }
