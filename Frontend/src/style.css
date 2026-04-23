@@ -23,6 +23,11 @@ body {
   min-width: 320px;
   min-height: 100vh;
   background-color: var(--paper);
+  background-image: url('./assets/background2.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
   color: var(--text-dark);
 }
 

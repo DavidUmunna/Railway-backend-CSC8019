@@ -106,16 +106,6 @@ const handleCheckout = () => {
 </script>
 
 <style>
-/* Global Styles */
-body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Inter', sans-serif;
-  background-color: #fdfaf8;
-  background-image: radial-gradient(#d7ccc8 1px, transparent 1px);
-  background-size: 20px 20px;
-}
-
 .app-wrapper {
   background: rgba(255, 255, 255, 0.95); 
   min-height: 100vh;
