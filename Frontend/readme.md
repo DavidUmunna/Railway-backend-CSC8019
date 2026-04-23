@@ -1,85 +1,63 @@
-# Vue 3 + Vite
-
 Whistlestop Coffee - Frontend Prototype
-Project Overview:
-A mobile-optimized web application for coffee ordering at Cramlington Station, built with Vue.js.
+CSC8019 Project | Vue 3 + Vite
 
-Project Structure:
+A mobile-optimized web application designed for seamless coffee ordering at Cramlington Station. This prototype focuses on a fast, intuitive user experience for commuters.
 
-src/App.vue: Main entry point, manages global state (Cart, Orders, Navigation).
+Project Overview
+This is the frontend implementation of the Whistlestop Coffee ordering system. It features a reactive menu, persistent shopping cart (via Pinia), and a dedicated dashboard for station staff to manage incoming orders.
 
-src/components/: Reusable UI elements (HeaderBar.vue, BottomNav.vue).
+Project Structure
+The source code is organized as follows:
 
-src/views/: Main pages (MenuPage.vue, OrdersPage.vue, CartPage.vue).
+src/App.vue: The root component. Orchestrates high-level navigation and coordinates between different views.
 
-src/assets/: Static resources like images or global styles.
+src/components/: Houses reusable UI building blocks (e.g., HeaderBar.vue, BottomNav.vue).
 
-How to Run the Project:
+src/views/: Contains the main page views:
 
-Install Environment:
-Ensure Node.js is installed on your computer.
+MenuPage.vue: Browse and select coffee.
 
-Install Dependencies:
-Open the project folder in your terminal and run:
+CartPage.vue: Manage selected items.
+
+CheckoutPage.vue: Finalize and place orders.
+
+OrdersPage.vue: User order history.
+
+StaffDashboard.vue: Administrative interface.
+
+src/store/: Centralized state management using Pinia .
+
+src/assets/: Static assets including background image.
+
+How to Run the Project
+1. Prerequisites
+
+Ensure you have Node.js installed on your machine.
+
+2. Installation
+
+Open your terminal in the project root folder and run:
+
 npm install
 
-Start Development Server:
-Run the following command:
+3. Start Development Server
+
+Launch the Vite development environment:
+
 npm run dev
 
-Access the App:
-Open your browser and navigate to the local URL provided in the terminal (default is http://localhost:5173).
+4. Access the App
 
-Notes for Reviewers:
+Open your browser to the URL provided in the terminal:
 
-The UI is designed for mobile screens. Please use the browser's "Inspect" tool and switch to "Responsive/Mobile" view for the best experience.
+Default: http://localhost:5173
 
-Current data is mocked. Backend integration will follow once API documentation is finalized.
+🛠 Tech Stack
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+Framework: Vue 3 
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
-# CSC8019
-# Vue 3 + Vite
+Build Tool: Vite
 
-Whistlestop Coffee - Frontend Prototype
-Project Overview:
-A mobile-optimized web application for coffee ordering at Cramlington Station, built with Vue.js.
+State Management: Pinia
 
-Project Structure:
-
-
-src/App.vue: Main entry point, manages global state (Cart, Orders, Navigation).
-
-src/components/: Reusable UI elements (HeaderBar.vue, BottomNav.vue).
-
-src/views/: Main pages (MenuPage.vue, OrdersPage.vue, CartPage.vue).
-
-src/assets/: Static resources like images or global styles.
-
-How to Run the Project:
-
-Install Environment:
-Ensure Node.js is installed on your computer.
-
-Install Dependencies:
-Open the project folder in your terminal and run:
-npm install
-
-Start Development Server:
-Run the following command:
-npm run dev
-
-Access the App:
-Open your browser and navigate to the local URL provided in the terminal (default is http://localhost:5173).
-
-Notes for Reviewers:
-
-The UI is designed for mobile screens. Please use the browser's "Inspect" tool and switch to "Responsive/Mobile" view for the best experience.
-
-Current data is mocked. Backend integration will follow once API documentation is finalized.
-
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
-
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
-# CSC8019
+Styles: Scoped CSS with a focus on responsive layouts.
