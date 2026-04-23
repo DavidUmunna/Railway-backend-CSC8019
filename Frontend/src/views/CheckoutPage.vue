@@ -2,14 +2,14 @@
   <div class="checkout-page">
     <h2>Order Summary</h2>
     
-    <div v-if="cart.items.length > 0" class="order-details">
-      <div v-for="item in cart.items" :key="item.id + item.size" class="order-item">
-        <span>{{ item.name }} ({{ item.size }}) x {{ item.quantity }}</span>
-        <span>£{{ (item.price * item.quantity).toFixed(2) }}</span>
+    <div v-if="cart.length > 0" class="order-details">
+      <div v-for="(item, index) in cart" :key="index" class="order-item">
+        <span>{{ item.name }} ({{ item.size }})</span>
+        <span>£{{ item.price.toFixed(2) }}</span>
       </div>
       
       <div class="total-price">
-        <strong>Total: £{{ cart.totalPrice.toFixed(2) }}</strong>
+        <strong>Total: £{{ cartTotal.toFixed(2) }}</strong>
       </div>
     </div>
 
@@ -25,13 +25,13 @@
         id="time" 
         v-model="selectedTime" 
         class="time-input" 
-        :disabled="cart.items.length === 0"
+        :disabled="cart.length === 0"
       />
       
       <button 
         @click="handleConfirm" 
         class="confirm-btn" 
-        :disabled="cart.items.length === 0"
+        :disabled="cart.length === 0"
       >
         Confirm Order
       </button>
@@ -40,25 +40,25 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useCartStore } from '../store/cart';
+import { ref, computed } from 'vue';
 
-// Access the shared cart state
-const cart = useCartStore();
+defineProps({
+  cart: {
+    type: Array,
+    default: () => []
+  }
+});
 
-// Local state for the selected time
-const selectedTime = ref('');
-
-// Define the event to tell App.vue to switch tabs
 const emit = defineEmits(['changeTab']);
 
-/**
- * Validates and finalizes the order.
- * Ensures the cart is not empty and a pick-up time is selected.
- */
+const selectedTime = ref('');
+const cartTotal = computed(() => {
+  return (Array.isArray(cart) ? cart : []).reduce((sum, item) => sum + (item.price || 0), 0);
+});
+
 const handleConfirm = () => {
   // 1. Check for empty cart
-  if (cart.items.length === 0) {
+  if (cart.length === 0) {
     alert('Your cart is empty. Please add items before placing an order.');
     return;
   }
@@ -69,12 +69,8 @@ const handleConfirm = () => {
     return;
   }
   
-  // 3. Update store with time and submit order
-  cart.selectedTime = selectedTime.value;
-  cart.submitOrder(); 
-  
-  // 4. Feedback and navigation
-  alert('Order placed successfully!');
+  // 3. Feedback and navigation
+  alert(`Order confirmed for pickup at ${selectedTime.value}`);
   emit('changeTab', 'orders');
 };
 </script>
@@ -109,49 +105,70 @@ const handleConfirm = () => {
   padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
+  font-weight: 600;
+}
+
+.go-back-btn:hover {
+  background: #6F4E37;
+  color: white;
 }
 
 .order-item { 
   display: flex; 
   justify-content: space-between; 
-  padding: 5px 0; 
+  padding: 10px 0; 
+  border-bottom: 1px solid #eee;
 }
 
 .total-price { 
   border-top: 2px solid #ddd; 
   margin-top: 10px; 
   padding-top: 10px; 
-  text-align: right; 
+  text-align: right;
+  font-size: 1.2rem;
 }
 
 .checkout-actions { 
   display: flex; 
   flex-direction: column; 
-  gap: 10px; 
+  gap: 15px; 
+  margin-top: 20px;
+}
+
+.checkout-actions label {
+  font-weight: 600;
+  color: #3e2723;
 }
 
 .time-input { 
-  padding: 10px; 
+  padding: 12px; 
   font-size: 1rem; 
-  border: 1px solid #ccc; 
-  border-radius: 4px; 
+  border: 2px solid #ddd; 
+  border-radius: 8px;
+  transition: border-color 0.2s;
+}
+
+.time-input:focus {
+  outline: none;
+  border-color: #6F4E37;
 }
 
 .confirm-btn { 
   background: #6F4E37; 
   color: white; 
   border: none; 
-  padding: 12px; 
-  border-radius: 6px; 
+  padding: 14px; 
+  border-radius: 8px; 
   cursor: pointer; 
-  font-size: 1.1rem; 
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: background-color 0.2s;
 }
 
 .confirm-btn:hover:not(:disabled) { 
   background: #503928; 
 }
 
-/* UI for disabled state */
 .confirm-btn:disabled, .time-input:disabled {
   background-color: #ccc;
   cursor: not-allowed;

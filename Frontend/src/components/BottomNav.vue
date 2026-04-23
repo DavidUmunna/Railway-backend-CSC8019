@@ -1,20 +1,21 @@
 <template>
   <nav class="bottom-nav">
-    <button :class="{ active: activeTab === 'menu' }" @click="$emit('changeTab', 'menu')">
-      <span>Menu</span>
-    </button>
-    
-    <button @click="$emit('toggleCart')">
-      <span>Cart ({{ cartCount }})</span>
-    </button>
-
-    <button :class="{ active: activeTab === 'orders' }" @click="$emit('changeTab', 'orders')">
-      <span>My Orders</span>
-    </button>
-
-    <button :class="{ active: activeTab === 'staff' }" @click="$emit('changeTab', 'staff')">
-      <span>Staff</span>
-    </button>
+    <div class="nav-content">
+      <button @click="$emit('changeTab', 'menu')" :class="{ active: activeTab === 'menu' }">
+        Menu
+      </button>
+      <button @click="$emit('changeTab', 'orders')" :class="{ active: activeTab === 'orders' }">
+        Orders
+      </button>
+      
+      <div v-if="cartCount > 0" class="cart-badge" @click="$emit('toggleCart')">
+        🛒 {{ cartCount }}
+      </div>
+      
+      <button @click="$emit('changeTab', 'staff')" :class="{ active: activeTab === 'staff' }">
+        Staff
+      </button>
+    </div>
   </nav>
 </template>
 
@@ -27,13 +28,54 @@ defineEmits(['changeTab', 'toggleCart']);
 .bottom-nav {
   position: fixed;
   bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-top: 1px solid #eee;
+  z-index: 900;
   width: 100%;
-  height: 60px;
+}
+
+.nav-content {
+  max-width: 800px;
+  margin: 0 auto;
+  height: 70px;
   display: flex;
   justify-content: space-around;
-  background: #fff;
-  border-top: 1px solid #ddd;
+  align-items: center;
 }
-.bottom-nav button { flex: 1; border: none; background: none; }
-.bottom-nav button.active { color: #6F4E37; font-weight: bold; }
+
+button {
+  border: none;
+  background: none;
+  font-size: 1rem;
+  color: #8d6e63;
+  cursor: pointer;
+  padding: 10px;
+  transition: 0.2s;
+}
+
+button:hover {
+  color: #3e2723;
+}
+
+button.active {
+  color: #3e2723;
+  font-weight: 800;
+  border-bottom: 3px solid #ffab40;
+}
+
+.cart-badge {
+  background: #3e2723;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.cart-badge:hover {
+  background: #6F4E37;
+}
 </style>

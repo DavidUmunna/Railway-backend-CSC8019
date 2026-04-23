@@ -1,36 +1,64 @@
-/* Custom coffee-themed palette */
 :root {
-  --primary-coffee: #6F4E37;
-  --light-cream: #F5F5DC;
-  --text-dark: #2C1B10;
+  --primary-coffee: #6f4e37;
+  --coffee-dark: #3e2723;
+  --light-cream: #f5f5dc;
+  --text-dark: #2c1b10;
+  --paper: #fdfaf8;
+
+  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  background-color: #fafafa;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: var(--paper);
   color: var(--text-dark);
-  -webkit-font-smoothing: antialiased;
 }
 
-.main-content {
-  padding: 15px;
-  padding-bottom: 80px; /* Space for BottomNav */
-  max-width: 600px; /* Mobile centric view  */
-  margin: 0 auto;
+#app {
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
 }
 
 button {
   cursor: pointer;
-  transition: opacity 0.2s;
+  font-family: inherit;
+  transition: opacity 0.2s ease;
 }
 
 button:active {
-  opacity: 0.7;
+  opacity: 0.85;
 }
 
-/* Status colors based on brief requirements [cite: 16] */
-.status-accepted { color: #2196F3; }
-.status-in-progress { color: #FF9800; }
-.status-ready { color: #4CAF50; font-weight: bold; }
-.status-cancelled { color: #F44336; }
+/* Shared status utility colors */
+.status-accepted {
+  color: #ef6c00;
+}
+
+.status-in-progress {
+  color: #c2185b;
+}
+
+.status-ready {
+  color: #2e7d32;
+  font-weight: 700;
+}
+
+.status-cancelled {
+  color: #c62828;
+}

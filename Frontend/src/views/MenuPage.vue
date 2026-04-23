@@ -1,96 +1,129 @@
 <template>
-  <div class="menu-page">
-    <div v-for="item in menuData" :key="item.id" class="coffee-card">
-      
-      <div class="info">
-        <h3>{{ item.name }}</h3>
-        <p>
-          Regular: £{{ item.regularPrice.toFixed(2) }}
-          <template v-if="item.largePrice">
-             | Large: £{{ item.largePrice.toFixed(2) }}
-          </template>
-        </p>
+  <div class="page-container">
+    <div class="location-tag">Cramlington Station</div>
+    
+    <div class="menu-list">
+      <div v-for="item in menuItems" :key="item.id" class="item-card">
+        <div class="info">
+          <span class="item-name">{{ item.name }}</span>
+        </div>
+        
+        <div class="button-group">
+          <button @click="$emit('addToCart', item, 'Regular')" class="price-btn">
+            <span class="size">Reg</span>
+            <span class="price">£{{ item.regPrice.toFixed(2) }}</span>
+          </button>
+          
+          <button v-if="item.largePrice" @click="$emit('addToCart', item, 'Large')" class="price-btn">
+            <span class="size">Large</span>
+            <span class="price">£{{ item.largePrice.toFixed(2) }}</span>
+          </button>
+        </div>
       </div>
-
-      <div class="actions">
-        <button @click="handleAdd(item, 'Regular')">Add Reg</button>
-        <button v-if="item.largePrice" @click="handleAdd(item, 'Large')">
-          Add Large
-        </button>
-      </div>
-      
     </div>
   </div>
 </template>
 
 <script setup>
-import { useCartStore } from '../store/cart';
+// Props for menu data passed from main App state
+defineProps({
+  menuItems: {
+    type: Array,
+    required: true
+  }
+});
 
-/**
- * Menu data mock-up.
- * 'largePrice' is null if the large size is unavailable for a specific item.
- */
-const menuData = [
-  { id: 1, name: 'Americano', regularPrice: 1.50, largePrice: 2.00 },
-  { id: 2, name: 'Americano with milk', regularPrice: 2.00, largePrice: 2.50 },
-  { id: 3, name: 'Latte', regularPrice: 2.50, largePrice: 3.00 },
-  { id: 4, name: 'Cappuccino', regularPrice: 2.50, largePrice: 3.00 },
-  { id: 5, name: 'Hot Chocolate', regularPrice: 2.00, largePrice: 2.50 },
-  { id: 6, name: 'Mocha', regularPrice: 2.50, largePrice: 3.00 },
-  { id: 7, name: 'Mineral Water', regularPrice: 1.00, largePrice: null }
-];
-
-// Initialize Pinia store to manage cart state
-const cart = useCartStore();
-
-/**
- * Handles the 'Add to Cart' action.
- * @param {Object} item - The product being added.
- * @param {String} size - Selected size ('Regular' or 'Large').
- */
-const handleAdd = (item, size) => {
-  cart.addToCart(item, size);
-};
+defineEmits(['addToCart']);
 </script>
 
 <style scoped>
-/* Base container style: horizontal layout for desktop */
-.coffee-card { 
-  display: flex; 
-  justify-content: space-between; 
-  align-items: center; 
-  padding: 15px; 
-  border-bottom: 1px solid #eee; 
+.page-container { 
+  padding: 20px 0; 
 }
 
-.actions {
+.location-tag { 
+  text-align: center; 
+  color: #8d6e63; 
+  margin-bottom: 20px; 
+  font-weight: bold; 
+}
+
+.menu-list {
   display: flex;
-  gap: 8px;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.actions button { 
-  background: #6F4E37; 
-  color: white; 
-  border: none; 
-  padding: 8px 12px; 
-  border-radius: 4px; 
+.item-card {
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  border-bottom: 1px solid #eee;
+}
+
+.info {
+  flex: 1;
+}
+
+.item-name { 
+  font-weight: 700; 
+  color: #3e2723; 
+  font-size: 1rem;
+}
+
+.button-group { 
+  display: flex; 
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.price-btn {
+  border: 1.5px solid #d7ccc8;
+  background: #fdfaf9;
+  border-radius: 10px;
+  padding: 8px 12px;
   cursor: pointer;
-  white-space: nowrap;
+  transition: 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
 }
 
-.actions button:hover {
-  background: #503928;
+.price-btn:hover {
+  background: #f5f1f0;
+  border-color: #8d6e63;
+}
+
+.price-btn:active { 
+  transform: scale(0.95); 
+}
+
+.size { 
+  display: block; 
+  font-size: 0.7rem; 
+  color: #a1887f;
+  font-weight: 600;
+}
+
+.price { 
+  font-weight: 800;
+  color: #6F4E37;
 }
 
 /* Responsive layout: switch to vertical stack for small screens */
 @media (max-width: 480px) {
-  .coffee-card {
-    flex-direction: column; 
-    align-items: flex-start; 
-    gap: 10px;
+  .item-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
   }
 
-  .actions {
+  .button-group {
     width: 100%;
     justify-content: flex-start;
   }
