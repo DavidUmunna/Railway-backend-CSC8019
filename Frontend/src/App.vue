@@ -20,6 +20,7 @@
       
       <CheckoutPage 
         v-if="activeTab === 'checkout'" 
+        :cart="currentCart"
         @changeTab="tab => activeTab = tab" 
       />
       
@@ -42,17 +43,15 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { useCartStore } from './store/cart';
+//Import Layout Components
 import HeaderBar from './components/HeaderBar.vue';
 import BottomNav from './components/BottomNav.vue';
+//Import View Components
 import MenuPage from './views/MenuPage.vue';
 import CartPage from './views/CartPage.vue';
 import CheckoutPage from './views/CheckoutPage.vue';
 import OrdersPage from './views/OrdersPage.vue';
 import StaffDashboard from './views/StaffDashboard.vue';
-
-// Pinia store
-const cart = useCartStore();
 
 // App state - combining both versions
 const activeTab = ref('menu');

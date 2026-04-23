@@ -20,7 +20,9 @@
 </template>
 
 <script setup>
+//Component Props
 defineProps(['activeTab', 'cartCount']);
+//Component Emits
 defineEmits(['changeTab', 'toggleCart']);
 </script>
 

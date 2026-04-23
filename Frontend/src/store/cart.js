@@ -2,27 +2,25 @@ import { defineStore } from 'pinia';
 
 /**
  * Cart Store for Whistlestop Coffee Hut
- * Manages coffee selection, sizes (Regular/Large), pick-up time, and order history.
+ * Manages coffee selection, sizes, pick-up time, and order history.
  */
 export const useCartStore = defineStore('cart', {
   state: () => ({
-    items: [],            // Format: { id, name, size, price, quantity }
-    selectedTime: '',     // Pick-up time selected by the customer
-    orderHistory: [],     // Archive for completed orders
+    items: [],            
+    selectedTime: '',    
+    orderHistory: [],     
   }),
   
   getters: {
-    // Calculates the total price of all items currently in the cart
+    //Calculates the total price of all items currently in the cart
     totalPrice: (state) => state.items.reduce((sum, item) => sum + (item.price * item.quantity), 0),
     
-    // Calculates total count of items in the cart
+    //Calculates total count of items in the cart
     totalCount: (state) => state.items.reduce((sum, item) => sum + item.quantity, 0),
   },
 
   actions: {
-    /**
-     * Adds a coffee item to the cart or increments quantity if it exists.
-     */
+    //Add a coffee item to the cart or increments quantity if it exists.
     addToCart(product, size) {
       const price = size === 'Large' ? product.largePrice : product.regularPrice;
       const existing = this.items.find(i => i.id === product.id && i.size === size);
@@ -40,9 +38,7 @@ export const useCartStore = defineStore('cart', {
       }
     },
 
-    /**
-     * Increments the quantity of a specific cart item.
-     */
+    //Increment the quantity of a specific cart item.
     increment(item) {
       item.quantity++;
     },
@@ -71,8 +67,8 @@ export const useCartStore = defineStore('cart', {
 
     /**
      * Finalizes the order: 
-     * 1. Saves current cart to orderHistory.
-     * 2. Clears the current cart for the next order.
+     * Saves current cart to orderHistory.
+     * Clears the current cart for the next order.
      */
     submitOrder() {
       const newOrder = {
@@ -80,7 +76,8 @@ export const useCartStore = defineStore('cart', {
         items: [...this.items], 
         total: this.totalPrice,
         time: this.selectedTime,
-        status: 'Pending' // Initial status for staff dashboard
+        // Initial status for staff dashboard
+        status: 'Pending' 
       };
       
       this.orderHistory.push(newOrder);
@@ -88,7 +85,7 @@ export const useCartStore = defineStore('cart', {
     },
 
     /**
-     * Updates the status of an order to 'Ready' for staff tracking.
+     * Updates the status of an order to Ready for staff tracking.
      */
     markAsReady(orderId) {
       const order = this.orderHistory.find(o => o.id === orderId);
@@ -98,7 +95,7 @@ export const useCartStore = defineStore('cart', {
     },
 
     /**
-     * Clears cart items and resets selection state.
+     * Clear cart items and resets selection state.
      */
     clearCart() {
       this.items = [];

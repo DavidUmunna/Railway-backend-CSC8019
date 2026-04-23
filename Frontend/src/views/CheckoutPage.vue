@@ -42,34 +42,31 @@
 <script setup>
 import { ref, computed } from 'vue';
 
-defineProps({
+const props = defineProps({
   cart: {
     type: Array,
     default: () => []
   }
 });
-
 const emit = defineEmits(['changeTab']);
 
 const selectedTime = ref('');
 const cartTotal = computed(() => {
-  return (Array.isArray(cart) ? cart : []).reduce((sum, item) => sum + (item.price || 0), 0);
+  return props.cart.reduce((sum, item) => sum + (item.price || 0), 0);
 });
 
 const handleConfirm = () => {
-  // 1. Check for empty cart
-  if (cart.length === 0) {
+  if (props.cart.length === 0) {
     alert('Your cart is empty. Please add items before placing an order.');
     return;
   }
 
-  // 2. Check for missing pick-up time
+  //Check for missing pick-up time
   if (!selectedTime.value) {
     alert('Please select a pick-up time!');
     return;
   }
   
-  // 3. Feedback and navigation
   alert(`Order confirmed for pickup at ${selectedTime.value}`);
   emit('changeTab', 'orders');
 };

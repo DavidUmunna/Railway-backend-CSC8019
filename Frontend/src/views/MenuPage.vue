@@ -115,7 +115,7 @@ defineEmits(['addToCart']);
   color: #6F4E37;
 }
 
-/* Responsive layout: switch to vertical stack for small screens */
+/* Responsive layout */
 @media (max-width: 480px) {
   .item-card {
     flex-direction: column;
