@@ -41,16 +41,17 @@ git checkout -b feature/<short-description>
 ## sql scripts usage
 the sql scripts are going to be used to connect to our backend java application and  get data from the database
 - use mysql workbench to create start server
-- use [coffee_shop.sql](sql%20scripts) to create the database tables on your machine
-- use [get_Status_names.sql](sql%20scripts) to create a sql function that gets status names
-- use [inprogress_orders.sql](sql%20scripts) to create a procedure for getting orders with 'in progress' status
-- use [Ready_order_views.sql](sql%20scripts) to create a tabular view of all ready orders i.e; orders  with status completed
+- use [coffee_shop.sql](Backend/sql%20scripts) to create the database tables on your machine
+- use [getallorders.sql](Backend/sql%20scripts) to view all orders
+- use [getOrderById.sql](Backend/sql%20scripts) to retrieve a specific order
+- use [inprogress_orders.sql](Backend/sql%20scripts) to create a procedure for getting orders with 'in progress' status
+- use [Ready_orders_view.sql](Backend/sql%20scripts) to create a tabular view of all ready orders
 
-you can still add more functions and procedures that are relevant and useful
+You can add more functions and procedures that are relevant and useful.
 
+---
 
-
-Always commit with description
+## Always commit with description
 
 Multi‑station coffee kiosk backend (e.g. Cramlington, Newcastle) sharing a **single database**.  
 Stations are separated logically using `station_id` on orders.
@@ -63,76 +64,74 @@ Stations are separated logically using `station_id` on orders.
 Frontend  →  DTO  →  Controller  →  Service  →  Entity/SQL  →  DB
    ↑                        ↓           ↓            ↑
    └────────────── DTO (response)  ←  Entity/SQL  ←─┘
-DTOs: What the API exposes (request/response shapes, validation, no JPA annotations)[web:421][web:555].
+```
+
+DTOs: What the API exposes (request/response shapes, validation, no JPA annotations).
 
 Entities: How we store data in the database (JPA mappings, relationships).
 
 Services: Business logic (validation, station/menu checks, calling stored procedures).
 
-controller :  a thin HTTP adapter, it accepts the request, delegates to the service, and returns the response
+Controller: A thin HTTP adapter that accepts the request, delegates to the service, and returns the response.
 
 Repositories / SQL: Data access (Spring Data JPA + stored procedures / views).
 
 This separation keeps the API stable while allowing us to change database details independently.
-```
 
-## project structure
+---
+
+## Project Structure
+
 ```text 
-├───sql scripts
-├───src
-│   ├────main
-│   ├───java
-│   │   └───org
-│   │       └───coffeeshop
-│   │           ├───auth
-│   │           │   ├───controller
-│   │           │   ├───dto
-│   │           │   └───service
-│   │           ├───PurchaseOrders
-│   │           │   ├───controllers
-│   │           │   ├───DTO
-│   │           │   ├───models
-│   │           │   ├───repository
-│   │           │   └───service
-│   │           ├───security
-│   │           ├───station
-│   │           │   ├───controller
-│   │           │   ├───dto
-│   │           │   ├───model
-│   │           │   ├───repository
-│   │           │   └───service
-│   │           └───Users
-│   │               ├───controller
-│   │               ├───dto
-│   │               ├───model
-│   │               ├───repository
-│   │               └───service
-│   └───resources
-└───test
-    └───java
-
-
-
+├───Backend
+│   ├───sql scripts
+│   │   ├───coffee_shop.sql
+│   │   ├───getallorders.sql
+│   │   ├───getOrderById.sql
+│   │   ├───inprogress_orders.sql
+│   │   └───Ready_orders_view.sql
+│   └───src
+│       ├────main
+│       │   ├───java
+│       │   │   └───org
+│       │   │       └───coffeeshop
+│       │   │           ├───auth
+│       │   │           ├───purchaseorders
+│       │   │           ├───security
+│       │   │           ├───stations
+│       │   │           └───users
+│       │   └───resources
+│       │       └───application.properties
+│       └───test
+├───Frontend
+│   ├───src
+│   │   ├───components
+│   │   ├───views
+│   │   └───store
+│   └───package.json
+└───README.md
 ```
 
-## resources folder
-- this is where your database environment variables are stored
+## Backend - Resources Folder
 
+The `Backend/src/main/resources/` folder contains database environment variables and configuration stored in `application.properties`.
 
-# Staff Workflow – CoffeeShop API
+---
 
-This module provides the backend workflow for managing staff in the CoffeeShop application. It exposes REST endpoints for creating staff, persists staff data using Spring Data JPA, and securely stores passwords using a `PasswordEncoder` (BCrypt). [web:835][web:838]
+## Staff Workflow – CoffeeShop API
 
-## Tech Stack
+This module provides the backend workflow for managing staff in the CoffeeShop application. It exposes REST endpoints for creating staff, persists staff data using Spring Data JPA, and securely stores passwords using `PasswordEncoder` (BCrypt).
+
+### Tech Stack
 
 - Java 17+
 - Spring Boot (Web, Data JPA, Security)
 - Spring Security `PasswordEncoder` (BCrypt)
 - JPA/Hibernate
 - MySQL (or any configured relational DB)
-- JUnit 5, Spring Boot Test, MockMvc for tests [web:833][web:840]
+- JUnit 5, Spring Boot Test, MockMvc for tests
 
-## Package Structure
+### Package Structure
 
 - `org.coffeeshop.staff.model` – `Staff` JPA entity
 - `org.coffeeshop.staff.dto` – `StaffDto` used for requests/responses
@@ -140,10 +139,8 @@ This module provides the backend workflow for managing staff in the CoffeeShop a
 - `org.coffeeshop.staff.service` – `StaffService` with business logic
 - `org.coffeeshop.staff.controller` – `StaffController` REST endpoints
 - `org.coffeeshop.security` – `SecurityConfig` with `PasswordEncoder` bean
-- `org.coffeeshop.staff.controller` – `StaffController` REST endpoints
-- `org.coffeeshop.staff.controller` (test) – `StaffControllerTest` using `@WebMvcTest` [web:838][web:841]
 
-## Staff Entity
+### Staff Entity
 
 Core fields (typical example):
 
@@ -153,16 +150,42 @@ Core fields (typical example):
 - `lastName`
 - `role` (e.g. `BARISTA`, `MANAGER`)
 - `active` (boolean)
-- `passwordHash` (BCrypt hash, never plain text) [web:792]
+- `passwordHash` (BCrypt hash, never plain text)
 
-## DTO
+### DTO
 
 `StaffDto` is used as the API contract:
 
 - Request: includes `email` (acts as username) and `password` (plain text) for creation.
-- Response: **excludes** `password`, returns other staff details and generated `id`. [web:659]
+- Response: **excludes** `password`, returns other staff details and generated `id`.
 
 Example DTO fields:
+
+- `id`
+- `email`
+- `firstName`
+- `lastName`
+- `role`
+- `active`
+- `password` (request only)
+
+### Security and Password Encoding
+
+Passwords are encoded using Spring Security's `PasswordEncoder`:
+
+```java
+@Configuration
+public class SecurityConfig {
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}
+```
+
+
+Always commit with description
 
 - `id`
 - `email`
