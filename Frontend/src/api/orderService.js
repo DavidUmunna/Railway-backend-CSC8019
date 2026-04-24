@@ -27,5 +27,11 @@ export default {
   //Update order status
   updateOrderStatus(orderId, status) {
     return apiClient.patch(`/orders/${orderId}/status`, { status });
+  },
+
+  //Get orders by phone number
+  getOrdersByPhone(phoneNumber) {
+    // Adjust the endpoint as needed to match your backend
+    return apiClient.get(`/orders?phone=${encodeURIComponent(phoneNumber)}`);
   }
 };

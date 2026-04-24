@@ -14,6 +14,10 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class StationDataLoader implements CommandLineRunner {
+
+    private static final String WEEKDAY_HOURS = "06:30-19:00";
+    private static final String SATURDAY_HOURS = "07:00-18:00";
+    private static final boolean CLOSED_ON_SUNDAY = true;
     
     private final StationRepository stationRepository;
 
@@ -24,9 +28,9 @@ public class StationDataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         if (stationRepository.count() == 0) {
-            stationRepository.save(new Station("Central", "7am-7pm", "8am-6pm", true));
-            stationRepository.save(new Station("North", "6am-8pm", "7am-7pm", false));
-            stationRepository.save(new Station("South", "8am-6pm", "9am-5pm", true));
+            stationRepository.save(new Station("Central", WEEKDAY_HOURS, SATURDAY_HOURS, CLOSED_ON_SUNDAY));
+            stationRepository.save(new Station("North", WEEKDAY_HOURS, SATURDAY_HOURS, CLOSED_ON_SUNDAY));
+            stationRepository.save(new Station("South", WEEKDAY_HOURS, SATURDAY_HOURS, CLOSED_ON_SUNDAY));
         }
     }
 

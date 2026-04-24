@@ -34,6 +34,7 @@ public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder, Lo
      */
     List<PurchaseOrder> findByCustomerCustomerId(Long id);
 
+    
     /**
      * Finds all purchase orders belonging to the given staff member.
      *
@@ -56,4 +57,5 @@ public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder, Lo
          + "(o.orderDate = CURRENT_DATE AND o.pickupTime < :expiryTime))")
     List<PurchaseOrder> findUncollectedBefore(@Param("expiryTime") LocalTime expiryTime);
 
+   
 }

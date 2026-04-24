@@ -2,15 +2,10 @@
   <div class="about-page">
     <!-- Header Section -->
     <div class="header-section">
-      <div class="nav-header">
-        <div class="logo-text"><Coffee size="22" /> whistlestop</div>
-        <nav class="nav-links">
-          <a href="#" class="nav-link">CATALOG</a>
-          <a href="#" class="nav-link">SHOP</a>
-          <a href="#" class="nav-link">CONTACT</a>
-          <a href="#" class="nav-link active">ABOUT US</a>
-        </nav>
-      </div>
+      <button class="back-btn" @click="emit('navigate', 'home')">
+        <ArrowLeft size="16" />
+        <span>Home</span>
+      </button>
 
       <h1 class="header-title">ABOUT US</h1>
     </div>
@@ -110,9 +105,9 @@
 </template>
 
 <script setup>
-defineProps({
-  // Component props if needed
-});
+import { Instagram, Facebook, Twitter, Phone, Mail, ArrowLeft } from 'lucide-vue-next';
+
+const emit = defineEmits(['navigate']);
 </script>
 
 <style scoped>
@@ -128,55 +123,27 @@ defineProps({
   position: relative;
 }
 
-.nav-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 40px;
-  max-width: 1440px;
-  margin: 0 auto;
-  gap: 30px;
-}
-
-.logo-text {
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: #ffbf00;
-  text-transform: uppercase;
-  flex-shrink: 0;
-}
-
-.nav-links {
-  display: flex;
-  gap: 30px;
-  flex: 1;
-  justify-content: center;
-}
-
-.nav-link {
-  color: white;
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-  transition: color 0.2s ease;
-  position: relative;
-}
-
-.nav-link:hover,
-.nav-link.active {
-  color: #ffbf00;
-}
-
-.nav-link.active::after {
-  content: '';
+.back-btn {
   position: absolute;
-  bottom: -5px;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: #ffbf00;
+  top: 20px;
+  left: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(34, 23, 18, 0.45);
+  color: #fff;
+  border-radius: 999px;
+  padding: 10px 16px;
+  backdrop-filter: blur(8px);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.back-btn:hover {
+  background: rgba(34, 23, 18, 0.75);
 }
 
 
@@ -373,19 +340,6 @@ defineProps({
 
 /* Responsive */
 @media (max-width: 768px) {
-  .nav-header {
-    flex-wrap: wrap;
-    padding: 20px;
-    gap: 20px;
-  }
-
-  .nav-links {
-    order: 3;
-    width: 100%;
-    gap: 12px;
-    font-size: 12px;
-  }
-
   .header-title {
     font-size: 36px;
   }

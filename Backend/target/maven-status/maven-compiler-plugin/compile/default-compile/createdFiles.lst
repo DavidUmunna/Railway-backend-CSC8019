@@ -6,6 +6,7 @@ org\coffeeshop\purchaseorders\models\PurchaseOrder.class
 org\coffeeshop\users\dtos\StaffDto.class
 org\coffeeshop\purchaseorders\dtos\PurchaseOrderDto.class
 org\coffeeshop\users\controllers\StaffController.class
+org\coffeeshop\Exceptions\userexceptions\StaffServiceException.class
 org\coffeeshop\purchaseorders\repositories\MenuItemTypeRepository.class
 org\coffeeshop\purchaseorders\services\MenuItemService.class
 org\coffeeshop\security\SecurityConfig.class
@@ -16,13 +17,12 @@ org\coffeeshop\purchaseorders\models\OrderItemKey.class
 org\coffeeshop\stations\repositories\StationRepository.class
 org\coffeeshop\purchaseorders\models\MenuItemType.class
 org\coffeeshop\purchaseorders\models\OrderStatus.class
-org\coffeeshop\exceptions\GlobalExceptionHandler.class
-org\coffeeshop\exceptions\userexceptions\StaffServiceException.class
+org\coffeeshop\Exceptions\userexceptions\CustomerServiceException.class
+org\coffeeshop\Exceptions\GlobalExceptionHandler.class
 org\coffeeshop\stations\models\Station.class
 org\coffeeshop\users\services\StaffService.class
 org\coffeeshop\purchaseorders\services\MenuItemTypeService.class
 org\coffeeshop\users\dtos\CustomerDto.class
-org\coffeeshop\exceptions\userexceptions\CustomerServiceException.class
 org\coffeeshop\Application.class
 org\coffeeshop\users\services\CustomerService.class
 org\coffeeshop\purchaseorders\repositories\PurchaseOrderRepository.class

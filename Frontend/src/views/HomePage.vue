@@ -1,7 +1,27 @@
+@media (max-width: 600px) {
+  .hero-content {
+    padding-bottom: 200px;
+  }
+}
 <template>
   <div class="home-page">
     <!-- Hero Section -->
     <div class="hero-section">
+      <div class="corner-nav">
+        <button class="corner-nav-btn" @click="handleNavigate('menu')">
+          <Coffee size="16" />
+          <span>Menu</span>
+        </button>
+        <button class="corner-nav-btn secondary" @click="handleNavigate('about')">
+          <Info size="16" />
+          <span>About</span>
+        </button>
+        <button class="corner-nav-btn staff" @click="handleNavigate('staffLogin')">
+          <User size="16" />
+          <span>Staff Login</span>
+        </button>
+      </div>
+
       <div class="hero-bg">
         <img 
           alt="whistlestop coffee hut" 
@@ -47,6 +67,14 @@
         <h3>Local Love</h3>
         <p>Proudly serving our community since day one</p>
       </div>
+      <div class="feature-card">
+        <Clock3 class="feature-icon" size="28" />
+        <h3>Opening Hours</h3>
+        <p>
+          The opening hours of the kiosk are 06:30-19:00 Monday - Friday, 07:00-18:00
+          Saturday and closed on Sundays.
+        </p>
+      </div>
     </div>
   </div>
 </template>
@@ -59,23 +87,71 @@ const emit = defineEmits(['navigate']);
 const handleOrderNow = () => {
   emit('navigate', 'menu');
 };
+
+const handleNavigate = (tab) => {
+  emit('navigate', tab);
+};
 </script>
 
 <style scoped>
 .home-page {
   width: 100%;
+  height: 100dvh;
   background: #fdfaf8;
 }
 
 /* Hero Section */
 .hero-section {
   position: relative;
-  height: 100vh;
-  min-height: 600px;
+  height: 100dvh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+}
+
+@media (max-width: 600px) {
+  .hero-section {
+    min-height: 100dvh;
+    height: 100dvh;
+  }
+}
+
+.corner-nav {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  z-index: 12;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.corner-nav-btn {
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(34, 23, 18, 0.45);
+  color: #fff;
+  border-radius: 999px;
+  padding: 10px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  font-weight: 600;
+}
+
+.corner-nav-btn.secondary {
+  background: rgba(255, 191, 0, 0.22);
+}
+
+.corner-nav-btn.staff {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.corner-nav-btn:hover {
+  background: rgba(34, 23, 18, 0.7);
 }
 
 .hero-bg {
@@ -110,9 +186,9 @@ const handleOrderNow = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
-  padding: 40px 20px;
-  max-width: 600px;
+  gap: 32px;
+  padding: 64px 24px 96px 24px;
+  max-width: 700px;
 }
 
 
@@ -232,6 +308,18 @@ const handleOrderNow = () => {
   .hero-section {
     min-height: 72vh;
     height: auto;
+  }
+
+  .corner-nav {
+    top: 16px;
+    left: 16px;
+    right: 16px;
+    gap: 8px;
+  }
+
+  .corner-nav-btn {
+    padding: 9px 12px;
+    font-size: 0.85rem;
   }
 
   .hero-title {

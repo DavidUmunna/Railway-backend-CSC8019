@@ -7,8 +7,11 @@ class MenuService {
       return items.map(item => ({
         id: item.id,
         name: item.name,
-        regPrice: this.getPriceBySize(item.types, 'REGULAR'),
-        largePrice: this.getPriceBySize(item.types, 'LARGE'),
+        description: item.description,
+        regPrice: this.getTypeBySize(item.types, 'REGULAR')?.price || 0,
+        largePrice: this.getTypeBySize(item.types, 'LARGE')?.price || 0,
+        regTypeId: this.getTypeBySize(item.types, 'REGULAR')?.menuItemTypeId || null,
+        largeTypeId: this.getTypeBySize(item.types, 'LARGE')?.menuItemTypeId || null,
       }));
     } catch (error) {
       console.error('Failed to fetch menu items:', error);
@@ -16,16 +19,14 @@ class MenuService {
     }
   }
 
-  getPriceBySize(types = [], size = 'REGULAR') {
+  getTypeBySize(types = [], size = 'REGULAR') {
     if (!Array.isArray(types)) {
-      return 0;
+      return null;
     }
 
-    const match = types.find(type =>
+    return types.find(type =>
       String(type?.size || '').toUpperCase() === size
     );
-
-    return typeof match?.price === 'number' ? match.price : 0;
   }
 
   async getMenuItemById(id) {

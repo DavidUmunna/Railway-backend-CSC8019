@@ -1,4 +1,6 @@
 package org.coffeeshop.purchaseorders.services;
+import org.coffeeshop.purchaseorders.dtos.OrderItemDetailsDto;
+ 
 
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
@@ -53,6 +55,34 @@ public class OrderItemService {
                                                         + menuItemId));
         return toDto(entity);
     }
+       /**
+     * Retrieves all order items for a given order, with menu item details.
+     */
+    public List<OrderItemDetailsDto> findDetailsByOrderId(Long orderId) {
+        List<OrderItem> items = repository.findById_PurchaseOrderId(orderId);
+        return items.stream().map(this::toDetailsDto).collect(Collectors.toList());
+    }
+
+    /**
+     * Converts an OrderItem entity to an OrderItemDetailsDto.
+     */
+    private OrderItemDetailsDto toDetailsDto(OrderItem entity) {
+        PurchaseOrder po = entity.getPurchaseOrder();
+        MenuItemType mu = entity.getMenuItemType();
+        String itemName = mu != null && mu.getMenuItem() != null ? mu.getMenuItem().getName() : null;
+        String itemDescription = mu != null && mu.getMenuItem() != null ? mu.getMenuItem().getDescription() : null;
+        String size = mu != null && mu.getSize() != null ? mu.getSize().name() : null;
+        return new OrderItemDetailsDto(
+            po != null ? po.getPurchaseOrderId() : 0L,
+            mu != null ? mu.getMenuItemTypeId() : 0L,
+            itemName,
+            itemDescription,
+            size,
+            entity.getUnitPrice(),
+            entity.getQuantity(),
+            entity.getLineTotal()
+        );
+    }
 
     /**
      * Retrieves all order items.
@@ -64,6 +94,11 @@ public class OrderItemService {
         return orderItems.stream().map(this::toDto).collect(Collectors.toList());
     }
 
+
+    public List<OrderItemDto> findByOrderId(Long orderId) {
+    List<OrderItem> items = repository.findById_PurchaseOrderId(orderId);
+    return items.stream().map(this::toDto).collect(Collectors.toList());
+}
     /**
      * Converts an OrderItem entity to an OrderItemDto.
      * Handles null purchase order or menu item type references by defaulting to 0L.

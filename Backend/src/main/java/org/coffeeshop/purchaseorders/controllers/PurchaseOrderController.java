@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.coffeeshop.purchaseorders.services.OrderItemService;
 
 /**
  * REST controller for managing purchase orders.
@@ -32,13 +33,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class PurchaseOrderController {
     private final PurchaseOrderService service;
 
+    private final OrderItemService orderItemService;
     /**
-     * Constructs the controller with the given purchase order service.
+     * Constructs the controller with the given purchase order service and order item service.
      *
      * @param service the purchase order service handling business logic
+     * @param orderItemService the order item service handling order item logic
      */
-    public PurchaseOrderController(PurchaseOrderService service) {
+    public PurchaseOrderController(PurchaseOrderService service, OrderItemService orderItemService) {
         this.service = service;
+        this.orderItemService = orderItemService;
     }
 
     /**
@@ -121,6 +125,30 @@ public class PurchaseOrderController {
         return ResponseEntity.ok(orders);
     }
 
+    /**
+     * Retrieves all purchase orders matching the given phone number.
+     *
+     * @param phoneNumber the query parameter specifying the phone number to filter by
+     * @return 200 OK with a list of matching order DTOs
+     */
+    @GetMapping(params = "phoneNumber")
+    public ResponseEntity<List<PurchaseOrderDto>> findByPhoneNumber(@RequestParam("phoneNumber") String phoneNumber) {
+        List<PurchaseOrderDto> orders = service.findByPhoneNumber(phoneNumber);
+        return ResponseEntity.ok(orders);
+    }
+    
+    
+    /**
+     * Retrieves all order items for a given order, including menu item details.
+     * @param orderId the path variable specifying the order ID to fetch items for
+     * @return 200 OK with a list of order item details DTOs
+     * @author Umunna David
+     * @since 24/04/2026
+     */
+    @GetMapping("/{orderId}/items")
+    public ResponseEntity<List<org.coffeeshop.purchaseorders.dtos.OrderItemDetailsDto>> getOrderItemsWithDetails(@PathVariable("orderId") Long orderId) {
+        return ResponseEntity.ok(orderItemService.findDetailsByOrderId(orderId));
+    }
     /**
      * Retrieves all purchase orders belonging to the given staff.
      *

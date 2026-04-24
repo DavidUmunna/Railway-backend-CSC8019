@@ -1,6 +1,7 @@
 package org.coffeeshop.purchaseorders.services;
 
 import jakarta.persistence.EntityNotFoundException;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -104,6 +105,7 @@ public class PurchaseOrderService {
      * @return the created order as a DTO
      * @throws jakarta.persistence.EntityNotFoundException if the station, customer, or any menu item type is not found
      * @throws IllegalArgumentException                    if the pickup time is outside the station's opening hours
+     * @since 2026-04-23
      */
     public PurchaseOrderDto createOrder(CreatePurchaseOrderDto orderDto) {
         Station station =
@@ -113,10 +115,8 @@ public class PurchaseOrderService {
                                 () ->
                                         new EntityNotFoundException(
                                                 "Station not found: " + orderDto.stationId()));
-        
-        if (orderDto.pickupTime().isBefore(LocalTime.of(8,0)) || orderDto.pickupTime().isAfter(LocalTime.of(22,0))) { // TODO hardcoded values, need methods in Station.java to be able to get hours as LocalTime
-                throw new IllegalArgumentException("Pickup time " + orderDto.pickupTime() + " is invalid for station " + station.getName());
-        }
+
+        validatePickupTimeForStation(station, orderDto.pickupTime());
         
         Customer customer =
                 customerRepository
@@ -171,6 +171,83 @@ public class PurchaseOrderService {
         return toDto(savedOrder);
     }
 
+        /**
+         * Validates a requested pickup time against today's schedule for the given station.
+         *
+         * @param station the station handling the order
+         * @param pickupTime the requested pickup time
+         * @throws IllegalArgumentException if the station is closed, the pickup time is in the past,
+         * or the pickup time is outside opening hours
+         * @since 2026-04-23
+         */
+        private void validatePickupTimeForStation(Station station, LocalTime pickupTime) {
+                DayOfWeek today = LocalDate.now().getDayOfWeek();
+
+                if (today == DayOfWeek.SUNDAY && station.isClosedOnSunday()) {
+                        throw new IllegalArgumentException(
+                                        "Pickup time "
+                                                        + pickupTime
+                                                        + " is invalid for station "
+                                                        + station.getName()
+                                                        + ". Station is closed today.");
+                }
+
+                String hoursRange = today == DayOfWeek.SATURDAY
+                                ? station.getSaturdayOpeningHours()
+                                : station.getWeekdayOpeningHours();
+
+                LocalTime[] hours = parseOpeningHours(hoursRange, station.getName());
+                LocalTime openTime = hours[0];
+                LocalTime closeTime = hours[1];
+                LocalTime now = LocalTime.now().withSecond(0).withNano(0);
+
+                if (pickupTime.isBefore(now)) {
+                        throw new IllegalArgumentException(
+                                        "Pickup time "
+                                                        + pickupTime
+                                                        + " is invalid for station "
+                                                        + station.getName()
+                                                        + ". Pickup time cannot be earlier than current time "
+                                                        + now
+                                                        + ".");
+                }
+
+                if (pickupTime.isBefore(openTime) || pickupTime.isAfter(closeTime)) {
+                        throw new IllegalArgumentException(
+                                        "Pickup time "
+                                                        + pickupTime
+                                                        + " is invalid for station "
+                                                        + station.getName()
+                                                        + ". Valid hours today: "
+                                                        + hoursRange
+                                                        + ".");
+                }
+        }
+
+        /**
+         * Parses opening hours in HH:mm-HH:mm format.
+         *
+         * @param hoursRange the opening-hours string
+         * @param stationName station name for diagnostics
+         * @return parsed opening and closing times
+         * @throws IllegalArgumentException if the hours format is missing or invalid
+         * @since 2026-04-23
+         */
+        private LocalTime[] parseOpeningHours(String hoursRange, String stationName) {
+                if (hoursRange == null || !hoursRange.contains("-")) {
+                        throw new IllegalArgumentException("Opening hours are invalid for station " + stationName);
+                }
+
+                String[] parts = hoursRange.split("-");
+                if (parts.length != 2) {
+                        throw new IllegalArgumentException("Opening hours are invalid for station " + stationName);
+                }
+
+                LocalTime openTime = LocalTime.parse(parts[0].trim());
+                LocalTime closeTime = LocalTime.parse(parts[1].trim());
+                return new LocalTime[] {openTime, closeTime};
+}
+
     /**
      * Retrieves all purchase orders matching the given status.
      *
@@ -190,6 +267,23 @@ public class PurchaseOrderService {
      */
     public List<PurchaseOrderDto> findByCustomerId(Long id) {
         List<PurchaseOrder> orders = orderRepository.findByCustomerCustomerId(id);
+        return orders.stream().map(this::toDto).collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieves all purchase orders belonging to the given customer phone number.
+     *
+     * @param phoneNumber the customer phone number to filter by
+     * @return a list of matching orders as DTOs
+     */
+    public List<PurchaseOrderDto> findByPhoneNumber(String phoneNumber) {
+        Customer customer = customerRepository.findByCustomerPhoneNumber(phoneNumber);
+        if (customer == null) {
+            throw new EntityNotFoundException("Customer not found with phone number: " + phoneNumber);
+        }
+
+        List<PurchaseOrder> orders = orderRepository.findByCustomerCustomerId(customer.getId());
+      
         return orders.stream().map(this::toDto).collect(Collectors.toList());
     }
 
