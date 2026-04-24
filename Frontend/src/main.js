@@ -1,21 +1,19 @@
 // Entry file of the Vue application
 // This file mounts the root component (App.vue) to the DOM
 
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
-import App from './App.vue'
-import './styles/light-animations.css' // Import animation styles
-import * as LucideVue from 'lucide-vue-next'
+import { createApp } from 'vue';
+import { createPinia } from 'pinia';
+import App from './App.vue';
+import './style.css';
+import './styles/light-animations.css';
+import * as LucideVue from 'lucide-vue-next';
 
-// Create Vue app instance
-const app = createApp(App)
+// Project Entry Point
+const app = createApp(App);
+app.use(createPinia());
 
-// Initialize Pinia for state management
-app.use(createPinia())
-
-// Register all Lucide icons globally
 Object.entries(LucideVue).forEach(([name, component]) => {
-  app.component(name, component)
-})
+  app.component(name, component);
+});
 
-app.mount('#app')
+app.mount('#app');

@@ -1,264 +1,228 @@
 <template>
-  <div class="app-wrapper">
-    <template v-if="activeTab === 'staffLogin'">
-      <StaffLogin
-        :is-submitting="userStore.isLoading"
-        :server-error="loginError"
-        @login="handleStaffLogin"
-        @cancel="activeTab = 'home'"
-      />
-    </template>
+  <div class="app-container">
+    <HeaderBar v-if="activeTab === 'menu' || activeTab === 'orders'" />
 
-    <template v-else-if="activeTab === 'staffDashboard'">
-      <StaffDashboard 
-        :staff-user="userStore.staffUser" 
-        @logout="handleStaffLogout" 
-      />
-    </template>
+    <StaffLogin
+      v-if="activeTab === 'staffLogin'"
+      :is-submitting="userStore.isLoading"
+      :server-error="userStore.userError"
+      @login="handleStaffLogin"
+      @cancel="handleStaffLoginCancel"
+    />
 
-    <!-- Home and About pages don't use HeaderBar/BottomNav -->
-    <template v-else-if="activeTab === 'home' || activeTab === 'about'">
-      <HomePage 
-        v-if="activeTab === 'home'" 
-        @navigate="handleNavigateFromHome"
-      />
-      <AboutPage 
-        v-if="activeTab === 'about'"
-      />
-      <!-- Quick Navigation Footer for About/Home pages -->
-      <div class="quick-nav">
-        <button @click="activeTab = 'home'" :class="{ active: activeTab === 'home' }">Home</button>
-        <button @click="activeTab = 'menu'" :class="{ active: activeTab === 'menu' }">Menu</button>
-        <button @click="activeTab = 'about'" :class="{ active: activeTab === 'about' }">About</button>
-        <button @click="activeTab = 'staffLogin'" :class="{ active: activeTab === 'staffLogin' }">Staff Login</button>
-      </div>
-    </template>
+    <StaffDashboard
+      v-else-if="activeTab === 'staffDashboard'"
+      :staff-user="userStore.staffUser"
+      @logout="handleStaffLogout"
+    />
 
-    <!-- Regular app pages with header and bottom nav -->
-    <template v-else>
-      <HeaderBar />
+    <HomePage v-else-if="activeTab === 'home'" @navigate="setActiveTab" />
 
-      <main class="main-content">
-        <MenuPage 
-          v-if="activeTab === 'menu'" 
-          :menuItems="menuData" 
-          :is-loading="isLoading"
-          :error="error"
-          @addToCart="handleAddToCart" 
-          @navigateHome="activeTab = 'home'"
-        />
-        <OrdersPage 
-          v-if="activeTab === 'orders'" 
-          :history="cartStore.orderHistory" 
-          :is-loading="cartStore.isLoading"
-          :error="cartStore.cartError"
-        />
-      </main>
+    <AboutPage v-else-if="activeTab === 'about'" @navigate="setActiveTab" />
 
-      <CartPage 
-        v-if="cartStore.showCart" 
-        :cart="cartStore.cart" 
-        :total="cartStore.cartTotal"
-        :is-checking-out="isCheckingOut"
-        @close="cartStore.showCart = false"
-        @checkout="handleCheckout"
-      />
+    <MenuPage
+      v-else-if="activeTab === 'menu'"
+      :menu-items="menuItems"
+      :is-loading="menuLoading"
+      :error="menuError"
+      @add="handleAddToCart"
+      @navigate-home="setActiveTab('home')"
+    />
 
-      <BottomNav 
-        :activeTab="activeTab" 
-        :cartCount="cartStore.cartCount"
-        @changeTab="tab => {
-          if (tab === 'home' || tab === 'about') {
-            activeTab = tab;
-          } else {
-            activeTab = tab;
-          }
-        }"
-        @toggleCart="cartStore.showCart = true"
-        @navigateHome="activeTab = 'home'"
-        @navigateAbout="activeTab = 'about'"
-      />
-    </template>
+    <OrdersPage
+      v-else-if="activeTab === 'orders'"
+      :orders="cartStore.orderHistory"
+      :is-loading="cartStore.isLoading"
+      :error="cartStore.cartError"
+    />
+
+    <CheckoutPage
+      v-else-if="activeTab === 'checkout'"
+      :cart="cartStore.cart"
+      :is-submitting="cartStore.isLoading"
+      :error="cartStore.cartError"
+      @confirm="handleConfirmCheckout"
+      @cancel="setActiveTab('menu')"
+    />
+
+    <CartPage
+      v-if="cartStore.showCart"
+      :cart="cartStore.cart"
+      :total="cartStore.formattedTotal"
+      :is-checking-out="cartStore.isLoading"
+      @close="cartStore.showCart = false"
+      @checkout="handleCheckout"
+      @remove="handleRemoveFromCart"
+    />
+
+    <BottomNav
+      v-if="activeTab === 'menu' || activeTab === 'orders'"
+      :active-tab="activeTab"
+      :cart-count="cartStore.cartCount"
+      @change-tab="handleBottomNavTab"
+      @toggle-cart="cartStore.showCart = true"
+    />
+
+
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import { useUserStore } from './stores/userStore.js';
-import { useCartStore } from './stores/cartStore.js';
+import { onMounted, ref } from 'vue';
 import HeaderBar from './components/HeaderBar.vue';
 import BottomNav from './components/BottomNav.vue';
 import MenuPage from './views/MenuPage.vue';
-import OrdersPage from './views/OrdersPage.vue';
 import CartPage from './views/CartPage.vue';
+import OrdersPage from './views/OrdersPage.vue';
+import CheckoutPage from './views/CheckoutPage.vue';
+import StaffLogin from './views/StaffLogin.vue';
 import HomePage from './views/HomePage.vue';
 import AboutPage from './views/AboutPage.vue';
-import StaffLogin from './views/StaffLogin.vue';
 import StaffDashboard from './views/StaffDashboard.vue';
-
-// Import API services
+import { useCartStore } from './stores/cartStore.js';
+import { useStationStore } from './stores/stationStore.js';
+import { useUserStore } from './stores/userStore.js';
 import menuService from './services/menuService.js';
 
-// Initialize Pinia stores
-const userStore = useUserStore();
 const cartStore = useCartStore();
+const stationStore = useStationStore();
+const userStore = useUserStore();
 
-// Local component state
 const activeTab = ref('home');
-const menuData = ref([]);
-const isLoading = ref(false);
-const error = ref(null);
-const loginError = ref('');
-const isCheckingOut = ref(false);
+const menuItems = ref([]);
+const menuLoading = ref(false);
+const menuError = ref('');
 
-// Load menu data on mount
-const loadMenuData = async () => {
-  try {
-    isLoading.value = true;
-    error.value = null;
-    menuData.value = await menuService.getAllMenuItems();
-  } catch (err) {
-    error.value = 'Failed to load menu data';
-    console.error('Menu loading error:', err);
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-// Initialize on mount
-onMounted(async () => {
-  await cartStore.loadOrderHistory();
-});
-
-watch(activeTab, async (tab) => {
-  if (tab === 'menu') {
-    await loadMenuData();
-  }
-});
-
-// Navigation handler from home
-const handleNavigateFromHome = (tab) => {
+const setActiveTab = (tab) => {
   activeTab.value = tab;
-};
-
-// Staff login handler
-const handleStaffLogin = async (payload) => {
-  try {
-    loginError.value = '';
-    await userStore.staffLogin({
-      username: payload.username,
-      password: payload.password
-    });
-    activeTab.value = 'staffDashboard';
-  } catch (err) {
-    console.error('Staff login failed:', err);
-    loginError.value = userStore.userError || 'Unable to sign in. Please try again.';
+  if (tab === 'menu' && (menuItems.value.length === 0 || menuError.value)) {
+    loadMenu();
   }
 };
 
-// Staff logout handler
-const handleStaffLogout = () => {
-  userStore.staffLogout();
-  activeTab.value = 'staffLogin';
+const handleBottomNavTab = (tab) => {
+  if (tab === 'staff') {
+    setActiveTab('staffLogin');
+    return;
+  }
+  setActiveTab(tab);
 };
 
-// Add to cart handler
-const handleAddToCart = (item, size) => {
+const loadMenu = async () => {
+  menuLoading.value = true;
+  menuError.value = '';
+  try {
+    menuItems.value = await menuService.getAllMenuItems();
+  } catch (error) {
+    menuError.value = error.message || 'Failed to load menu items.';
+  } finally {
+    menuLoading.value = false;
+  }
+};
+
+const handleAddToCart = ({ item, size }) => {
   cartStore.addToCart(item, size);
 };
 
-// Checkout handler
-const handleCheckout = async () => {
+const handleRemoveFromCart = (group) => {
+  const index = cartStore.cart.findIndex(
+    (item) => item.id === group.id && item.size === group.size
+  );
+
+  if (index === -1) {
+    return;
+  }
+
+  const item = cartStore.cart[index];
+  const nextQty = (item.quantity || 1) - 1;
+  cartStore.updateCartItemQuantity(index, nextQty);
+};
+
+const handleCheckout = () => {
+  if (cartStore.cart.length === 0) {
+    return;
+  }
+
+  cartStore.showCart = false;
+  activeTab.value = 'checkout';
+};
+
+const handleConfirmCheckout = async (checkoutDetails) => {
   try {
-    isCheckingOut.value = true;
-    await cartStore.checkout();
+    await cartStore.checkout(checkoutDetails);
     activeTab.value = 'orders';
-  } catch (err) {
-    console.error('Checkout failed:', err);
-  } finally {
-    isCheckingOut.value = false;
+  } catch (error) {
+    console.error('Checkout failed:', error);
   }
 };
+
+const handleStaffLogin = async (credentials) => {
+  try {
+    await userStore.staffLogin(credentials);
+    activeTab.value = 'staffDashboard';
+  } catch (error) {
+    console.error('Login failed:', error);
+  }
+};
+
+const handleStaffLoginCancel = () => {
+  userStore.clearError();
+  activeTab.value = 'home';
+};
+
+const handleStaffLogout = () => {
+  userStore.staffLogout();
+  activeTab.value = 'home';
+};
+
+onMounted(async () => {
+  await Promise.all([loadMenu(), cartStore.loadOrderHistory(), stationStore.loadStations().catch(() => null)]);
+
+  if (userStore.isStaffLoggedIn) {
+    activeTab.value = 'staffDashboard';
+  }
+});
 </script>
 
-<style>
-/* Global Styles */
-body {
-  margin: 0;
-  font-family: 'Inter', sans-serif;
-  background-color: #fdfaf8;
-  background-image: radial-gradient(#d7ccc8 1px, transparent 1px);
-  background-size: 20px 20px;
-}
-
-.app-wrapper { 
+<style scoped>
+.app-container {
   min-height: 100vh;
-  position: relative;
-  box-sizing: border-box;
+  background: transparent;
+  padding-bottom: 88px;
 }
 
-.main-content {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 0 20px 100px; /* Space for bottom nav */
-}
-
-/* Quick Navigation for Home/About pages */
-.quick-nav {
+.staff-login-fab {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: flex-start;
-  gap: 12px;
-  padding: 12px 16px;
-  z-index: 100;
-}
-
-.quick-nav button {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 6px 12px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
-  cursor: pointer;
+  right: 16px;
+  bottom: 92px;
+  z-index: 901;
+  border: none;
   border-radius: 999px;
-  transition: all 0.2s ease;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  padding: 10px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  background: #3e2723;
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  font-weight: 700;
 }
 
-.quick-nav button:hover {
-  color: #ffbf00;
-  background: rgba(255, 255, 255, 0.25);
-}
-
-.quick-nav button.active {
-  color: #ffbf00;
-  background: rgba(255, 255, 255, 0.35);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+.staff-login-fab:hover {
+  background: #5d4037;
 }
 
 @media (max-width: 768px) {
-  .main-content {
-    padding: 0 14px 92px;
+  .app-container {
+    padding-bottom: 84px;
   }
 
-  .quick-nav {
-    justify-content: flex-start;
-    overflow-x: auto;
-    white-space: nowrap;
-    padding: 10px 12px;
-    gap: 8px;
-  }
-
-  .quick-nav button {
-    font-size: 12px;
-    padding: 6px 10px;
-    letter-spacing: 0.2px;
-    flex: 0 0 auto;
+  .staff-login-fab {
+    right: 12px;
+    bottom: 84px;
+    padding: 9px 12px;
+    font-size: 0.85rem;
   }
 }
 </style>

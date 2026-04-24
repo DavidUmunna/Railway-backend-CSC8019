@@ -1,241 +1,344 @@
 <template>
-  <div class="page-container">
-    <div class="menu-top-row">
-      <button class="back-home-btn" @click="$emit('navigateHome')">
-        <ArrowLeft size="18" />
-        Back to Home
-      </button>
-      <div class="location-tag">
-        <MapPin size="18" />
-        Cramlington Station Coffee Hut
+  <div class="menu-page">
+    <div class="menu-header">
+      <div class="menu-header-top">
+        <button class="home-btn" @click="$emit('navigateHome')" aria-label="Back to home">
+          <ArrowLeft size="18" />
+          <span>Home</span>
+        </button>
+
+        <div class="station-status" aria-live="polite">
+          <template v-if="stationName">
+            <p class="station-name">{{ stationName }}</p>
+            <p class="station-hours">
+              <span class="status-pill" :class="{ closed: !isOpenNow }">{{ isOpenNow ? 'Open now' : 'Closed' }}</span>
+              <span>{{ todaysHoursText }}</span>
+            </p>
+          </template>
+          <template v-else>
+            <p class="station-name">Station info unavailable</p>
+            <p class="station-hours">{{ stationError || 'Unable to load opening hours.' }}</p>
+          </template>
+        </div>
       </div>
+
+      <h2>Our Menu</h2>
+      <p>Choose your favorite brew and size.</p>
     </div>
-    
+
     <div v-if="isLoading" class="loading-wrap">
-      <div class="state-card loading-state">
-        <Loader2 size="20" class="spin" />
-        <span>Loading menu items...</span>
-      </div>
-
-      <div class="skeleton-list" aria-hidden="true">
-        <div v-for="n in 5" :key="`menu-skeleton-${n}`" class="item-card skeleton-card">
-          <div class="skeleton skeleton-text"></div>
-          <div class="button-group">
-            <div class="skeleton skeleton-btn"></div>
-            <div class="skeleton skeleton-btn"></div>
-          </div>
-        </div>
-      </div>
+      <Loader2 size="30" class="spin" />
+      <p>Brewing your menu...</p>
     </div>
 
-    <div v-else-if="error" class="state-card error-state">
-      <AlertCircle size="20" />
-      <span>{{ error }}</span>
+    <div v-else-if="error" class="error-wrap">
+      <AlertTriangle size="24" />
+      <p>{{ error }}</p>
     </div>
 
-    <div v-else class="menu-list">
-      <div v-for="item in menuItems" :key="item.id" class="item-card">
-        <span class="item-name">{{ item.name }}</span>
-        
-        <div class="button-group">
-          <button @click="$emit('addToCart', item, 'Regular')" class="price-btn" :title="`Add ${item.name} Regular`">
-            <Plus size="14" />
-            <span class="size">Reg</span>
-            <span class="price">£{{ item.regPrice.toFixed(2) }}</span>
-          </button>
-          
-          <button v-if="item.largePrice" @click="$emit('addToCart', item, 'Large')" class="price-btn" :title="`Add ${item.name} Large`">
-            <Plus size="14" />
-            <span class="size">Large</span>
-            <span class="price">£{{ item.largePrice.toFixed(2) }}</span>
-          </button>
+    <div v-else class="menu-grid">
+      <div v-for="item in menuItems" :key="item.id" class="menu-card">
+        <h3>{{ item.name }}</h3>
+        <p v-if="item.description" class="menu-desc">{{ item.description }}</p>
+        <p class="price">Regular: £{{ Number(item.regPrice || 0).toFixed(2) }}</p>
+        <p class="price">Large: £{{ Number(item.largePrice || item.regPrice || 0).toFixed(2) }}</p>
+
+        <div class="actions">
+          <button @click="addItem(item, 'Regular')">Add Regular</button>
+          <button @click="addItem(item, 'Large')">Add Large</button>
         </div>
       </div>
+    
     </div>
   </div>
 </template>
 
 <script setup>
-// Props for menu data passed from main App state
-defineProps(['menuItems', 'isLoading', 'error'])
-defineEmits(['addToCart', 'navigateHome'])
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import stationService from '../services/stationService.js';
+
+const props = defineProps({
+  menuItems: { type: Array, default: () => [] },
+  isLoading: { type: Boolean, default: false },
+  error: { type: String, default: '' },
+});
+
+const emit = defineEmits(['add', 'navigateHome']);
+
+const station = ref(null);
+const stationError = ref('');
+const now = ref(new Date());
+let clockTimer = null;
+
+const parseHourRange = (rangeText) => {
+  if (!rangeText || !rangeText.includes('-')) {
+    return null;
+  }
+
+  const [openText, closeText] = rangeText.split('-').map((part) => part.trim());
+  if (!openText || !closeText) {
+    return null;
+  }
+
+  const [openHour, openMinute] = openText.split(':').map(Number);
+  const [closeHour, closeMinute] = closeText.split(':').map(Number);
+
+  if ([openHour, openMinute, closeHour, closeMinute].some((v) => Number.isNaN(v))) {
+    return null;
+  }
+
+  return {
+    openMinutes: openHour * 60 + openMinute,
+    closeMinutes: closeHour * 60 + closeMinute,
+  };
+};
+
+const todaysHoursRaw = computed(() => {
+  if (!station.value) {
+    return '';
+  }
+
+  const day = now.value.getDay();
+  if (day === 0 && station.value.closedOnSunday) {
+    return 'Closed';
+  }
+
+  return day === 6 ? station.value.saturdayOpeningHours : station.value.weekdayOpeningHours;
+});
+
+const stationName = computed(() => station.value?.name || '');
+
+const todaysHoursText = computed(() => {
+  if (!todaysHoursRaw.value) {
+    return 'Hours unavailable';
+  }
+  return todaysHoursRaw.value;
+});
+
+const isOpenNow = computed(() => {
+  if (!station.value) {
+    return false;
+  }
+
+  const day = now.value.getDay();
+  if (day === 0 && station.value.closedOnSunday) {
+    return false;
+  }
+
+  const parsed = parseHourRange(todaysHoursRaw.value);
+  if (!parsed) {
+    return false;
+  }
+
+  const minutesNow = now.value.getHours() * 60 + now.value.getMinutes();
+  return minutesNow >= parsed.openMinutes && minutesNow <= parsed.closeMinutes;
+});
+
+onMounted(async () => {
+  try {
+    const stations = await stationService.getAllStations();
+    station.value = Array.isArray(stations) && stations.length > 0 ? stations[0] : null;
+    if (!station.value) {
+      stationError.value = 'No station data found.';
+    }
+  } catch (error) {
+    stationError.value = error.message || 'Unable to load station information right now.';
+  }
+
+  clockTimer = setInterval(() => {
+    now.value = new Date();
+  }, 30000);
+});
+
+onBeforeUnmount(() => {
+  if (clockTimer) {
+    clearInterval(clockTimer);
+  }
+});
+
+
+const addItem = (item, size) => {
+  emit('add', { item, size });
+};
+
 </script>
 
 <style scoped>
-.page-container { padding: 20px 0; }
-.menu-top-row {
+.menu-page {
+  max-width: 980px;
+  margin: 0 auto;
+  min-height: calc(100vh - 160px);
+  padding: 26px 16px 24px;
+  background: rgba(253, 250, 248, 0.82);
+  border-radius: 18px;
+  box-shadow: 0 14px 36px rgba(45, 24, 16, 0.08);
+}
+
+.menu-header {
+  margin-bottom: 22px;
+}
+
+.menu-header-top {
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
-  align-items: center;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
-.back-home-btn {
-  border: 1px solid rgba(141, 110, 99, 0.35);
-  background: white;
-  color: #3e2723;
+.home-btn {
+  border: 1px solid #e2d4ca;
+  background: #fff;
+  color: #5d4037;
   border-radius: 999px;
-  padding: 10px 18px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 0.9rem;
-  font-weight: 700;
-}
-
-.back-home-btn:hover {
-  background: #fff3e0;
-  border-color: #ffbf00;
-}
-
-.location-tag {
-  text-align: center;
-  color: #8d6e63;
-  margin-bottom: 0;
-  font-weight: bold;
-  display: flex;
+  padding: 6px 12px;
+  display: inline-flex;
+  gap: 6px;
   align-items: center;
-  justify-content: center;
+  cursor: pointer;
+}
+.menu-desc {
+      font-size: 0.98em;
+      color: #5d4037;
+      margin: 6px 0 8px 0;
+    }
+
+.station-status {
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid #eadccf;
+  border-radius: 12px;
+  padding: 8px 10px;
+  min-width: 220px;
+  text-align: right;
+}
+
+.station-name {
+  margin: 0;
+  color: #3e2723;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.station-hours {
+  margin: 4px 0 0;
+  color: #6f5b52;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
   gap: 8px;
 }
 
-.state-card {
-  background: white;
-  border-radius: 12px;
-  padding: 18px;
-  display: flex;
+.status-pill {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #0f5132;
+  background: #d1e7dd;
+}
+
+.status-pill.closed {
+  color: #842029;
+  background: #f8d7da;
+}
+
+.menu-header h2 {
+  margin: 0;
+  color: #3e2723;
+}
+
+.menu-header p {
+  margin: 6px 0 0;
+  color: #6e5a50;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.menu-card {
+  background: #fff;
+  border: 1px solid #f0e5dd;
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 6px 14px rgba(45, 24, 16, 0.06);
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-card h3 {
+  margin: 0 0 8px;
+  color: #3e2723;
+}
+
+.price {
+  margin: 3px 0;
+  color: #6f5b52;
+}
+
+.actions {
+  margin-top: auto;
+  padding-top: 10px;
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.actions button {
+  flex: 1;
+  border: none;
+  border-radius: 9px;
+  padding: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  background: #3e2723;
+  color: #fff;
+}
+
+.actions button:hover {
+  background: #5d4037;
+}
+
+.loading-wrap,
+.error-wrap {
+  display: grid;
+  place-items: center;
   gap: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
-.loading-wrap {
-  display: grid;
-  gap: 12px;
-}
-
-.skeleton-list {
-  display: grid;
-  gap: 12px;
-}
-
-.skeleton-card {
-  pointer-events: none;
-}
-
-.skeleton {
-  border-radius: 10px;
-  background: linear-gradient(90deg, #efe7e1 25%, #f7f2ee 50%, #efe7e1 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.1s linear infinite;
-}
-
-.skeleton-text {
-  height: 18px;
-  width: 180px;
-}
-
-.skeleton-btn {
-  height: 36px;
-  width: 110px;
-}
-
-.loading-state {
-  color: #6d4c41;
-}
-
-.error-state {
-  color: #b23b3b;
+  color: #5d4037;
+  padding: 40px 0;
 }
 
 .spin {
-  animation: spin 0.8s linear infinite;
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
-
-@keyframes shimmer {
-  from { background-position: 200% 0; }
-  to { background-position: -200% 0; }
-}
-
-.item-card {
-  background: white;
-  margin-bottom: 12px;
-  padding: 20px;
-  border-radius: 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-}
-
-.item-name { font-weight: 700; color: #3e2723; }
-.button-group { display: flex; gap: 10px; }
-
-.price-btn {
-  border: 1.5px solid #d7ccc8;
-  background: #fdfaf9;
-  border-radius: 10px;
-  padding: 10px 16px;
-  cursor: pointer;
-  transition: 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.85rem;
-}
-
-.price-btn:hover {
-  background: #fff3e0;
-  border-color: #ffab40;
-}
-
-.price-btn:active { transform: scale(0.95); }
-
-.size { display: block; font-size: 0.7rem; color: #a1887f; }
-.price { font-weight: 800; }
 
 @media (max-width: 768px) {
-  .menu-top-row {
+  .menu-page {
+    min-height: calc(100vh - 150px);
+    border-radius: 16px 16px 0 0;
+    padding-bottom: 32px;
+  }
+
+  .menu-header-top {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .location-tag {
-    justify-content: flex-start;
-  }
-
-  .item-card {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 16px;
-  }
-
-  .button-group {
-    width: 100%;
-    flex-wrap: wrap;
-  }
-
-  .price-btn {
-    flex: 1 1 140px;
-    justify-content: center;
-  }
-}
-
-@media (max-width: 480px) {
-  .page-container {
-    padding: 14px 0;
-  }
-
-  .back-home-btn {
-    width: 100%;
-    justify-content: center;
+  .station-status {
+    text-align: left;
   }
 }
 </style>

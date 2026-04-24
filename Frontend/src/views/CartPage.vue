@@ -1,173 +1,234 @@
 <template>
-  <div class="overlay" @click.self="$emit('close')">
+  <div class="cart-overlay" @click.self="$emit('close')">
     <div class="cart-modal">
-      <div class="modal-header">
-        <h3><ShoppingCart size="20" /> Confirm Your Order</h3>
-        <button class="close-btn" @click="$emit('close')" :title="'Close cart'">
-          <X size="20" />
-        </button>
+      <button class="close-btn" @click="$emit('close')" aria-label="Close cart">
+        <X size="18" />
+      </button>
+
+      <h2>Your Cart</h2>
+
+      <div v-if="groupedCart.length === 0" class="empty-cart">
+        Your cart is empty.
       </div>
 
-      <ul class="cart-items">
-        <li v-for="(item, index) in cart" :key="index">
-          <span>
-            {{ item.name }} ({{ item.size }})
-          </span>
-          <span>£{{ item.price.toFixed(2) }}</span>
+      <ul v-else class="cart-list">
+        <li v-for="item in groupedCart" :key="item.key" class="cart-item">
+          <div class="cart-details">
+            <strong>{{ item.name }}</strong>
+            <span>{{ item.size }} x {{ item.quantity }}</span>
+            <small>${{ item.unitPrice.toFixed(2) }} each</small>
+          </div>
+
+          <div class="cart-actions">
+            <span class="line-total">${{ item.lineTotal.toFixed(2) }}</span>
+            <button class="remove-btn" @click="$emit('remove', item)">Remove</button>
+          </div>
         </li>
       </ul>
 
-      <div class="total-box">
-        <span>Grand Total</span>
-        <span class="total-price">£{{ formattedTotal }}</span>
+      <div class="cart-footer">
+        <p class="total">Total: ${{ Number(total || 0).toFixed(2) }}</p>
+        <button class="checkout-btn" @click="$emit('checkout')" :disabled="isCheckingOut || groupedCart.length === 0">
+          <Loader2 v-if="isCheckingOut" size="16" class="spin" />
+          <span>{{ isCheckingOut ? 'Processing...' : 'Checkout' }}</span>
+        </button>
       </div>
-
-      <button class="pay-btn" :disabled="isCheckingOut" @click="$emit('checkout')">
-        <Loader2 v-if="isCheckingOut" size="18" class="spin" />
-        <CreditCard v-else size="18" />
-        {{ isCheckingOut ? 'Processing...' : 'Confirm & Pay' }}
-      </button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed } from 'vue';
 
-const props = defineProps(['cart', 'total', 'isCheckingOut'])
-defineEmits(['close', 'checkout'])
+const props = defineProps({
+  cart: { type: Array, default: () => [] },
+  total: { type: [String, Number], default: 0 },
+  isCheckingOut: { type: Boolean, default: false },
+});
 
-const formattedTotal = computed(() => {
-  const amount = Number(props.total)
-  return Number.isFinite(amount) ? amount.toFixed(2) : '0.00'
-})
+defineEmits(['close', 'checkout', 'remove']);
+
+const groupedCart = computed(() => {
+  const grouped = new Map();
+
+  for (const item of props.cart) {
+    const quantity = item.quantity || 1;
+    const key = `${item.id}-${item.size}`;
+
+    if (!grouped.has(key)) {
+      grouped.set(key, {
+        key,
+        id: item.id,
+        name: item.name,
+        size: item.size,
+        unitPrice: Number(item.price || 0),
+        quantity,
+        lineTotal: Number(item.price || 0) * quantity,
+      });
+      continue;
+    }
+
+    const existing = grouped.get(key);
+    existing.quantity += quantity;
+    existing.lineTotal += Number(item.price || 0) * quantity;
+  }
+
+  return Array.from(grouped.values());
+});
 </script>
 
 <style scoped>
-.overlay {
+.cart-overlay {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.6);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
   display: flex;
-  align-items: flex-end;
-  z-index: 2000;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
 .cart-modal {
-  background: white;
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 30px 30px 100px;
-  border-radius: 24px 24px 0 0;
-  max-height: 85vh;
-  overflow-y: auto;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+  background: #fff;
+  padding: 22px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 420px;
+  position: relative;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.15);
 }
 
 .close-btn {
-  background: none;
+  position: absolute;
+  top: 12px;
+  right: 12px;
   border: none;
+  background: transparent;
+  font-size: 1.1rem;
   cursor: pointer;
-  color: #8d6e63;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  transition: 0.2s;
+  color: #666;
 }
 
-.close-btn:hover {
-  color: #5d4037;
+h2 {
+  margin: 0 0 16px;
+  color: #3e2723;
 }
 
-.cart-items { list-style: none; padding: 0; margin-bottom: 20px; }
-.cart-items li {
+.empty-cart {
+  text-align: center;
+  color: #777;
+  margin: 20px 0;
+}
+
+.cart-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.cart-item {
   display: flex;
   justify-content: space-between;
+  gap: 10px;
   align-items: center;
   padding: 12px 0;
   border-bottom: 1px solid #eee;
 }
 
-.cart-items li span:first-child {
+.cart-item:last-child {
+  border-bottom: none;
+}
+
+.cart-details {
   display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cart-details strong {
+  color: #3e2723;
+}
+
+.cart-details span {
+  font-size: 0.88rem;
+  color: #666;
+}
+
+.cart-details small {
+  color: #9b6c5f;
+}
+
+.cart-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.line-total {
+  font-weight: 700;
+  color: #3e2723;
+}
+
+.remove-btn {
+  border: 1px solid #f1c3c3;
+  background: #fff5f5;
+  color: #b03c3c;
+  border-radius: 8px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.cart-footer {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.total {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0;
+  color: #3e2723;
+}
+
+.checkout-btn {
+  width: 100%;
+  padding: 11px;
+  border: none;
+  border-radius: 10px;
+  background: #3e2723;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
 }
 
-.total-box {
-  background: #efebe9;
-  padding: 20px;
-  border-radius: 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
-}
-
-.total-price { font-size: 1.6rem; font-weight: 900; color: #3e2723; }
-
-.pay-btn {
-  width: 100%;
-  background: #3e2723;
-  color: white;
-  padding: 18px;
-  border-radius: 12px;
-  font-weight: bold;
-  font-size: 1.1rem;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  transition: 0.2s;
-}
-
-.pay-btn:hover {
+.checkout-btn:hover {
   background: #5d4037;
 }
 
-.pay-btn:disabled {
-  opacity: 0.7;
+.checkout-btn:disabled {
+  background: #b9a9a5;
   cursor: not-allowed;
 }
 
 .spin {
-  animation: spin 0.8s linear infinite;
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@media (max-width: 768px) {
-  .cart-modal {
-    padding: 20px 16px 84px;
-    border-radius: 18px 18px 0 0;
+  from {
+    transform: rotate(0deg);
   }
-
-  .modal-header h3 {
-    font-size: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .total-price {
-    font-size: 1.3rem;
-  }
-
-  .pay-btn {
-    font-size: 1rem;
-    padding: 14px;
+  to {
+    transform: rotate(360deg);
   }
 }
 </style>

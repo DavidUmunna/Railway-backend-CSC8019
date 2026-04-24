@@ -1,225 +1,368 @@
 <template>
-  <div class="page-container">
-    <h2 class="title">
-      <ShoppingBag size="24" class="orders-icon" />
-      My Orders
-    </h2>
+  <div class="orders-page">
+    <div class="orders-header-row">
+      <h2 class="orders-title">Your Orders</h2>
+      <button v-if="!showPhoneModal" class="reopen-modal-btn" @click="showPhoneModal = true">Enter Phone Number</button>
+    </div>
 
-    <div v-if="isLoading" class="loading-wrap">
-      <div class="state-card loading-state">
-        <Loader2 size="20" class="spin" />
-        <span>Loading orders...</span>
-      </div>
+    <!-- Phone Number Modal as component -->
+    <PhoneNumberModal
+      v-if="showPhoneModal"
+      :show="showPhoneModal"
+      :isLoading="isLoading"
+      :error="modalError"
+      :phoneNumber="phoneNumber"
+      @submit="onPhoneModalSubmit"
+      @close="showPhoneModal = false"
+    />
 
-      <div class="skeleton-list" aria-hidden="true">
-        <div v-for="n in 4" :key="`order-skeleton-${n}`" class="order-card skeleton-order-card">
-          <div class="order-header">
-            <div class="skeleton skeleton-id"></div>
-            <div class="skeleton skeleton-status"></div>
+    <div v-if="isLoading" class="state-wrap">
+      <Loader2 size="26" class="spin" />
+      <p>Loading your orders...</p>
+    </div>
+
+    <div v-else-if="error" class="state-wrap error">
+      <AlertTriangle size="22" />
+      <p>{{ error }}</p>
+    </div>
+
+    <div v-else-if="!orders.length" class="state-wrap empty">
+      <Package size="24" />
+      <p>No orders yet. Place your first one from the menu.</p>
+    </div>
+
+    <div v-else class="orders-list">
+      <div
+        v-for="order in orders"
+        :key="order.id"
+        class="order-card"
+        role="button"
+        tabindex="0"
+        @click="toggleOrder(order.id)"
+        @keydown.enter.prevent="toggleOrder(order.id)"
+      >
+        <div class="order-main">
+          <div>
+            <h3>Order #{{ order.id }}</h3>
+            <p>{{ order.summary || 'Order placed' }}</p>
+            <div class="order-meta">
+
+              <small v-if="order.pickupTime">Pickup: {{ order.pickupTime }}</small>
+              <small v-if="order.totalAmount !== undefined">Total: £{{ order.totalAmount.toFixed(2) }}</small>
+            </div>
           </div>
-          <div class="order-body">
-            <div class="skeleton skeleton-line"></div>
-            <div class="skeleton skeleton-line short"></div>
-          </div>
+
+          <span class="status" :class="statusClass(order.status)">
+            {{ formatStatus(order.status) }}
+          </span>
         </div>
-      </div>
-    </div>
 
-    <div v-else-if="error" class="state-card error-state">
-      <AlertCircle size="20" />
-      <span>{{ error }}</span>
-    </div>
-    
-    <div v-else-if="history.length === 0" class="empty">
-      <PackageOpen size="40" />
-      No orders placed yet.
-    </div>
-    
-    <div v-else v-for="order in history" :key="order.id" class="order-card">
-      <div class="order-header">
-        <span class="order-id">#{{ order.id }}</span>
-        <span :class="['status-tag', order.status.toLowerCase()]">
-          <CheckCircle2 v-if="order.status === 'READY'" size="14" />
-          <Clock v-else size="14" />
-          {{ order.status }}
-        </span>
-      </div>
-      <div class="order-body">
-        <p>{{ order.summary }}</p>
-        <p class="arrival">
-          <Clock size="14" />
-          Est. Arrival: {{ order.arrivalTime }}
-        </p>
+        <div v-if="isExpanded(order.id)" class="order-details">
+          <h4>Items</h4>
+          <ul v-if="orderItemsMap[order.id]?.length" class="items-list">
+            <li v-for="(item, index) in orderItemsMap[order.id]" :key="`${order.id}-${index}`">
+              <span>{{ item.itemName || 'Item' }} ({{ item.size || 'Regular' }})</span>
+              <div class="item-desc" v-if="item.description">{{ item.description }}</div>
+              <span>Unit: £{{ item.unitPrice.toFixed(2) }}</span>
+              <strong>x{{ item.quantity || 1 }}</strong>
+            </li>
+          </ul>
+          <p v-else class="no-items">Item details are unavailable for this order.</p>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
+
 <script setup>
-defineProps(['history', 'isLoading', 'error'])
+import { ref } from 'vue';
+import orderService from '../services/orderService.js';
+import PhoneNumberModal from '../components/PhoneNumberModal.vue';
+
+const orders = ref([]);
+const isLoading = ref(false);
+const error = ref('');
+
+const showPhoneModal = ref(true);
+const phoneNumber = ref('');
+const modalError = ref('');
+
+const expandedOrders = ref(new Set());
+const orderItemsMap = ref({}); // { [orderId]: [items] }
+
+const toggleOrder = async (orderId) => {
+  const key = String(orderId);
+  if (expandedOrders.value.has(key)) {
+    expandedOrders.value.delete(key);
+  } else {
+    expandedOrders.value.add(key);
+    // Always fetch items on expand
+    try {
+      const items = await orderService.getOrderItems(orderId);
+      orderItemsMap.value[key] = Array.isArray(items.data) ? items.data : items;
+    } catch (err) {
+      orderItemsMap.value[key] = [];
+    }
+  }
+  expandedOrders.value = new Set(expandedOrders.value);
+};
+
+const isExpanded = (orderId) => expandedOrders.value.has(String(orderId));
+
+const statusClass = (status = '') => {
+  const normalized = String(status).toUpperCase();
+  if (normalized === 'COMPLETED' || normalized === 'READY') return 'done';
+  if (normalized === 'IN_PROGRESS') return 'progress';
+  if (normalized === 'CANCELLED') return 'cancelled';
+  return 'accepted';
+};
+
+const formatStatus = (status = '') => String(status).replace('_', ' ');
+
+
+const onPhoneModalSubmit = async (enteredPhoneNumber) => {
+  modalError.value = '';
+  phoneNumber.value = enteredPhoneNumber;
+  isLoading.value = true;
+  try {
+    const response = await orderService.getOrdersByPhone(phoneNumber.value);
+    const result = Array.isArray(response.data) ? response.data : response;
+    orders.value = result.map(order => ({
+      id: order.orderId?.toString() || order.id?.toString() || '',
+      summary: ` Thank You for your order`,
+      arrivalTime: order.pickupTime || '--:--',
+      status: order.orderStatus || order.status || 'ACCEPTED',
+      orderDate: order.orderDate || null,
+      pickupTime: order.pickupTime || null,
+      totalAmount: Number(order.totalAmount || 0),
+      items: order.items || []
+    }));
+    showPhoneModal.value = false;
+    error.value = '';
+  } catch (err) {
+    modalError.value = err.message || 'Failed to fetch orders.';
+    orders.value = [];
+    error.value = '';
+  } finally {
+    isLoading.value = false;
+  }
+};
 </script>
 
 <style scoped>
-.page-container { padding: 20px 0; }
-.title { 
-  text-align: center; 
-  margin-bottom: 20px; 
+.orders-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.reopen-modal-btn {
+  background: #3e2723;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.92em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+
+}
+.reopen-modal-btn:hover {
+  background: #5d4037;
+}
+
+.orders-title {
+  margin: 0;
   color: #3e2723;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+.orders-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  z-index: 1000;
 }
 
-.empty {
+.modal-content {
+  background: #fff;
+  padding: 32px 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.15);
+  min-width: 320px;
+  max-width: 90vw;
   text-align: center;
-  color: #a1887f;
-  padding: 40px 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
 }
 
-.state-card {
-  background: white;
-  border-radius: 12px;
-  padding: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+.phone-input {
+  width: 100%;
+  padding: 8px 12px;
+  margin: 16px 0;
+  font-size: 1.1em;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
-.loading-wrap {
+.modal-actions {
+  margin-top: 12px;
+}
+
+.modal-actions button {
+  padding: 8px 20px;
+  font-size: 1em;
+  border: none;
+  border-radius: 4px;
+  background: #007bff;
+  color: #fff;
+  cursor: pointer;
+}
+.modal-actions button:disabled {
+  background: #aaa;
+  cursor: not-allowed;
+}
+.modal-error {
+  color: #d32f2f;
+  margin-top: 8px;
+}
+
+h2 {
+  margin: 0 0 16px;
+  color: #3e2723;
+}
+
+.orders-list {
   display: grid;
   gap: 12px;
-}
-
-.skeleton-list {
-  display: grid;
-  gap: 12px;
-}
-
-.skeleton-order-card {
-  pointer-events: none;
-}
-
-.skeleton {
-  border-radius: 10px;
-  background: linear-gradient(90deg, #efe7e1 25%, #f7f2ee 50%, #efe7e1 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.1s linear infinite;
-}
-
-.skeleton-id {
-  width: 70px;
-  height: 16px;
-}
-
-.skeleton-status {
-  width: 90px;
-  height: 24px;
-  border-radius: 20px;
-}
-
-.skeleton-line {
-  width: 80%;
-  height: 14px;
-  margin-bottom: 8px;
-}
-
-.skeleton-line.short {
-  width: 55%;
-  margin-bottom: 0;
-}
-
-.loading-state {
-  color: #6d4c41;
-}
-
-.error-state {
-  color: #b23b3b;
-}
-
-.spin {
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes shimmer {
-  from { background-position: 200% 0; }
-  to { background-position: -200% 0; }
 }
 
 .order-card {
-  background: white;
-  margin-bottom: 15px;
-  padding: 20px;
+  background: #fff;
+  border: 1px solid #efdfd3;
   border-radius: 12px;
-  border-left: 6px solid #ffab40;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+  cursor: pointer;
 }
 
-.order-header {
+.order-main {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 8px;
+  align-items: center;
+  gap: 10px;
 }
 
-.order-id { font-weight: 900; font-size: 1.1rem; }
+.order-card h3 {
+  margin: 0 0 4px;
+  color: #3e2723;
+}
 
-.status-tag {
-  font-size: 0.75rem;
-  padding: 6px 12px;
-  border-radius: 20px;
-  text-transform: uppercase;
-  font-weight: bold;
+.order-card p {
+  margin: 0 0 4px;
+  color: #6f5b52;
+}
+
+.order-details {
+  border-top: 1px solid #f2e8e1;
+  padding-top: 10px;
+}
+
+.order-meta {
   display: flex;
-  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 0.9rem;
+  color: #5f4b43;
+}
+
+.order-details h4 {
+  margin: 0 0 8px;
+  color: #3e2723;
+  font-size: 0.92rem;
+}
+
+.items-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
   gap: 6px;
 }
 
-.arrival { 
-  font-size: 0.85rem; 
-  color: #8d6e63; 
-  margin-top: 5px;
+.items-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #5f4b43;
 }
 
-/* Status colors as per Project Brief */
-.accepted { background: #fff3e0; color: #ef6c00; }
-.ready { background: #e8f5e9; color: #2e7d32; }
-
-@media (max-width: 768px) {
-  .order-card {
-    padding: 16px;
-  }
-
-  .order-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .status-tag {
-    width: fit-content;
-  }
+.no-items {
+  margin: 0;
+  color: #8a756b;
+  font-size: 0.9rem;
 }
 
-@media (max-width: 480px) {
-  .title {
-    font-size: 1.2rem;
-  }
+.status {
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
 
-  .order-id {
-    font-size: 1rem;
+.accepted {
+  background: #fff3e0;
+  color: #b26a00;
+}
+
+.progress {
+  background: #e3f2fd;
+  color: #0f5ca8;
+}
+
+.done {
+  background: #e8f5e9;
+  color: #2d7d32;
+}
+
+.cancelled {
+  background: #ffebee;
+  color: #b71c1c;
+}
+
+.state-wrap {
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  color: #5d4037;
+  padding: 28px 0;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 </style>
