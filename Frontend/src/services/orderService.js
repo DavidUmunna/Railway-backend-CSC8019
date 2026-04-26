@@ -68,9 +68,9 @@ class OrderService {
     }
   }
 
-  async updateOrderStatus(orderId, status) {
+  async updateOrderStatus(orderId, staffId, status) {
     try {
-      return await apiClient.put(`/api/v1/orders/${orderId}/status`, { orderStatus: status });
+      return await apiClient.put(`/api/v1/orders/${orderId}/${staffId}/status`, { orderStatus: status });
     } catch (error) {
       throw new Error(error.message || 'Unable to update order status right now.');
     }

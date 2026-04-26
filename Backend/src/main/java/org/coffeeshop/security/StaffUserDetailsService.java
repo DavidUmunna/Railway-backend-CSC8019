@@ -37,10 +37,11 @@ public class StaffUserDetailsService implements UserDetailsService {
 
         String role = SecurityRoleUtils.toAuthority(staff.getRole());
 
-        return User.builder()
-                .username(staff.getUsername())
-                .password(staff.getPasswordHash())
-                .authorities(List.of(new SimpleGrantedAuthority(role)))
-                .build();
+        return new StaffUserDetails(
+            staff.getStaffId(),
+            staff.getUsername(),
+            staff.getPasswordHash(),
+            List.of(new SimpleGrantedAuthority(role))
+        );
     }
 }

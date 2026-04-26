@@ -1,3 +1,4 @@
+
 <template>
   <section class="staff-dashboard">
     <header class="dashboard-header">
@@ -46,39 +47,79 @@
     </div>
 
     <div v-else class="orders-grid">
-      <article v-for="order in filteredOrders" :key="order.id" class="order-card">
+      <article
+        v-for="order in filteredOrders"
+        :key="order.id"
+        class="order-card"
+        role="button"
+        tabindex="0"
+        @click="toggleOrder(order.id)"
+        @keydown.enter.prevent="toggleOrder(order.id)"
+      >
         <header class="card-top">
           <h3>Order #{{ order.id }}</h3>
           <span :class="['status-chip', chipClass(order.status)]">{{ prettyStatus(order.status) }}</span>
         </header>
 
-        <p class="summary">{{ order.summary || 'Order in progress' }}</p>
+        <p class="summary"><span>Total : </span>{{ order.totalAmount ? `£${order.totalAmount.toFixed(2)}` : 'Order in progress' }}</p>
         <p class="meta">Pickup: {{ order.pickupTime || order.arrivalTime || '--:--' }}</p>
 
         <div class="actions">
-          <button
-            v-if="order.status === 'ACCEPTED'"
-            class="action-btn in-progress"
-            @click="changeStatus(order.id, 'IN_PROGRESS')"
-          >
-            Start
-          </button>
+          <template v-if="order.status !== 'COMPLETED'">
+            <button
+              v-if="order.status === 'ACCEPTED'"
+              class="action-btn in-progress"
+              @click.stop="changeStatus(order.id, staffUser.id, 'IN_PROGRESS')"
+            >
+              Start
+            </button>
 
-          <button
-            v-if="order.status === 'IN_PROGRESS'"
-            class="action-btn ready"
-            @click="changeStatus(order.id, 'COMPLETED')"
-          >
-            Mark Complete
-          </button>
+            <button
+              v-if="order.status === 'COLLECTED'"
+              class="action-btn revert"
+              @click.stop="changeStatus(order.id, staffUser.id, 'IN_PROGRESS')"
+            >
+              Revert
+            </button>
 
-          <button
-            v-if="order.status !== 'COMPLETED' && order.status !== 'CANCELLED'"
-            class="action-btn cancel"
-            @click="changeStatus(order.id, 'CANCELLED')"
-          >
-            Cancel
-          </button>
+            <button
+              v-if="order.status === 'IN_PROGRESS'"
+              class="action-btn ready"
+              @click.stop="changeStatus(order.id, staffUser.id, 'COLLECTED')"
+            >
+              Mark Complete
+            </button>
+
+            <button
+            v-if="order.status === 'COLLECTED'"
+              class="action-btn ready"
+              @click.stop="changeStatus(order.id, staffUser.id, 'COMPLETED')"
+            >
+
+            </button>
+
+            <button
+              v-if="order.status !== 'CANCELLED' && order.status !== 'COLLECTED' && order.status !== 'COMPLETED'"
+              class="action-btn cancel"
+              @click.stop="changeStatus(order.id, staffUser.id, 'CANCELLED')"
+            >
+              Cancel
+            </button>
+          </template>
+        
+        </div>
+
+        <div v-if="isExpanded(order.id)" class="order-details">
+          <h4>Items</h4>
+          <ul v-if="orderItemsMap[order.id]?.length" class="items-list">
+            <li v-for="(item, index) in orderItemsMap[order.id]" :key="`${order.id}-${index}`">
+              <span>{{ item.itemName || 'Item' }} ({{ item.size || 'Regular' }})</span>
+              <div class="item-desc" v-if="item.description">{{ item.description }}</div>
+              <span>Unit: £{{ item.unitPrice.toFixed(2) }}</span>
+              <strong>x{{ item.quantity || 1 }}</strong>
+            </li>
+          </ul>
+          <p v-else class="no-items">Item details are unavailable for this order.</p>
         </div>
       </article>
     </div>
@@ -89,6 +130,8 @@
 import { computed, onMounted, ref } from 'vue';
 import orderService from '../services/orderService.js';
 
+
+
 const props = defineProps({
   staffUser: {
     type: Object,
@@ -98,24 +141,38 @@ const props = defineProps({
 
 defineEmits(['logout']);
 
-const statusFilters = ['ACCEPTED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'];
+const statusFilters = ['ACCEPTED', 'IN_PROGRESS', 'COLLECTED','COMPLETED', 'CANCELLED'];
 const activeFilter = ref('ACCEPTED');
 
 const orders = ref([]);
 const isLoading = ref(false);
 const error = ref('');
 
+
+// Use same structure as OrdersPage
 const filteredOrders = computed(() => {
   return orders.value.filter((order) => order.status === activeFilter.value);
 });
 
-const prettyStatus = (status = '') => String(status).replace('_', ' ');
+// Expand/collapse logic and order items map
+const expandedOrders = ref(new Set());
+const orderItemsMap = ref({});
 
-const chipClass = (status = '') => {
-  if (status === 'COMPLETED') return 'done';
-  if (status === 'IN_PROGRESS') return 'progress';
-  if (status === 'CANCELLED') return 'cancelled';
-  return 'accepted';
+const toggleOrder = async (orderId) => {
+  const key = String(orderId);
+  if (expandedOrders.value.has(key)) {
+    expandedOrders.value.delete(key);
+  } else {
+    expandedOrders.value.add(key);
+    // Always fetch items on expand
+    try {
+      const items = await orderService.getOrderItems(orderId);
+      orderItemsMap.value[key] = Array.isArray(items.data) ? items.data : items;
+    } catch (err) {
+      orderItemsMap.value[key] = [];
+    }
+  }
+  expandedOrders.value = new Set(expandedOrders.value);
 };
 
 const loadOrders = async () => {
@@ -130,16 +187,16 @@ const loadOrders = async () => {
   }
 };
 
-const changeStatus = async (orderId, status) => {
-  try {
-    await orderService.updateOrderStatus(orderId, status);
-    const match = orders.value.find((order) => order.id === String(orderId));
-    if (match) {
-      match.status = status;
-    }
-  } catch (err) {
-    error.value = err.message || 'Unable to update order status.';
-  }
+const isExpanded = (orderId) => expandedOrders.value.has(String(orderId));
+
+const prettyStatus = (status = '') => String(status).replace('_', ' ');
+
+const chipClass = (status = '') => {
+  if (status === 'COMPLETED') return 'done';
+  if (status === 'IN_PROGRESS') return 'progress';
+  if (status === 'CANCELLED') return 'cancelled';
+  if (status === 'COLLECTED') return 'collected';
+  return 'accepted';
 };
 
 onMounted(loadOrders);
@@ -276,6 +333,12 @@ h2 {
   background: #e8f5e9;
   color: #2d7d32;
 }
+/* Add collected status button style */
+.collected {
+  background: #e0f7fa;
+  color: #00838f;
+}
+
 
 .cancelled {
   background: #ffebee;

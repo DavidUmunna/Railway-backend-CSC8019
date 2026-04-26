@@ -4,25 +4,28 @@ package org.coffeeshop.auth.dtos;
  * Response payload returned after successful authentication.
  */
 public class AuthResponsedto {
-
+    
 	private String token;
 	private String tokenType = "Bearer";
 	private String username;
+	private Long id;
 	private String role;
 
 	public AuthResponsedto() {
 	}
 
 	/**
-	 * Creates an authentication response with bearer token, username, and role.
+	 * Creates an authentication response with bearer token, username, user ID, and role.
 	 *
 	 * @param token signed JWT token
 	 * @param username authenticated username
+	 * @param id authenticated user's ID
 	 * @param role primary authority of the authenticated user
 	 */
-	public AuthResponsedto(String token, String username, String role) {
+	public AuthResponsedto(String token, String username, Long id, String role) {
 		this.token = token;
 		this.username = username;
+		this.id = id;
 		this.role = role;
 	}
 
@@ -48,6 +51,10 @@ public class AuthResponsedto {
 
 	public void setUsername(String username) {
 		this.username = username;
+	}
+	
+	public Long getId() {
+		return id;
 	}
 
 	public String getRole() {
