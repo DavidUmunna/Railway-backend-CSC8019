@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--please do not ADD  irrelevant dependencies-->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
@@ -69,18 +70,12 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
-        <!-- Source: https://mvnrepository.com/artifact/org.springframework.security/spring-security-core -->
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-core</artifactId>
-            <version>7.1.0-M3</version>
-            <scope>compile</scope>
-        </dependency>
+       
         <!-- Source: https://mvnrepository.com/artifact/org.springframework.security/spring-security-test -->
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
-            <version>7.1.0-M3</version>
+           
             <scope>test</scope>
         </dependency>
         <dependency>
