@@ -54,6 +54,7 @@ Thumbs.db
 *.pem
 *.key
 keystore
+src/main/resources/application.properties
 
 ########################################
 # Temp / Misc
