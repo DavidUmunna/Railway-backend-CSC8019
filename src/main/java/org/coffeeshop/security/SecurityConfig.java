@@ -42,7 +42,7 @@ public class SecurityConfig {
     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
     private final RestAccessDeniedHandler restAccessDeniedHandler;
 
-        @Value("${app.cors.allowed-origins:http://localhost:5173,http://127.0.0.1:5173}")
+        @Value("${app.cors.allowed-origins:http://localhost:5173,http://127.0.0.1:5173,https://whistlestopcoffee-production.up.railway.app}")
         private String allowedOrigins;
     /*@Bean
     public AuthenticationManager authenticationManager(
