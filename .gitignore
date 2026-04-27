@@ -1,37 +1,43 @@
-# IntelliJ / IDE
+########################################
+# IDE files
+########################################
 .idea/
 *.iml
 *.ipr
 *.iws
 .vscode/
 !.vscode/settings.json
-!.idea/runConfigurations/
 
-# Maven / Backend
-**/target/
-**/build/
+# Eclipse
+.classpath
+.project
+.settings/
+
+########################################
+# Maven / Build output
+########################################
+target/
+build/
 *.jar
 *.war
 *.ear
-.mvn/
+.mvn/wrapper/
 mvnw
 mvnw.cmd
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
 pom.xml.next
-tools/
 
-
-# Spring Boot
-backend/src/main/resources/
+########################################
+# Logs
+########################################
 logs/
 *.log
-Backend/target
 
-
-
-# OS
+########################################
+# OS generated files
+########################################
 .DS_Store
 .DS_Store?
 ._*
@@ -40,22 +46,21 @@ Backend/target
 ehthumbs.db
 Thumbs.db
 
+########################################
 # Env & Secrets
+########################################
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
 *.pem
 *.key
 keystore
 
+########################################
 # Temp / Misc
+########################################
 *.tmp
 *.bak
 *.swp
 *.swo
 *~
 !.gitkeep
-Backend/target/classes/org/coffeeshop/Application.class
-Backend/target/classes/org/coffeeshop/security/SecurityConfig.class
