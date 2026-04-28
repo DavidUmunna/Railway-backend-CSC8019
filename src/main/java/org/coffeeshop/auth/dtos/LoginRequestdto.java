@@ -4,28 +4,12 @@ import jakarta.validation.constraints.NotBlank;
 
 /**
  * Request payload for username/password login.
+ * @Author willian
+ * @version 1.0
+ * @modifiedBy Umunna David
+ * changed from class to record to adhere to consistency and immutability best practices in DTO design
  */
-public class LoginRequestdto {
-
-	@NotBlank
-	private String username;
-
-	@NotBlank
-	private String password;
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-}
+public record LoginRequestdto(
+	@NotBlank String username,
+	@NotBlank String password
+) {}

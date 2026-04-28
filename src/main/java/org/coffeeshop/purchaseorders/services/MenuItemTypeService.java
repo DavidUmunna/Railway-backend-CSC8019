@@ -3,6 +3,7 @@ package org.coffeeshop.purchaseorders.services;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.coffeeshop.purchaseorders.dtos.MenuItemTypeDto;
 import org.coffeeshop.purchaseorders.models.MenuItem;
 import org.coffeeshop.purchaseorders.models.MenuItemType;
@@ -56,9 +57,6 @@ public class MenuItemTypeService {
         List<MenuItemType> menuItemTypes = repository.findAll();
         return menuItemTypes.stream().map(this::toDto).collect(Collectors.toList());
     }
-
-    // TBC if MenuItemType can be added by staff. if so add createMenuItemType method and
-    // deleteMenuItemType
 
     /**
      * Converts a MenuItemType entity to a MenuItemTypeDto.

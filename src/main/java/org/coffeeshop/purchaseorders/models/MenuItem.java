@@ -9,7 +9,7 @@ import java.util.List;
  * and a list of associated types (sizes and prices).
  * @author Kulagina Tatiana
  * @version 1.0
- * @since 2026-04-18
+ * @since 2026-04-23
  */
 @Entity
 @Table(name = "menu_item")
@@ -22,7 +22,7 @@ public class MenuItem {
     private Long menuItemId;
 
     /** The size and price variants available for this menu item. */
-    @OneToMany(mappedBy = "menuItem")
+    @OneToMany(mappedBy = "menuItem", orphanRemoval = true)
     private List<MenuItemType> menuItems;
 
     /** The display name of the menu item. */

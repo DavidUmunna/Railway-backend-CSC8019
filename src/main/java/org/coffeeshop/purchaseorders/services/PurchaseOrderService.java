@@ -33,7 +33,7 @@ import org.springframework.stereotype.Service;
  * and querying orders by ID or retrieving all orders.
  * @author Kulagina Tatiana
  * @version 1.0
- * @since 2026-04-21
+ * @since 2026-04-23
  */
 @Service
 public class PurchaseOrderService {
@@ -276,13 +276,16 @@ public class PurchaseOrderService {
      * @param phoneNumber the customer phone number to filter by
      * @return a list of matching orders as DTOs
      */
-    public List<PurchaseOrderDto> findByPhoneNumber(String phoneNumber) {
+     public List<PurchaseOrderDto> findByPhoneNumber(String phoneNumber) {
         Customer customer = customerRepository.findByCustomerPhoneNumber(phoneNumber);
         if (customer == null) {
             throw new EntityNotFoundException("Customer not found with phone number: " + phoneNumber);
         }
 
+        System.out.println("Found customer for phone number(Service) " + phoneNumber + ": " + customer); // Debug log
         List<PurchaseOrder> orders = orderRepository.findByCustomerCustomerId(customer.getId());
+
+        System.out.println("Found " + orders.size() + " orders for customer ID " + customer.getId()); // Debug log
       
         return orders.stream().map(this::toDto).collect(Collectors.toList());
     }
@@ -296,6 +299,43 @@ public class PurchaseOrderService {
     public List<PurchaseOrderDto> findByStaffId(Long id) {
         List<PurchaseOrder> orders = orderRepository.findByStaffStaffId(id);
         return orders.stream().map(this::toDto).collect(Collectors.toList());
+    }
+
+    /**
+     * Updates the archive flag of an existing purchase order.
+     *
+     * @param orderId    the purchase order ID
+     * @param isArchived the new archive flag value
+     * @return the updated order as a DTO
+     * @throws IllegalArgumentException if the order ID is null
+     * @throws jakarta.persistence.EntityNotFoundException if no order exists with the given ID
+     */
+    public PurchaseOrderDto updateArchiveFlag(Long orderId, boolean isArchived) {
+        if(orderId == null) {
+            throw new IllegalArgumentException("Order ID cannot be null");
+        }
+        PurchaseOrder existing =
+                orderRepository
+                        .findById(orderId)
+                        .orElseThrow(
+                                () ->
+                                        new EntityNotFoundException(
+                                                "PurchaseOrder not found: " + orderId));
+
+        PurchaseOrder updated =
+                new PurchaseOrder(
+                        existing.getPurchaseOrderId(),
+                        existing.getCustomer(),
+                        existing.getStation(),
+                        existing.getStaff(),
+                        existing.getOrderDate(),
+                        existing.getPickupTime(),
+                        existing.getOrderStatus(),
+                        existing.getTotalAmount(),
+                        isArchived);
+
+        PurchaseOrder saved = orderRepository.save(updated);
+        return toDto(saved);
     }
     
     /**
@@ -339,7 +379,8 @@ public class PurchaseOrderService {
                         existing.getOrderDate(),
                         existing.getPickupTime(),
                         dto.orderStatus(),
-                        existing.getTotalAmount());
+                        existing.getTotalAmount(),
+                        existing.getIsArchived());
 
         PurchaseOrder saved = orderRepository.save(updated);
         return toDto(saved);
@@ -363,6 +404,10 @@ public class PurchaseOrderService {
                                         new EntityNotFoundException(
                                                 "PurchaseOrder not found: " + orderId));
         
+        if (existing.getOrderStatus() == OrderStatus.COLLECTED || existing.getOrderStatus() == OrderStatus.CANCELLED) {
+                return;
+        }
+        
         PurchaseOrder updated =
                 new PurchaseOrder(
                         existing.getPurchaseOrderId(),
@@ -372,7 +417,8 @@ public class PurchaseOrderService {
                         existing.getOrderDate(),
                         existing.getPickupTime(),
                         OrderStatus.CANCELLED,
-                        existing.getTotalAmount());
+                        existing.getTotalAmount(),
+                        existing.getIsArchived());
         orderRepository.save(updated);
     }
 
@@ -384,15 +430,16 @@ public class PurchaseOrderService {
      * @return the corresponding DTO
      */
     private PurchaseOrderDto toDto(PurchaseOrder order) {
-        Customer cust = order.getCustomer();
+        Customer customer = order.getCustomer();
         Station station = order.getStation();
         Staff staff = order.getStaff();
 
         return new PurchaseOrderDto(
                 order.getPurchaseOrderId(),
-                cust != null ? cust.getId() : 0L,
+                customer != null ? customer.getId() : 0L,
                 station != null ? station.getId() : 0L,
                 staff != null ? staff.getStaffId() : 0L,
+                order.getIsArchived(),
                 order.getOrderDate(),
                 order.getPickupTime(),
                 order.getOrderStatus(),

@@ -2,66 +2,19 @@ package org.coffeeshop.auth.dtos;
 
 /**
  * Response payload returned after successful authentication.
+ * @Author willian
+ * @version 1.0
+ * @modifiedBy Umunna David
+ * changed from class to record to adhere to consistency and immutability best practices in DTO design
  */
-public class AuthResponsedto {
-    
-	private String token;
-	private String tokenType = "Bearer";
-	private String username;
-	private Long id;
-	private String role;
-
-	public AuthResponsedto() {
-	}
-
-	/**
-	 * Creates an authentication response with bearer token, username, user ID, and role.
-	 *
-	 * @param token signed JWT token
-	 * @param username authenticated username
-	 * @param id authenticated user's ID
-	 * @param role primary authority of the authenticated user
-	 */
+public record AuthResponsedto(
+	String token,
+	String tokenType,
+	String username,
+	Long id,
+	String role
+) {
 	public AuthResponsedto(String token, String username, Long id, String role) {
-		this.token = token;
-		this.username = username;
-		this.id = id;
-		this.role = role;
-	}
-
-	public String getToken() {
-		return token;
-	}
-
-	public void setToken(String token) {
-		this.token = token;
-	}
-
-	public String getTokenType() {
-		return tokenType;
-	}
-
-	public void setTokenType(String tokenType) {
-		this.tokenType = tokenType;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-	
-	public Long getId() {
-		return id;
-	}
-
-	public String getRole() {
-		return role;
-	}
-
-	public void setRole(String role) {
-		this.role = role;
+		this(token, "Bearer", username, id, role);
 	}
 }

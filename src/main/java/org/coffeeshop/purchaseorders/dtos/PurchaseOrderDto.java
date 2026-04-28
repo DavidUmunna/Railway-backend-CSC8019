@@ -25,6 +25,7 @@ public record PurchaseOrderDto(
         Long customerId,
         Long stationId,
         Long staffId,
+        boolean isArchived,
         LocalDate orderDate,
         LocalTime pickupTime,
         OrderStatus orderStatus,

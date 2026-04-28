@@ -114,9 +114,21 @@ public class PurchaseOrderController {
     }
 
     /**
+     * Archives a purchase order by setting its archive flag to true.
+     *
+     * @param orderId the path variable specifying the order ID to archive
+     * @return 200 OK with the archived order DTO
+     */
+    @PutMapping("/{orderId}/archive")
+    public ResponseEntity<PurchaseOrderDto> archiveOrder(@PathVariable("orderId") Long orderId) {
+        PurchaseOrderDto archived = service.updateArchiveFlag(orderId, true);
+        return ResponseEntity.ok(archived);
+    }
+
+    /**
      * Retrieves all purchase orders belonging to the given customer.
      *
-     * @param customerId the query parameter specifying the customer ID to filter by
+     * @param customerId the path variable specifying the customer ID to filter by
      * @return 200 OK with a list of matching order DTOs
      */
     @GetMapping(params = "customerId")
@@ -131,13 +143,13 @@ public class PurchaseOrderController {
      * @param phoneNumber the query parameter specifying the phone number to filter by
      * @return 200 OK with a list of matching order DTOs
      */
-    @GetMapping(params = "phoneNumber")
-    public ResponseEntity<List<PurchaseOrderDto>> findByPhoneNumber(@RequestParam("phoneNumber") String phoneNumber) {
+    @GetMapping("/phoneNumber/{phoneNumber}")
+    public ResponseEntity<List<PurchaseOrderDto>> findByPhoneNumber(@PathVariable("phoneNumber") String phoneNumber) {
+        System.out.println("Received phone number(Controller): " + phoneNumber); // Debug log
         List<PurchaseOrderDto> orders = service.findByPhoneNumber(phoneNumber);
         return ResponseEntity.ok(orders);
     }
-    
-    
+
     /**
      * Retrieves all order items for a given order, including menu item details.
      * @param orderId the path variable specifying the order ID to fetch items for

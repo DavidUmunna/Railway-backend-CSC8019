@@ -52,6 +52,9 @@ public class PurchaseOrder {
     @Column(name = "order_status")
     private OrderStatus orderStatus;
 
+    @Column(name = "is_archived")
+    private boolean isArchived;
+
     /** The total monetary amount for the order. */
     @Column(name = "total_amount")
     private double totalAmount;
@@ -70,6 +73,7 @@ public class PurchaseOrder {
      * @param pickupTime   the requested pickup time
      * @param orderStatus  the initial status
      * @param totalAmount  the calculated total amount
+     * @param isArchived   whether the order is archived
      */
     public PurchaseOrder(
             Long orderId,
@@ -79,7 +83,8 @@ public class PurchaseOrder {
             LocalDate orderDate,
             LocalTime pickupTime,
             OrderStatus orderStatus,
-            double totalAmount) {
+            double totalAmount,
+            boolean isArchived) {
         this.orderId = orderId;
         this.customer = customer;
         this.staff = staff;
@@ -88,6 +93,7 @@ public class PurchaseOrder {
         this.pickupTime = pickupTime;
         this.orderStatus = orderStatus;
         this.totalAmount = totalAmount;
+        this.isArchived = isArchived;
     }
 
     /**
@@ -107,7 +113,7 @@ public class PurchaseOrder {
             LocalTime pickupTime,
             OrderStatus orderStatus,
             double totalAmount) {
-        this(null, customer, station, null, orderDate, pickupTime, orderStatus, totalAmount);
+        this(null, customer, station, null, orderDate, pickupTime, orderStatus, totalAmount, false);
     }
 
     public Long getPurchaseOrderId() {
@@ -120,6 +126,9 @@ public class PurchaseOrder {
 
     public Station getStation() {
         return station;
+    }
+    public boolean getIsArchived() {
+        return isArchived;
     }
 
     public Staff getStaff() {

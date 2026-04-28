@@ -1,13 +1,21 @@
 package org.coffeeshop.purchaseorders.controllers;
 
 import java.util.List;
+
+import org.coffeeshop.purchaseorders.dtos.CreateMenuItemDto;
 import org.coffeeshop.purchaseorders.dtos.MenuItemDto;
 import org.coffeeshop.purchaseorders.services.MenuItemService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import jakarta.validation.Valid;
 
 /**
  * REST controller for browsing menu items.
@@ -55,4 +63,28 @@ public class MenuItemController {
 
         return ResponseEntity.ok(dto);
     }
+
+    /**
+     * Creates a new menu item with its nested size and price variants.
+     *
+     * @param itemDto the request body containing the menu item details and type variants
+     * @return 201 Created with the newly created menu item DTO
+     */
+    @PostMapping
+    public ResponseEntity<MenuItemDto> createMenuItem(@Valid @RequestBody CreateMenuItemDto itemDto) {
+        MenuItemDto created = service.createMenuItem(itemDto);
+
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
+    }
+
+    /**
+     * Deletes a menu item and all its associated size and price variants by ID.
+     *
+     * @param id the path variable specifying the menu item ID to delete
+     * @return 204 No Content on successful deletion
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteMenuItem(@PathVariable("id") Long id) {
+        service.deleteMenuItem(id);
+        return ResponseEntity.noContent().build();    }
 }

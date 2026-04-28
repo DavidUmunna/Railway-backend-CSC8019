@@ -1,13 +1,19 @@
 package org.coffeeshop.purchaseorders.services;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
+
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.coffeeshop.purchaseorders.dtos.CreateMenuItemDto;
+import org.coffeeshop.purchaseorders.dtos.CreateMenuItemTypeDto;
 import org.coffeeshop.purchaseorders.dtos.MenuItemDto;
 import org.coffeeshop.purchaseorders.dtos.MenuItemTypeDto;
 import org.coffeeshop.purchaseorders.models.MenuItem;
 import org.coffeeshop.purchaseorders.models.MenuItemType;
 import org.coffeeshop.purchaseorders.repositories.MenuItemRepository;
+import org.coffeeshop.purchaseorders.repositories.MenuItemTypeRepository;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,19 +21,22 @@ import org.springframework.stereotype.Service;
  * Retrieves menu items with their associated types (sizes and prices) nested.
  * @author Kulagina Tatiana
  * @version 1.0
- * @since 2026-04-18
+ * @since 2026-04-23
  */
 @Service
 public class MenuItemService {
-    private final MenuItemRepository repository;
+    private final MenuItemRepository itemRepository;
+    private final MenuItemTypeRepository typeRepository;
 
     /**
      * Constructs the service with the given menu item repository.
      *
-     * @param repository the menu item repository
+     * @param itemRepository the menu item repository
+     * @param typeRepository the menu item type repository
      */
-    public MenuItemService(MenuItemRepository repository) {
-        this.repository = repository;
+    public MenuItemService(MenuItemRepository itemRepository, MenuItemTypeRepository typeRepository) {
+        this.itemRepository = itemRepository;
+        this.typeRepository = typeRepository;
     }
 
     /**
@@ -39,7 +48,7 @@ public class MenuItemService {
      */
     public MenuItemDto getById(Long id) {
         MenuItem entity =
-                repository
+                itemRepository
                         .findById(id)
                         .orElseThrow(
                                 () ->
@@ -54,11 +63,53 @@ public class MenuItemService {
      * @return a list of all menu items as DTOs
      */
     public List<MenuItemDto> findAllMenuItems() {
-        List<MenuItem> menuItems = repository.findAll();
+        List<MenuItem> menuItems = itemRepository.findAll();
         return menuItems.stream().map(this::toDto).collect(Collectors.toList());
     }
 
-    // TBC if MenuItem can be added by staff. if so add createMenuItem method and deleteMenuItem
+    /**
+     * Creates a new menu item along with its size and price variants.
+     * The parent menu item is persisted first, then each nested type is
+     * linked to it via the many-to-one relationship before being saved.
+     *
+     * @param itemDto the creation DTO containing the item details and its type variants
+     * @return the created menu item as a response DTO, including nested types
+     */
+    public MenuItemDto createMenuItem(CreateMenuItemDto itemDto) {
+        MenuItem menuItem = new MenuItem(
+                itemDto.name(), 
+                itemDto.description(), 
+                true);
+        MenuItem savedItem = itemRepository.save(menuItem);
+        
+        for (CreateMenuItemTypeDto typeDto : itemDto.menuItemTypes()) {
+            MenuItemType type = new MenuItemType(
+                menuItem,
+                typeDto.size(),
+                typeDto.price(),
+                true
+            );
+            typeRepository.save(type);
+        }
+
+        return toDto(savedItem);
+    }
+
+    /**
+     * Deletes a menu item and all its associated size and price variants.
+     * The operation is transactional — if any part fails, the entire deletion
+     * is rolled back. Child types are removed automatically via orphan removal.
+     *
+     * @param id the menu item ID to delete
+     * @throws jakarta.persistence.EntityNotFoundException if no menu item exists with the given ID
+     */
+    @Transactional
+    public void deleteMenuItem(Long id) {
+        MenuItem entity = 
+                itemRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("MenuItem not found with id: " + id));
+        itemRepository.delete(entity);
+    }
 
     /**
      * Converts a MenuItem entity to a MenuItemDto, including nested type variants.
