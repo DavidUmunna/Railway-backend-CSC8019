@@ -130,6 +130,7 @@ public class SecurityConfig {
                     .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/stations/**").permitAll()
                     .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/v1/orders").permitAll()
                     .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/orders/**").permitAll()
+                    .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/v1/checkout/**").permitAll()
                     .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/v1/orders/**").authenticated()
                         .requestMatchers("/api/v1/auth/**", "/gate", "/error").permitAll()
                         .requestMatchers("/api/v1/customers/**").permitAll()
