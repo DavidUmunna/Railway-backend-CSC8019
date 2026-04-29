@@ -103,12 +103,13 @@ public class PurchaseOrderController {
 
     /**
      * Retrieves all purchase orders matching the given status.
-     *
-     * @param status the query parameter specifying the order status to filter by
+     *@ModifiedBy Umunna David
+     @since 29/04/2026
+     * @param status the path variable specifying the order status to filter by
      * @return 200 OK with a list of matching order DTOs
      */
-    @GetMapping(params = "status")
-    public ResponseEntity<List<PurchaseOrderDto>> findByStatus(@RequestParam("status") OrderStatus status) {
+    @GetMapping("/status/{status}")
+    public ResponseEntity<List<PurchaseOrderDto>> findByStatus(@PathVariable("status") OrderStatus status) {
         List<PurchaseOrderDto> orders = service.findByStatus(status);
         return ResponseEntity.ok(orders);
     }
@@ -117,11 +118,12 @@ public class PurchaseOrderController {
      * Archives a purchase order by setting its archive flag to true.
      *
      * @param orderId the path variable specifying the order ID to archive
+     * @param archive the query parameter specifying whether to archive or unarchive the order
      * @return 200 OK with the archived order DTO
      */
     @PutMapping("/{orderId}/archive")
-    public ResponseEntity<PurchaseOrderDto> archiveOrder(@PathVariable("orderId") Long orderId) {
-        PurchaseOrderDto archived = service.updateArchiveFlag(orderId, true);
+    public ResponseEntity<PurchaseOrderDto> archiveOrder(@PathVariable("orderId") Long orderId, @RequestParam("archive") boolean archive) {
+        PurchaseOrderDto archived = service.updateArchiveFlag(orderId, archive);
         return ResponseEntity.ok(archived);
     }
 

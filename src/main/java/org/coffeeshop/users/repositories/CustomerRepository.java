@@ -25,4 +25,12 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
      */
     Customer findByCustomerPhoneNumber(String customerPhoneNumber);
 
+    /**
+     * Checks if a customer exists with the given phone number.
+     *
+     * @param customerPhoneNumber the phone number to check for existence
+     * @return true if a customer with the given phone number exists, false otherwise
+     */
+    boolean existsByCustomerPhoneNumber(String customerPhoneNumber);
+
 }

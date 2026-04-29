@@ -1,6 +1,9 @@
 package org.coffeeshop.users.models;
 
+import org.hibernate.validator.constraints.UniqueElements;
+
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 
 /**
  * this class is a representation of the customer entity in the database
@@ -26,8 +29,8 @@ public  class Customer {
     @Column(name = "customer_lastname", nullable = false)
     private String customerLastName;
 
-
-    @Column(name = "customer_phone_number")
+    @Pattern(regexp = "^[0-9+]{10,15}$")
+    @Column(name = "customer_phone_number",unique = true, nullable = false)
     private String customerPhoneNumber;
 
 

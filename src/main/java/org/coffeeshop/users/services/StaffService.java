@@ -54,6 +54,9 @@ public class StaffService {
     public StaffDto create(CreateStaffDto dto) {
         try {
             Staff staff = fromCreateDto(dto);
+            if (staffRepository.existsByUsername(staff.getUsername())) {
+                throw new StaffServiceException("Staff with username " + staff.getUsername() + " already exists");
+            }
             Staff saved = staffRepository.save(staff);
 
             return toDto(saved);
