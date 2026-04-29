@@ -29,8 +29,8 @@ public class CustomerService {
         try {
 
             Customer newCustomer = fromDtoCreate(dto);
-            if (customerRepository.existsByCustomerPhoneNumber(newCustomer.getCustomerPhoneNumber())) {
-                throw new CustomerServiceException("Customer with phone number " + newCustomer.getCustomerPhoneNumber() + " already exists");
+            if (newCustomer==null) {    
+                throw new CustomerServiceException("Customer data is invalid");
             }
             Customer saved = customerRepository.save(newCustomer);
             return toDto(saved);

@@ -30,7 +30,7 @@ public  class Customer {
     private String customerLastName;
 
     @Pattern(regexp = "^[0-9+]{10,15}$")
-    @Column(name = "customer_phone_number",unique = true, nullable = false)
+    @Column(name = "customer_phone_number", nullable = false)
     private String customerPhoneNumber;
 
 
