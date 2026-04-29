@@ -42,7 +42,7 @@ public class SecurityConfig {
     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
     private final RestAccessDeniedHandler restAccessDeniedHandler;
 
-        @Value("${app.cors.allowed-origins:http://localhost:5173,http://127.0.0.1:5173,https://railway-backend-csc8019-production.up.railway.app}")
+        @Value("${app.cors.allowed-origins:http://localhost:5173,http://127.0.0.1:5173,https://whistlestopcoffee-production.up.railway.app}")
         private String allowedOrigins;
     /*@Bean
     public AuthenticationManager authenticationManager(
@@ -96,7 +96,18 @@ public class SecurityConfig {
             .collect(Collectors.toList());
         configuration.setAllowedOrigins(origins);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowedHeaders(Arrays.asList(
+            "Authorization",
+            "Content-Type",
+            "X-Requested-With",
+            "Accept",
+            "Origin",
+            "Access-Control-Allow-Origin",
+            "Access-Control-Allow-Methods",
+            "Access-Control-Allow-Headers",
+            "Access-Control-Allow-Credentials",
+            "Access-Control-Expose-Headers"
+        ));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 
