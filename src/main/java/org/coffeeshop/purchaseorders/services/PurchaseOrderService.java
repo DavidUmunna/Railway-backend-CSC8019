@@ -277,18 +277,22 @@ public class PurchaseOrderService {
      * @return a list of matching orders as DTOs
      */
      public List<PurchaseOrderDto> findByPhoneNumber(String phoneNumber) {
-        Customer customer = customerRepository.findByCustomerPhoneNumber(phoneNumber);
-        if (customer == null) {
-            throw new EntityNotFoundException("Customer not found with phone number: " + phoneNumber);
-        }
+    List<Customer> customers = customerRepository.findByCustomerPhoneNumber(phoneNumber);
 
-        System.out.println("Found customer for phone number(Service) " + phoneNumber + ": " + customer); // Debug log
-        List<PurchaseOrder> orders = orderRepository.findByCustomerCustomerId(customer.getId());
-
-        System.out.println("Found " + orders.size() + " orders for customer ID " + customer.getId()); // Debug log
-      
-        return orders.stream().map(this::toDto).collect(Collectors.toList());
+    if (customers.isEmpty()) {
+        throw new EntityNotFoundException("Customer not found with phone number: " + phoneNumber);
     }
+
+    List<PurchaseOrder> orders = new ArrayList<>();
+
+    for (Customer customer : customers) {
+        orders.addAll(orderRepository.findByCustomerCustomerId(customer.getId()));
+    }
+
+    return orders.stream()
+            .map(this::toDto)
+            .collect(Collectors.toList());
+}
 
     /**
      * Retrieves all purchase orders belonging to the given staff member.

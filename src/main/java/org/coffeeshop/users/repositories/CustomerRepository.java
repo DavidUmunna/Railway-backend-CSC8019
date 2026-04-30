@@ -1,5 +1,7 @@
 package org.coffeeshop.users.repositories;
 
+import java.util.List;
+
 import org.coffeeshop.users.models.Customer;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,7 +25,7 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
      * @param customerPhoneNumber the phone number of the customer
      * @return the customer entity matching the given phone number
      */
-    Customer findByCustomerPhoneNumber(String customerPhoneNumber);
+    List<Customer> findByCustomerPhoneNumber(String customerPhoneNumber);
 
     /**
      * Checks if a customer exists with the given phone number.
