@@ -26,7 +26,7 @@ public class MenuItemType {
     private MenuItem menuItem;
 
     /** The size variant of this menu item type. */
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = MenuItemSizeConverter.class)
     @Column(name = "size_name")
     private MenuItemSize size;
 
