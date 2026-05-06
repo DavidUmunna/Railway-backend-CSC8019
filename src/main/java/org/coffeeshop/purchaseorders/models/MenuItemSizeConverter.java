@@ -4,7 +4,7 @@ import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import java.util.Locale;
 
-@Converter(autoApply = false)
+@Converter(autoApply = true)
 public class MenuItemSizeConverter implements AttributeConverter<MenuItemSize, String> {
 
     @Override
