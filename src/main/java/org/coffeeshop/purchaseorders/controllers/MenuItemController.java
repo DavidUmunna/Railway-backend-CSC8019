@@ -23,7 +23,7 @@ import jakarta.validation.Valid;
  * with nested size and price information.
  * @author Kulagina Tatiana
  * @version 1.0
- * @since 2026-04-18
+ * @since 2026-04-27
  */
 @RestController
 @RequestMapping("/api/v1/menu-items")
@@ -58,7 +58,7 @@ public class MenuItemController {
      * @return 200 OK with the menu item DTO
      */
     @GetMapping("/{id}")
-    public ResponseEntity<MenuItemDto> getById(@PathVariable Long id) {
+    public ResponseEntity<MenuItemDto> getById(@PathVariable("id") Long id) {
         MenuItemDto dto = service.getById(id);
 
         return ResponseEntity.ok(dto);

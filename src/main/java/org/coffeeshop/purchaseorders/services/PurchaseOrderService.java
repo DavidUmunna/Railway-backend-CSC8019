@@ -1,6 +1,8 @@
 package org.coffeeshop.purchaseorders.services;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -354,6 +356,7 @@ public class PurchaseOrderService {
      * @throws jakarta.persistence.EntityNotFoundException         if no order exists with the given ID
      * @throws InvalidOrderStatusTransition                        if the order is CANCELLED and a status change is attempted
      */
+    @Transactional
     public PurchaseOrderDto updateOrderStatus(Long orderId, Long staffId, UpdateOrderStatusDto dto) {
         PurchaseOrder existing =
                 orderRepository
@@ -385,6 +388,7 @@ public class PurchaseOrderService {
                         dto.orderStatus(),
                         existing.getTotalAmount(),
                         existing.getIsArchived());
+       
 
         PurchaseOrder saved = orderRepository.save(updated);
         return toDto(saved);

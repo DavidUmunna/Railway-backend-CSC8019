@@ -1,6 +1,8 @@
 package org.coffeeshop.purchaseorders.models;
 
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,7 +40,9 @@ public class MenuItem {
     private boolean isAvailable;
 
     /** No-arg constructor required by JPA. */
-    protected MenuItem() {}
+    protected MenuItem() {
+        menuItems = new ArrayList<>();
+    }
 
     /**
      * Full constructor including the menu item ID.
@@ -57,6 +61,7 @@ public class MenuItem {
         this.name = name;
         this.description = description;
         this.isAvailable = isAvailable;
+        menuItems = new ArrayList<>();
     }
 
     /**

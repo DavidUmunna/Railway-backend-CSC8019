@@ -3,6 +3,7 @@ package org.coffeeshop.purchaseorders.services;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,7 +22,7 @@ import org.springframework.stereotype.Service;
  * Retrieves menu items with their associated types (sizes and prices) nested.
  * @author Kulagina Tatiana
  * @version 1.0
- * @since 2026-04-23
+ * @since 2026-04-25
  */
 @Service
 public class MenuItemService {
@@ -81,18 +82,32 @@ public class MenuItemService {
                 itemDto.description(), 
                 true);
         MenuItem savedItem = itemRepository.save(menuItem);
-        
+
+        List<MenuItemTypeDto> typeDtos = new ArrayList<>();
         for (CreateMenuItemTypeDto typeDto : itemDto.menuItemTypes()) {
             MenuItemType type = new MenuItemType(
-                menuItem,
+                savedItem,
                 typeDto.size(),
                 typeDto.price(),
                 true
             );
-            typeRepository.save(type);
+            MenuItemType savedType = typeRepository.save(type);
+            
+            typeDtos.add(new MenuItemTypeDto(
+                    savedType.getMenuItemTypeId(),
+                    savedItem.getMenuItemId(),
+                    savedType.getSize(),
+                    savedType.getPrice(),
+                    savedType.isAvailable()));
+
         }
 
-        return toDto(savedItem);
+        return new MenuItemDto(
+                savedItem.getMenuItemId(),
+                savedItem.getName(),
+                savedItem.getDescription(),
+                savedItem.isAvailable(),
+                typeDtos);
     }
 
     /**
@@ -118,8 +133,12 @@ public class MenuItemService {
      * @return the corresponding DTO
      */
     private MenuItemDto toDto(MenuItem entity) {
+        // List<MenuItemTypeDto> types =
+        //         entity.getMenuItems().stream().map(this::toTypeDto).collect(Collectors.toList());
         List<MenuItemTypeDto> types =
-                entity.getMenuItems().stream().map(this::toTypeDto).collect(Collectors.toList());
+                entity.getMenuItems() != null
+                ? entity.getMenuItems().stream().map(this::toTypeDto).collect(Collectors.toList())
+                : List.of();
 
         return new MenuItemDto(
                 entity.getMenuItemId(),

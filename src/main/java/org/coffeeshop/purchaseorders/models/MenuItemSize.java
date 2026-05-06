@@ -14,8 +14,8 @@ import java.util.Locale;
  * @since 2026-04-18
  */
 public enum MenuItemSize {
-    Regular,
-    Large;
+    REGULAR,
+    LARGE;
 
     @JsonCreator
     public static MenuItemSize fromValue(String value) {

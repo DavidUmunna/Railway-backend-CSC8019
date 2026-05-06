@@ -2,16 +2,26 @@
 package org.coffeeshop.users.services;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.coffeeshop.exceptions.userexceptions.CustomerServiceException;
+import org.coffeeshop.users.dtos.CreateCustomerDto;
 import org.coffeeshop.users.dtos.CustomerDto;
+import org.coffeeshop.users.dtos.UpdateCustomerDto;
 import org.coffeeshop.users.models.Customer;
 import org.coffeeshop.users.repositories.CustomerRepository;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
-
+import org.springframework.dao.DataAccessException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
+/**
+ * @author Umunna David
+ * @version 1.0
+ * @since 2026-04-12
+ * @modifiedby Kulagina Tatiana
+ * @since 2026-04-27
+ */
 @Service
 public class CustomerService {
 
@@ -22,15 +32,17 @@ public class CustomerService {
     }
 
     /**
-     * Create a new customer from the provided DTO.
+      * Create a new customer from the provided DTO.
       * @param dto the customer data transfer object containing the information needed to create a new customer
-     */
-    public CustomerDto createCustomer(CustomerDto dto) {
+      * @return the created customer as a DTO
+      * @throws CustomerServiceException if the customer could not be created
+      */
+    public CustomerDto createCustomer(CreateCustomerDto dto) {
         try {
 
             Customer newCustomer = fromDtoCreate(dto);
-            if (newCustomer==null) {    
-                throw new CustomerServiceException("Customer data is invalid");
+            if(newCustomer==null) {
+                throw new IllegalArgumentException("Customer data is invalid");
             }
             Customer saved = customerRepository.save(newCustomer);
             return toDto(saved);
@@ -40,62 +52,51 @@ public class CustomerService {
     }
 
     public List<CustomerDto> findAllCustomers() {
-        List<Customer> customers = customerRepository.findAll(); // List<Customer> if JpaRepository
+        List<Customer> customers = customerRepository.findAll();
         return customers.stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
 
-   
-
     /**
      * Find customer by id.
      */
     public CustomerDto findCustomerById(Long id) {
-        try {
-            Customer customer = customerRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException("Customer not found: " + id));
-            return toDto(customer);
-        } catch (DataAccessException e) {
-            throw new CustomerServiceException("Could not find customer with id " + id, e);
-        }
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Customer not found: " + id));
+        return toDto(customer);
     }
 
-    
-    public CustomerDto updateCustomer(Long id, CustomerDto dto) {
-        try {
-            Customer existing = customerRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException("Customer not found: " + id));
+    public CustomerDto updateCustomer(Long id, UpdateCustomerDto dto) {
+        Customer existing = customerRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Customer not found: " + id));
 
-                Customer updated = new Customer(
-                    existing.getId(),
-                    dto.customerFirstName(),
-                    dto.customerLastName(),
-                    dto.customerPhoneNumber()
-                );
+            Customer updated = new Customer(
+                existing.getId(),
+                dto.customerFirstName(),
+                dto.customerLastName(),
+                dto.customerPhoneNumber()
+            );
 
-            Customer saved = customerRepository.save(updated);
-            return toDto(saved);
-        } catch (DataAccessException e) {
-            throw new CustomerServiceException("Could not update customer with id " + id, e);
-        }
+        Customer saved = customerRepository.save(updated);
+        return toDto(saved);
     }
 
-    
-    public String deleteCustomer(Long id) {
-        try {
-            customerRepository.deleteById(id);
-            customerRepository.flush();
-          return "Customer Deleted Successfully";
-        } catch (DataAccessException e) {
-            throw new CustomerServiceException("Error deleting customer with id " + id, e);
+    @Transactional
+    public void deleteCustomer(Long id) {
+        Customer entity = 
+                customerRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Customer not found: " + id));
+        
+        if (entity == null) {
+            throw new EntityNotFoundException("Customer not found: " + id);
         }
+        customerRepository.delete(entity);
     }
 
     /**
      * Mapping helpers, similar to StaffService.
      */
-
     private CustomerDto toDto(Customer customer) {
         return new CustomerDto(
                 customer.getId(),
@@ -105,12 +106,11 @@ public class CustomerService {
         );
     }
 
-    // For create if you add an update path later, you can mirror Staff.fromDto
-    private Customer fromDtoCreate(CustomerDto customerDto) {
+    private Customer fromDtoCreate(CreateCustomerDto dto) {
         return new Customer(
-                customerDto.customerFirstName(),
-                customerDto.customerLastName(),
-                customerDto.customerPhoneNumber()
+                dto.customerFirstName(),
+                dto.customerLastName(),
+                dto.customerPhoneNumber()
         );
     }
 }

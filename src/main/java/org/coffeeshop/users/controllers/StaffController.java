@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import org.coffeeshop.users.dtos.CreateStaffDto;
 import org.coffeeshop.users.dtos.StaffDto;
+import org.coffeeshop.users.dtos.UpdateStaffDto;
 import org.coffeeshop.users.services.StaffService;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Handles HTTP requests related to staff management.
@@ -60,7 +60,7 @@ public class StaffController {
     @GetMapping("/all")
     public ResponseEntity<List<StaffDto>> getAllStaff() {
         List<StaffDto> allStaff = staffService.getAllStaff();
-        return new ResponseEntity<>(allStaff, HttpStatus.OK);
+        return ResponseEntity.ok(allStaff);
     }
 
     /**
@@ -90,7 +90,7 @@ public class StaffController {
      * @return a response containing the updated staff record
      */
     @PutMapping("/update/{id}")
-    public ResponseEntity<StaffDto> updateStaff(@PathVariable("id") Long id, @Valid @RequestBody StaffDto staffDto) {
+    public ResponseEntity<StaffDto> updateStaff(@PathVariable("id") Long id, @Valid @RequestBody UpdateStaffDto staffDto) {
         StaffDto staffData = staffService.updateStaff(id, staffDto);
         return ResponseEntity.ok(staffData);
     }
@@ -105,12 +105,8 @@ public class StaffController {
      * @return a response containing a confirmation message
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, String>> deleteStaff(@PathVariable("id") Long id) {
-        String msg = staffService.deleteStaff(id);
-        Map<String, String> body = Map.of("message", msg);
-        return ResponseEntity.ok(body);
+    public ResponseEntity<Void> deleteStaff(@PathVariable("id") Long id) {
+        staffService.deleteStaff(id);
+        return ResponseEntity.noContent().build();
     }
-
-    
-
 }

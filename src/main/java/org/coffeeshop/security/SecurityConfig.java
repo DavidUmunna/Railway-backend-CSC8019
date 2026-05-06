@@ -25,14 +25,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableMethodSecurity
 /**
  * Configures authentication, authorization, and JWT filter chain for the API.
- * @Author willian
- * @version 1.0
- * @since 15/04/2026
  * 
- * @ModifiedBy Umunna David
- * added Cors confiuration for origin issues
- * sorted out order authorization rules to ensure correct access control
- * @since 17/04/2026
+ * @author William Liang
+ * @version 1.0
+ * @since 2026-04-15
+ * @modifiedby Umunna David
+ * @since 2026-04-17
  * 
  */
 public class SecurityConfig {
@@ -42,8 +40,8 @@ public class SecurityConfig {
     private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
     private final RestAccessDeniedHandler restAccessDeniedHandler;
 
-    @Value("${app.cors.allowed-origins}")
-    private String allowedOrigins;
+        @Value("${app.cors.allowed-origins:http://localhost:5173,http://127.0.0.1:5173,https://whistlestopcoffee-production.up.railway.app}")
+        private String allowedOrigins;
     /*@Bean
     public AuthenticationManager authenticationManager(
             StaffUserDetailsService userDetailsService,
@@ -96,7 +94,8 @@ public class SecurityConfig {
             .collect(Collectors.toList());
         configuration.setAllowedOrigins(origins);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList(    "Authorization",
+        configuration.setAllowedHeaders(Arrays.asList(
+            "Authorization",
             "Content-Type",
             "X-Requested-With",
             "Accept",
@@ -105,8 +104,8 @@ public class SecurityConfig {
             "Access-Control-Allow-Methods",
             "Access-Control-Allow-Headers",
             "Access-Control-Allow-Credentials",
-            "Access-Control-Expose-Headers"));
-        configuration.setExposedHeaders(List.of("Authorization"));
+            "Access-Control-Expose-Headers"
+        ));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 
@@ -131,7 +130,7 @@ public class SecurityConfig {
                     .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/stations/**").permitAll()
                     .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/v1/orders").permitAll()
                     .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v1/orders/**").permitAll()
-                    .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/v1/checkout/**").permitAll()
+                    .requestMatchers(org.springframework.http.HttpMethod.POST , "/api/v1/checkout/**").permitAll()
                     .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/v1/orders/**").authenticated()
                         .requestMatchers("/api/v1/auth/**", "/gate", "/error").permitAll()
                         .requestMatchers("/api/v1/customers/**").permitAll()

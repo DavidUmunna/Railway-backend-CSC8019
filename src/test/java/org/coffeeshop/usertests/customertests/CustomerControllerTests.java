@@ -3,10 +3,12 @@ package org.coffeeshop.usertests.customertests;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.persistence.EntityManager;
-import org.coffeeshop.users.dtos.CustomerDto;
+import jakarta.transaction.Transactional;
+import org.coffeeshop.users.dtos.CreateCustomerDto;
+import org.coffeeshop.users.dtos.UpdateCustomerDto;
 import org.coffeeshop.users.models.Customer;
 import org.coffeeshop.users.repositories.CustomerRepository;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -15,160 +17,438 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.util.Objects;
-
-
 
 /**
- * Test class for CustomerController.
- * It uses Spring Boot's testing support to perform integration tests on the CustomerController endpoints.
- * The tests cover creating, retrieving, and listing customers.
- * all tests are transactional and will not persist in the database/store
+ * Integration tests for CustomerController.
+ * Uses Spring Boot's testing support with MockMvc to perform integration tests
+ * on the customer endpoints. Tests are grouped by operation using @Nested classes
+ * and are transactional to avoid persisting test data.
+ *
  * @author Umunna David
  * @version 1.0
  * @since 2026-04-12
+ * @modifiedby Kulagina Tatiana
+ * @since 2026-04-27
  */
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 class CustomerControllerTests {
+    private static final Long FAULTY_ID = 999L;
 
     @Autowired
     private MockMvc mockMvc;
-    /*@MockBean
-    JwtService jwtService;
-    @MockBean
-    JwtAuthenticationFilter jwtAuthenticationFilter;*/
-    @Autowired
-    private CustomerRepository customerRepository;
-
     @Autowired
     private EntityManager entityManager;
-
     @Autowired
     private ObjectMapper objectMapper;
 
-    @BeforeEach
-    void setUp() {
-        customerRepository.deleteAll();
+    @Autowired
+    private CustomerRepository customerRepository;
+
+    /**
+     * Tests for POST /api/v1/customers/create — customer creation scenarios
+     * including happy path and validation errors for null, empty, and invalid fields.
+     */
+    @Nested
+    class CreateCustomerTests{
+        /**
+         * Verifies that creating a customer with valid data returns 201 Created
+         * with the correct fields including customerId, customerFirstName,
+         * customerLastName, and customerPhoneNumber. Also asserts the customer
+         * is persisted in the repository.
+         *
+         * @throws Exception if the MockMvc request fails
+         */
+        @Test
+        void createCustomer_returnsCreatedCustomer() throws Exception {
+            CreateCustomerDto request = new CreateCustomerDto("Jane", "Grande", "07123456789");
+            
+            mockMvc.perform(post("/api/v1/customers/create")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.customerId").isNumber())
+                    .andExpect(jsonPath("$.customerFirstName").value("Jane"))
+                    .andExpect(jsonPath("$.customerLastName").value("Grande"))
+                    .andExpect(jsonPath("$.customerPhoneNumber").value("07123456789"));
+            
+            assertTrue(customerRepository.findAll().stream()
+            .anyMatch(customer -> "07123456789".equals(customer.getCustomerPhoneNumber())));
+        }
+        
+        /**
+         * Verifies that creating a customer with a null first name returns 400 Bad Request,
+         * as the @NotNull constraint on CreateCustomerDto.customerFirstName rejects null values.
+         *
+         * @throws Exception if the MockMvc request fails
+         */
+        @Test
+        void createCustomer_returns400WhenFirstNameIsNull() throws Exception {
+            CreateCustomerDto request = new CreateCustomerDto(null, "Grande", "07123456789");
+            
+            mockMvc.perform(post("/api/v1/customers/create")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+            
+            assertEquals(0, customerRepository.count());
+        }
+        
+        /**
+         * Verifies that creating a customer with an empty first name returns 400 Bad Request,
+         * as the @NotBlank constraint on CreateCustomerDto.customerFirstName rejects empty strings.
+         *
+         * @throws Exception if the MockMvc request fails
+         */
+        @Test
+        void createCustomer_returns400WhenFirstNameIsEmpty() throws Exception {
+            CreateCustomerDto request = new CreateCustomerDto("", "Grande", "07123456789");
+            
+            mockMvc.perform(post("/api/v1/customers/create")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+            
+            assertEquals(0, customerRepository.count());
+        }
+        
+        /**
+         * Verifies that creating a customer with a null last name returns 400 Bad Request,
+         * as the @NotNull constraint on CreateCustomerDto.customerLastName rejects null values.
+         *
+         * @throws Exception if the MockMvc request fails
+         */
+        @Test
+        void createCustomer_returns400WhenLastNameIsNull() throws Exception {
+            CreateCustomerDto request = new CreateCustomerDto("Jane", null, "07123456789");
+            
+            mockMvc.perform(post("/api/v1/customers/create")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+            
+            assertEquals(0, customerRepository.count());
+        }
+        
+        /**
+         * Verifies that creating a customer with an empty last name returns 400 Bad Request,
+         * as the @NotBlank constraint on CreateCustomerDto.customerLastName rejects empty strings.
+         *
+         * @throws Exception if the MockMvc request fails
+         */
+        @Test
+        void createCustomer_returns400WhenLastNameIsEmpty() throws Exception {
+            CreateCustomerDto request = new CreateCustomerDto("Jane", "", "07123456789");
+            
+            mockMvc.perform(post("/api/v1/customers/create")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+            
+            assertEquals(0, customerRepository.count());
+        }
+        
+        /**
+         * Verifies that creating a customer with a null phone number returns 400 Bad Request,
+         * as the @NotNull constraint on CreateCustomerDto.customerPhoneNumber rejects null values.
+         *
+         * @throws Exception if the MockMvc request fails
+         */
+        @Test
+        void createCustomer_returns400WhenPhoneIsNull() throws Exception {
+            CreateCustomerDto request = new CreateCustomerDto("Jane", "Grande", null);
+            
+            mockMvc.perform(post("/api/v1/customers/create")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+            
+            assertEquals(0, customerRepository.count());
+        }
+        
+        /**
+         * Verifies that creating a customer with an empty phone number returns 400 Bad Request,
+         * as the @NotBlank constraint on CreateCustomerDto.customerPhoneNumber rejects empty strings.
+         *
+         * @throws Exception if the MockMvc request fails
+         */
+        @Test
+        void createCustomer_returns400WhenPhoneIsEmpty() throws Exception {
+            CreateCustomerDto request = new CreateCustomerDto("Jane", "Grande", "");
+            
+            mockMvc.perform(post("/api/v1/customers/create")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+            
+            assertEquals(0, customerRepository.count());
+        }
+        
+        /**
+         * Verifies that creating a customer with a phone number that is too short returns 400 Bad Request,
+         * as the @Size(min = 10) constraint on CreateCustomerDto.customerPhoneNumber rejects short values.
+         *
+         * @throws Exception if the MockMvc request fails
+         */
+        @Test
+        void createCustomer_returns400WhenPhoneTooShort() throws Exception {
+            CreateCustomerDto request = new CreateCustomerDto("Jane", "Grande", "0");
+            
+            mockMvc.perform(post("/api/v1/customers/create")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+            
+            assertEquals(0, customerRepository.count());
+        }
     }
 
     /**
-     * this test asserts if  if a particular customer is created,
-     * it makes use of mockMvc to perform a post request
-     * which is expetcted to be created and expected to have all the customers data 
-     * saved in the right field  
-     * @throws Exception 
+     * Tests for GET /api/v1/customers — customer retrieval scenarios
+     * including get by ID, get all, and 404 for missing customers.
      */
-    @Test
-    void createCustomer_returnsCreatedCustomer() throws Exception {
-         CustomerDto request = new CustomerDto(null, "Jane", "Grande", "07123456789");
+    @Nested
+    class GetCustomerTests {
+        /**
+         * Verifies that GET /api/v1/customers/all returns 200 OK
+         * with a list containing all previously created customers.
+         *
+         * @throws Exception if the MockMvc request fails
+         */
+        @Test
+        void getAllCustomers_returnsListOfAllCustomers() throws Exception {
+            customerRepository.save(new Customer("John", "Doe", "07000000000"));
+            customerRepository.save(new Customer("Jasper", "Doe", "07000000001"));
+            saveTestCustomer();
+    
+            mockMvc.perform(get("/api/v1/customers/all"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.length()").value(3))
+                    .andExpect(jsonPath("$[*].customerPhoneNumber", containsInAnyOrder("07123456789", "07000000000", "07000000001")));
 
-        mockMvc.perform(post("/api/v1/customers/create")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.customerId").isNumber())
-                .andExpect(jsonPath("$.customerFirstName").value("Jane"))
-                .andExpect(jsonPath("$.customerLastName").value("Grande"))
-                .andExpect(jsonPath("$.customerPhoneNumber").value("07123456789"));
-
-        assertTrue(customerRepository.findAll().stream()
-                .anyMatch(customer -> "07123456789".equals(customer.getCustomerPhoneNumber())));
-    }
-
-    @Test
-    void getAllCustomers_returnsList() throws Exception {
-        customerRepository.save(new Customer("Jane", "Grande", "07123456789"));
-        customerRepository.save(new Customer("John", "Doe", "07000000000"));
-        customerRepository.flush();
-        entityManager.clear();
-
-        mockMvc.perform(get("/api/v1/customers/all")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[*].customerPhoneNumber", containsInAnyOrder("07123456789", "07000000000")));
-    }
-
-    @Test
-    void getCustomerById_returnsCustomer() throws Exception {
-        Customer savedCustomer = customerRepository.save(
-                new Customer("Jane", "Grande", "07123456789")
-        );
-        customerRepository.flush();
-        entityManager.clear();
-
-        mockMvc.perform(get("/api/v1/customers/{id}", savedCustomer.getId()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.customerId").value(savedCustomer.getId()))
-                .andExpect(jsonPath("$.customerFirstName").value("Jane"))
-                .andExpect(jsonPath("$.customerPhoneNumber").value("07123456789"));
-    }
-
-    /**
-     * This test asserts if a particular customer is updated successfully
-     * it makes use of mockMvc to perform a put request to update the customer details
-     * the request is expected to be successful and the response should contain the updated customer details
-     * @throws Exception
-     */
-    @Test
-    void updateCustomer_returnsUpdatedCustomer() throws Exception {
-        Customer savedCustomer = customerRepository.save(
-                new Customer("Jane", "Grande", "07123456789")
-        );
-        customerRepository.flush();
-        entityManager.clear();
-
-        CustomerDto updatedCustomer = new CustomerDto(
-                savedCustomer.getId(),
-                "John",
-                "Doe",
-                "07011112222"
-        );
-
-        String json = objectMapper.writeValueAsString(updatedCustomer);
-
-
-        mockMvc.perform(put("/api/v1/customers/{id}", savedCustomer.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.customerId").value(savedCustomer.getId()))
-                .andExpect(jsonPath("$.customerFirstName").value("John"))
-                .andExpect(jsonPath("$.customerLastName").value("Doe"))
-                .andExpect(jsonPath("$.customerPhoneNumber").value("07011112222"));
-        Long customerId = savedCustomer.getId();
-        Objects.requireNonNull(customerId, "Saved customer ID should not be null");
-        assertTrue(customerRepository.findById(customerId)
-                .map(customer -> "07011112222".equals(customer.getCustomerPhoneNumber()))
-                .orElse(false));
-    }
+            assertEquals(3, customerRepository.count());
+        }
+    
+        /**
+         * Verifies that retrieving an existing customer by ID returns 200 OK
+         * with the correct fields including customerId, customerFirstName,
+         * and customerPhoneNumber.
+         *
+         * @throws Exception if the MockMvc request fails
+         */
+        @Test
+        void getCustomerById_returnsCustomer() throws Exception {
+            Customer customer = saveTestCustomer();
+    
+            mockMvc.perform(get("/api/v1/customers/{id}", customer.getId()))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.customerId").value(customer.getId()))
+                    .andExpect(jsonPath("$.customerFirstName").value("Jane"))
+                    .andExpect(jsonPath("$.customerPhoneNumber").value("07123456789"));
+        }
+    
+        /**
+         * Verifies that retrieving a non-existent customer ID returns 404 Not Found.
+         *
+         * @throws Exception if the MockMvc request fails
+         */
+        @Test
+        void getCustomerById_returns404ForMissingCustomer() throws Exception {    
+            mockMvc.perform(get("/api/v1/customers/{id}", FAULTY_ID))
+                    .andExpect(status().isNotFound());
+        }
 
         /**
-         * This test asserts if a particular customer is deleted successfully
-         * it makes use of mockMvc to perform a delete request to delete the customer
-         * the request is expected to be successful and the response should contain a message confirming the deletion
-         * after the deletion, the test also checks that the customer no longer exists in the repository
-         * @throws Exception
+         * Verifies that GET /api/v1/customers/all returns 200 OK
+         * with an empty list when no customers exist.
+         *
+         * @throws Exception if the MockMvc request fails
          */
-    @Test
-    void deleteCustomer_returnsStringMessage() throws Exception {
-        Customer savedCustomer = customerRepository.save(
-                new Customer("Jane", "Grande", "07123456789")
-        );
-        customerRepository.flush();
+        @Test
+        void getCustomer_returnsEmptyListWhenNoCustomers() throws Exception {
+            mockMvc.perform(get("/api/v1/customers/all"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.length()").value(0));
+        }
+    }
+
+    /**
+     * Tests for PUT /api/v1/customers/{id} — customer update scenarios
+     * including happy path, 404 for missing customer, and validation errors.
+     */
+    @Nested
+    class UpdateCustomerTests {
+        /**
+         * Verifies that updating an existing customer with valid data returns 200 OK,
+         * and that a subsequent GET confirms the updated fields have been persisted.
+         *
+         * @throws Exception if the MockMvc request fails
+         */
+        @Test
+        void updateCustomer_returns200() throws Exception {
+            Customer savedCustomer = saveTestCustomer();
+            UpdateCustomerDto updatedCustomer = new UpdateCustomerDto(
+                    "John",
+                    "Doe",
+                    "07011112222"
+            );
+    
+            mockMvc.perform(put("/api/v1/customers/{id}", savedCustomer.getId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(updatedCustomer)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.customerFirstName").value("John"));
+            
+            mockMvc.perform(get("/api/v1/customers/{id}", savedCustomer.getId()))
+                    .andExpect(jsonPath("$.customerId").value(savedCustomer.getId()))
+                    .andExpect(jsonPath("$.customerFirstName").value("John"))
+                    .andExpect(jsonPath("$.customerLastName").value("Doe"))
+                    .andExpect(jsonPath("$.customerPhoneNumber").value("07011112222"));
+
+            assertEquals(1, customerRepository.count());
+        }
+        
+        /**
+         * Verifies that updating a non-existent customer ID returns 404 Not Found,
+         * and that a subsequent GET confirms the existing customer was not modified.
+         *
+         * @throws Exception if the MockMvc request fails
+         */
+        @Test
+        void updateCustomer_returns404ForMissingCustomer() throws Exception {
+            Customer savedCustomer = saveTestCustomer();
+            UpdateCustomerDto updatedCustomer = new UpdateCustomerDto(
+                    "John",
+                    "Doe",
+                    "07011112222"
+            );
+    
+            mockMvc.perform(put("/api/v1/customers/{id}", FAULTY_ID)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(updatedCustomer)))
+                    .andExpect(status().isNotFound());
+                        
+            mockMvc.perform(get("/api/v1/customers/{id}", savedCustomer.getId()))
+                    .andExpect(jsonPath("$.customerId").value(savedCustomer.getId()))
+                    .andExpect(jsonPath("$.customerFirstName").value("Jane"))
+                    .andExpect(jsonPath("$.customerLastName").value("Grande"))
+                    .andExpect(jsonPath("$.customerPhoneNumber").value("07123456789"));
+        }
+        
+        /**
+         * Verifies that updating a customer with a null first name returns 400 Bad Request,
+         * as the @NotNull constraint on UpdateCustomerDto.customerFirstName rejects null values,
+         * and that a subsequent GET confirms the existing customer was not modified.
+         *
+         * @throws Exception if the MockMvc request fails
+         */
+        @Test
+        void updateCustomer_returns400ForNullFirstName() throws Exception {
+            Customer savedCustomer = saveTestCustomer();
+            UpdateCustomerDto updatedCustomer = new UpdateCustomerDto(
+                    null,
+                    "Doe",
+                    "07011112222"
+            );
+    
+            mockMvc.perform(put("/api/v1/customers/{id}", savedCustomer.getId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(updatedCustomer)))
+                    .andExpect(status().isBadRequest());
+                        
+            mockMvc.perform(get("/api/v1/customers/{id}", savedCustomer.getId()))
+                    .andExpect(jsonPath("$.customerId").value(savedCustomer.getId()))
+                    .andExpect(jsonPath("$.customerFirstName").value("Jane"))
+                    .andExpect(jsonPath("$.customerLastName").value("Grande"))
+                    .andExpect(jsonPath("$.customerPhoneNumber").value("07123456789"));
+        }
+        
+        /**
+         * Verifies that updating a customer with an empty first name returns 400 Bad Request,
+         * as the @NotBlank constraint on UpdateCustomerDto.customerFirstName rejects empty strings,
+         * and that a subsequent GET confirms the existing customer was not modified.
+         *
+         * @throws Exception if the MockMvc request fails
+         */
+        @Test
+        void updateCustomer_returns400ForEmptyFirstName() throws Exception {
+            Customer savedCustomer = saveTestCustomer();
+            UpdateCustomerDto updatedCustomer = new UpdateCustomerDto(
+                    "",
+                    "Doe",
+                    "07011112222"
+            );
+    
+            mockMvc.perform(put("/api/v1/customers/{id}", savedCustomer.getId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(updatedCustomer)))
+                    .andExpect(status().isBadRequest());
+                        
+            mockMvc.perform(get("/api/v1/customers/{id}", savedCustomer.getId()))
+                    .andExpect(jsonPath("$.customerId").value(savedCustomer.getId()))
+                    .andExpect(jsonPath("$.customerFirstName").value("Jane"))
+                    .andExpect(jsonPath("$.customerLastName").value("Grande"))
+                    .andExpect(jsonPath("$.customerPhoneNumber").value("07123456789"));
+        }
+    }
+
+    /**
+     * Tests for DELETE /api/v1/customers/{id} — customer deletion scenarios
+     * including happy path with follow-up verification and 404 for missing customers.
+     */
+    @Nested
+    class DeleteCustomerTests {
+        /**
+         * Verifies that deleting an existing customer returns 204 No Content,
+         * and that a subsequent GET returns 404. Also asserts that the customer
+         * no longer exists in the repository.
+         *
+         * @throws Exception if the MockMvc request fails
+         */
+        @Test
+        void deleteCustomer_returns204() throws Exception {
+            Customer customer = saveTestCustomer();
+    
+            mockMvc.perform(delete("/api/v1/customers/{id}", customer.getId()))
+                    .andExpect(status().isNoContent());
+
+            mockMvc.perform(get("/api/v1/customers/{id}", customer.getId()))
+                    .andExpect(status().isNotFound());
+
+            assertFalse(customerRepository.existsById(customer.getId()));
+        }
+        
+        /**
+         * Verifies that deleting a non-existent customer returns 404 Not Found.
+         *
+         * @throws Exception if the MockMvc request fails
+         */
+        @Test
+        void deleteCustomer_returns404ForMissingCustomer() throws Exception {
+            mockMvc.perform(delete("/api/v1/customers/{id}", FAULTY_ID))
+                    .andExpect(status().isNotFound());
+        }
+    }
+
+    /**
+     * Creates and persists a test Customer entity with predefined data,
+     * then flushes and clears the persistence context to ensure fresh loading.
+     *
+     * @return the saved Customer entity
+     */
+    private Customer saveTestCustomer() {
+        Customer customer = customerRepository.save(new Customer("Jane", "Grande", "07123456789"));
+
+        entityManager.flush();
         entityManager.clear();
 
-        mockMvc.perform(delete("/api/v1/customers/{id}", savedCustomer.getId()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Customer Deleted Successfully"));
-
-        assertFalse(customerRepository.existsById(savedCustomer.getId()));
+        return customer;
     }
 }

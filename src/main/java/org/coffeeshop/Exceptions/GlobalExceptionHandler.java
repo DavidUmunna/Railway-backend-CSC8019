@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.coffeeshop.exceptions.purchaseorderexceptions.InvalidOrderStatusTransition;
 import org.coffeeshop.exceptions.userexceptions.CustomerServiceException;
 import org.coffeeshop.exceptions.userexceptions.StaffServiceException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -78,6 +79,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handleBadRequest(IllegalArgumentException ex) {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(OptimisticLockingFailureException.class)
+    public ResponseEntity<Map<String, String>> handleOptimisticLockingFailure(OptimisticLockingFailureException ex) {
+        return buildErrorResponse(HttpStatus.CONFLICT, "The resource you are trying to update has been modified by another User. Please try again.");
     }
 
     /**

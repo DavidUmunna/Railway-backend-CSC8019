@@ -1,6 +1,8 @@
 package org.coffeeshop.users.controllers;
 
+import org.coffeeshop.users.dtos.CreateCustomerDto;
 import org.coffeeshop.users.dtos.CustomerDto;
+import org.coffeeshop.users.dtos.UpdateCustomerDto;
 import org.coffeeshop.users.services.CustomerService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * REST controller that exposes CRUD endpoints for managing customers in the Coffee Shop system.
@@ -21,6 +22,8 @@ import java.util.Map;
  * @author Umunna David
  * @version 1.0
  * @since 2026-04-12
+ * @modifiedby Kulagina Tatiana
+ * @since 2026-04-27
  */
 @RestController
 @RequestMapping("/api/v1/customers")
@@ -50,7 +53,7 @@ public class CustomerController {
      * @return an HTTP 201 (Created) response containing the newly created customer DTO
      */
     @PostMapping("/create")
-    public ResponseEntity<CustomerDto> createCustomer(@Valid @RequestBody CustomerDto dto) {
+    public ResponseEntity<CustomerDto> createCustomer(@Valid @RequestBody CreateCustomerDto dto) {
         CustomerDto created = customerService.createCustomer(dto);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
@@ -100,7 +103,7 @@ public class CustomerController {
     @PutMapping("/{id}")
     public ResponseEntity<CustomerDto> updateCustomer(
             @PathVariable("id") Long id,
-            @Valid @RequestBody CustomerDto dto) {
+            @Valid @RequestBody UpdateCustomerDto dto) {
 
         return ResponseEntity.ok(customerService.updateCustomer(id, dto));
     }
@@ -120,10 +123,9 @@ public class CustomerController {
      *         field describing the outcome
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, String>> deleteCustomer(@PathVariable("id") Long id) {
-        String msg = customerService.deleteCustomer(id);
-        Map<String, String> body = Map.of("message", msg);
-        return ResponseEntity.ok(body);
+    public ResponseEntity<Void> deleteCustomer(@PathVariable("id") Long id) {
+        customerService.deleteCustomer(id);
+        return ResponseEntity.noContent().build();
     }
     
 }

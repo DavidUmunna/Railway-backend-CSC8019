@@ -21,7 +21,7 @@ import java.io.IOException;
 /**
  * Authenticates requests by parsing Bearer tokens and populating security context.
  * @author willian
- * @modifiedBy Umunna David
+ * @ModifiedBy Umunna David
  * improved error handling to clear security context on invalid tokens or disabled accounts
  * @since 20/04/2026
  */

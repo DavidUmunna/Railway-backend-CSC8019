@@ -5,20 +5,19 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 /**
- * this is a data transfer object class for creating a new staff member
+ * this is adata transfer object class for the staff entity
  * its main function is to ensure that only the necessary data is sent to the client and to provide a clear structure for the data being transferred
  * it is made up of Attributes in the staff entity 
  * 
- * @author Umunna David
+ * @author Kulagina Tatiana
  * @version 1.0 
- * @since 2026-04-12
- * @modifiedby Kulagina Tatiana
  * @since 2026-04-27
  */
-public record CreateStaffDto(
+public record UpdateStaffDto(
+        Long id,
         @NotNull @NotBlank @Size(min = 3, max = 50) String username,
         @NotNull @NotBlank @Size(min = 1, max = 50) String firstName,
         @NotNull @NotBlank @Size(min = 1, max = 50) String lastName,
-        @NotNull @NotBlank String role, 
+        @NotNull @NotBlank String role,
         @NotNull @NotBlank @Size(min = 6, max = 25) String password
 ) {}

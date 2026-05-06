@@ -15,7 +15,7 @@ import jakarta.validation.constraints.NotNull;
  */
 @Entity
 @Table(name = "staff")
-public  class Staff {
+public class Staff {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +25,7 @@ public  class Staff {
     // used for login
     @Column(nullable = false, unique = true)
     @NotNull
-    private  String username;
+    private String username;
 
     // basic identity
     @Column(name = "staff_firstname", nullable = false)
@@ -36,7 +36,6 @@ public  class Staff {
     @NotNull
     private String staffLastName;
 
-
     // e.g. "BARISTA", "MANAGER", "ADMIN"
     @Column(name = "staff_role", nullable = false)
     private String staffRole;
@@ -46,10 +45,7 @@ public  class Staff {
     @NotNull
     private String passwordHash;
 
-
-    protected Staff() {
-
-    }
+    protected Staff() {}
 
     public Staff(String username, String staffFirstName, String staffLastName, String staffRole, String passwordHash) {
         this(null, username, staffFirstName, staffLastName, staffRole, passwordHash);
@@ -64,11 +60,7 @@ public  class Staff {
         this.passwordHash = passwordHash;
     }
 
-
-
-
-
-    // === getters/setters ===
+    // === getters ===
 
     public Long getStaffId() {
         return staffId;
@@ -78,31 +70,21 @@ public  class Staff {
         return username;
     }
 
-
-
     public String getFirstName() {
         return staffFirstName;
     }
-
-
 
     public String getLastName() {
         return staffLastName;
     }
 
-
-
-
-
     public String getRole() {
         return staffRole;
     }
 
-
     public String getPasswordHash() {
         return passwordHash;
     }
-
 
     @Override
     public String toString() {
@@ -111,8 +93,5 @@ public  class Staff {
                 + "staff lastname:"+getLastName()+"\n"
                 + "staff role:"+getRole()+"\n";
     }
-
-    
-    
 }
 

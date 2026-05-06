@@ -1,4 +1,4 @@
-package org.coffeeshop.purchaseorders;
+package org.coffeeshop.purchaseorders.scripts;
 
 import org.coffeeshop.purchaseorders.models.MenuItem;
 import org.coffeeshop.purchaseorders.models.MenuItemSize;
@@ -13,14 +13,14 @@ import org.springframework.stereotype.Component;
  * @ModifiedBy Umunna David
  * added component annotation to enable automatic execution on application startup
  */
-@Component
 /**
  * Seeds the database with initial menu items and their size variants on application startup.
  * Only inserts data if the menu item table is empty.
  * @author Kulagina Tatiana
  * @version 1.0
- * @since 2026-04-18
+ * @since 2026-04-27
  */
+@Component
 public class MenuItemDataLoader implements CommandLineRunner {
     private final MenuItemRepository menuItemRepository;
     private final MenuItemTypeRepository menuItemTypeRepository;
@@ -64,20 +64,18 @@ public class MenuItemDataLoader implements CommandLineRunner {
         menuItemRepository.save(mocha);
         menuItemRepository.save(mineralWater);
 
-        menuItemTypeRepository.save(new MenuItemType(americano, MenuItemSize.Regular, 1.50, true));
-        menuItemTypeRepository.save(new MenuItemType(americano, MenuItemSize.Large, 2.00, true));
-        menuItemTypeRepository.save(new MenuItemType(americanoWithMilk, MenuItemSize.Regular, 2.00, true));
-        menuItemTypeRepository.save(new MenuItemType(americanoWithMilk, MenuItemSize.Large, 2.50, true));
-        menuItemTypeRepository.save(new MenuItemType(latte, MenuItemSize.Regular, 2.50, true));
-        menuItemTypeRepository.save(new MenuItemType(latte, MenuItemSize.Large, 3.00, true));
-        menuItemTypeRepository.save(new MenuItemType(cappuccino, MenuItemSize.Regular, 2.50, true));
-        menuItemTypeRepository.save(new MenuItemType(cappuccino, MenuItemSize.Large, 3.00, true));
-        menuItemTypeRepository.save(new MenuItemType(hotChocolate, MenuItemSize.Regular, 2.00, true));
-        menuItemTypeRepository.save(new MenuItemType(hotChocolate, MenuItemSize.Large, 2.50, true));
-        menuItemTypeRepository.save(new MenuItemType(mocha, MenuItemSize.Regular, 2.50, true));
-        menuItemTypeRepository.save(new MenuItemType(mocha, MenuItemSize.Large, 3.00, true));
-        menuItemTypeRepository.save(new MenuItemType(mineralWater, MenuItemSize.Regular, 1.00, true));
+        menuItemTypeRepository.save(new MenuItemType(americano, MenuItemSize.REGULAR, 1.50, true));
+        menuItemTypeRepository.save(new MenuItemType(americano, MenuItemSize.LARGE, 2.00, true));
+        menuItemTypeRepository.save(new MenuItemType(americanoWithMilk, MenuItemSize.REGULAR, 2.00, true));
+        menuItemTypeRepository.save(new MenuItemType(americanoWithMilk, MenuItemSize.LARGE, 2.50, true));
+        menuItemTypeRepository.save(new MenuItemType(latte, MenuItemSize.REGULAR, 2.50, true));
+        menuItemTypeRepository.save(new MenuItemType(latte, MenuItemSize.LARGE, 3.00, true));
+        menuItemTypeRepository.save(new MenuItemType(cappuccino, MenuItemSize.REGULAR, 2.50, true));
+        menuItemTypeRepository.save(new MenuItemType(cappuccino, MenuItemSize.LARGE, 3.00, true));
+        menuItemTypeRepository.save(new MenuItemType(hotChocolate, MenuItemSize.REGULAR, 2.00, true));
+        menuItemTypeRepository.save(new MenuItemType(hotChocolate, MenuItemSize.LARGE, 2.50, true));
+        menuItemTypeRepository.save(new MenuItemType(mocha, MenuItemSize.REGULAR, 2.50, true));
+        menuItemTypeRepository.save(new MenuItemType(mocha, MenuItemSize.LARGE, 3.00, true));
+        menuItemTypeRepository.save(new MenuItemType(mineralWater, MenuItemSize.REGULAR, 1.00, true));
     }
-
-    
 }

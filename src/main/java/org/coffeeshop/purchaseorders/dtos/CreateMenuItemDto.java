@@ -3,6 +3,7 @@ package org.coffeeshop.purchaseorders.dtos;
 import java.util.List;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
@@ -16,10 +17,10 @@ import jakarta.validation.constraints.NotNull;
  * @param menuItemTypes the list of size and price variants for this menu item (must not be empty)
  * @author Kulagina Tatiana
  * @version 1.0
- * @since 2026-04-23
+ * @since 2026-04-27
  */
 public record CreateMenuItemDto(
-    @NotNull String name,
+    @NotNull @NotBlank String name,
     String description,
     boolean isAvailable,
     @NotEmpty List<@Valid CreateMenuItemTypeDto> menuItemTypes) {}

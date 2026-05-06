@@ -1,4 +1,4 @@
-package org.coffeeshop.stations.Scripts;
+package org.coffeeshop.stations.scripts;
 
 import org.coffeeshop.stations.models.Station;
 import org.coffeeshop.stations.repositories.StationRepository;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
  * Component that loads initial station data into the database when the application starts.
  * This is useful for testing and development purposes to ensure there are stations available for the application to work with.
  * @author Umunna David
- * @since 22/04/2026
+ * @since 2026-04-22
  * @version 1.0
  */
 @Component
@@ -27,11 +27,11 @@ public class StationDataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if (stationRepository.count() == 0) {
-            stationRepository.save(new Station("Central", WEEKDAY_HOURS, SATURDAY_HOURS, CLOSED_ON_SUNDAY));
+        /*if (stationRepository.count() == 0) {
+            stationRepository.save(new Station("Cramlington", WEEKDAY_HOURS, SATURDAY_HOURS, CLOSED_ON_SUNDAY));
             stationRepository.save(new Station("North", WEEKDAY_HOURS, SATURDAY_HOURS, CLOSED_ON_SUNDAY));
             stationRepository.save(new Station("South", WEEKDAY_HOURS, SATURDAY_HOURS, CLOSED_ON_SUNDAY));
-        }
+        }*/
+        stationRepository.save(new Station("Cramlington", "08:00-18:00", "09:00-17:00", true));
     }
-
 }

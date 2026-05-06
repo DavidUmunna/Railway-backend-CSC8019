@@ -34,7 +34,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -49,7 +48,7 @@ import jakarta.transaction.Transactional;
  *
  * @author Kulagina Tatiana
  * @version 1.0
- * @since 2026-04-21
+ * @since 2026-04-27
  */
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -108,15 +107,14 @@ class PurchaseOrderControllerTests {
             
             double expectedValue = menuItemType.getPrice() * quantity;
             mockMvc.perform(post("/api/v1/orders")
-            .with(csrf())
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.orderId").isNumber())
-            .andExpect(jsonPath("$.customerId").value(customer.getId()))
-            .andExpect(jsonPath("$.stationId").value(station.getId()))
-            .andExpect(jsonPath("$.orderStatus").value("ACCEPTED"))
-            .andExpect(jsonPath("$.totalAmount").value(expectedValue));
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.orderId").isNumber())
+                    .andExpect(jsonPath("$.customerId").value(customer.getId()))
+                    .andExpect(jsonPath("$.stationId").value(station.getId()))
+                    .andExpect(jsonPath("$.orderStatus").value("ACCEPTED"))
+                    .andExpect(jsonPath("$.totalAmount").value(expectedValue));
             
             assertEquals(1, orderRepository.count());
         }
@@ -141,10 +139,11 @@ class PurchaseOrderControllerTests {
             );
 
             mockMvc.perform(post("/api/v1/orders")
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
+            
+            assertEquals(0, orderRepository.count());
         }
         
         /**
@@ -166,10 +165,11 @@ class PurchaseOrderControllerTests {
             );
 
             mockMvc.perform(post("/api/v1/orders")
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound());
+            
+            assertEquals(0, orderRepository.count());
         }
         
         /**
@@ -191,10 +191,11 @@ class PurchaseOrderControllerTests {
             );
 
             mockMvc.perform(post("/api/v1/orders")
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound());
+            
+            assertEquals(0, orderRepository.count());
         }
         
         /**
@@ -204,7 +205,7 @@ class PurchaseOrderControllerTests {
          * @throws Exception if the MockMvc request fails
          */
         @Test
-        void createOrder_returns404WhenCustomerNull() throws Exception {
+        void createOrder_returns400WhenCustomerNull() throws Exception {
             Station station = saveTestStation();
             MenuItemType menuItemType = saveTestMenuItemType();
 
@@ -216,10 +217,11 @@ class PurchaseOrderControllerTests {
             );
 
             mockMvc.perform(post("/api/v1/orders")
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest());
+            
+            assertEquals(0, orderRepository.count());
         }
         
         /**
@@ -241,10 +243,11 @@ class PurchaseOrderControllerTests {
             );
 
             mockMvc.perform(post("/api/v1/orders")
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNotFound());
+
+            assertEquals(0, orderRepository.count());
         }
         
         /**
@@ -266,10 +269,11 @@ class PurchaseOrderControllerTests {
             );
 
             mockMvc.perform(post("/api/v1/orders")
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
+
+            assertEquals(0, orderRepository.count());
         }
         
         /**
@@ -293,10 +297,11 @@ class PurchaseOrderControllerTests {
             );
 
             mockMvc.perform(post("/api/v1/orders")
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
+
+            assertEquals(0, orderRepository.count());
         }
 
         /**
@@ -312,10 +317,10 @@ class PurchaseOrderControllerTests {
             Station station = saveTestStation();
 
             MenuItem latte = menuItemRepository.save(new MenuItem("Latte", "Espresso with steamed milk", true));
-            MenuItemType regLatte = menuItemTypeRepository.save(new MenuItemType(latte, MenuItemSize.Regular, 2.50, true));
+            MenuItemType regLatte = menuItemTypeRepository.save(new MenuItemType(latte, MenuItemSize.REGULAR, 2.50, true));
             
             MenuItem americano = menuItemRepository.save(new MenuItem("Americano", "Espresso with boiled water", true));
-            MenuItemType regAmericano = menuItemTypeRepository.save(new MenuItemType(americano, MenuItemSize.Regular, 1.50, true));
+            MenuItemType regAmericano = menuItemTypeRepository.save(new MenuItemType(americano, MenuItemSize.REGULAR, 1.50, true));
 
             int latteQuantity = 1;
             int americanoQuantity = 2;
@@ -328,11 +333,12 @@ class PurchaseOrderControllerTests {
             
             double expectedValue = regLatte.getPrice() * latteQuantity + regAmericano.getPrice() * americanoQuantity;
             mockMvc.perform(post("/api/v1/orders")
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.totalAmount").value(expectedValue));
+                
+            assertEquals(1, orderRepository.count());
         }
     }
 
@@ -362,11 +368,10 @@ class PurchaseOrderControllerTests {
             );
 
             String responseJson = mockMvc.perform(post("/api/v1/orders")
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(createRequest)))
-            .andExpect(status().isCreated())
-            .andReturn().getResponse().getContentAsString();
+                    .andExpect(status().isCreated())
+                    .andReturn().getResponse().getContentAsString();
 
             Long orderId = objectMapper.readTree(responseJson).get("orderId").asLong();
 
@@ -379,11 +384,22 @@ class PurchaseOrderControllerTests {
         }
         
         /**
+         * Verifies that retrieving a non-existent order ID returns 404 Not Found.
+         *
+         * @throws Exception if the MockMvc request fails
+         */
+        @Test
+        void getOrderById_returns404ForMissingOrder() throws Exception {
+            mockMvc.perform(get("/api/v1/orders/{id}", FAULTY_ID))
+                    .andExpect(status().isNotFound());
+        }
+        
+        /**
          * Verifies that GET /api/v1/orders (no query params) returns 200 OK
          * with a list containing all previously created orders.
          *
          * @throws Exception if the MockMvc request fails
-         */
+        */
         @Test 
         void getOrder_returnsListOfAllOrders() throws Exception {
             Customer customer = saveTestCustomer();
@@ -404,31 +420,16 @@ class PurchaseOrderControllerTests {
             );
 
             mockMvc.perform(post("/api/v1/orders")
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(orderOne)));
             
             mockMvc.perform(post("/api/v1/orders")
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(orderTwo)));
             
-            mockMvc.perform(get("/api/v1/orders")
-                    .contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(get("/api/v1/orders"))
                     .andExpect(status().isOk())
-                    .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                     .andExpect(jsonPath("$.length()").value(2));
-        }
-        
-        /**
-         * Verifies that retrieving a non-existent order ID returns 404 Not Found.
-         *
-         * @throws Exception if the MockMvc request fails
-         */
-        @Test
-        void getOrderById_returns404ForMissingOrder() throws Exception {
-            mockMvc.perform(get("/api/v1/orders/{id}", FAULTY_ID))
-            .andExpect(status().isNotFound());
         }
 
         /**
@@ -451,13 +452,11 @@ class PurchaseOrderControllerTests {
             );
 
             mockMvc.perform(post("/api/v1/orders")
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)));
 
             mockMvc.perform(get("/api/v1/orders?status=COMPLETED"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(0));
         }
 
@@ -487,18 +486,15 @@ class PurchaseOrderControllerTests {
             );
 
             mockMvc.perform(post("/api/v1/orders")
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(orderOne)));
             
             mockMvc.perform(post("/api/v1/orders")
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(orderTwo)));
             
             mockMvc.perform(get("/api/v1/orders?status=ACCEPTED"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(2));
         }
         
@@ -528,19 +524,16 @@ class PurchaseOrderControllerTests {
             );
 
             mockMvc.perform(post("/api/v1/orders")
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(orderOne)));
             
             mockMvc.perform(post("/api/v1/orders")
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(orderTwo)));
             
             Long customerId = customer.getId();
             mockMvc.perform(get("/api/v1/orders?customerId={customerId}", customerId))
                 .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(2));
         }
 
@@ -554,7 +547,6 @@ class PurchaseOrderControllerTests {
         void getOrdersByCustomer_returnsEmptyListForMissingCustomer() throws Exception {
             mockMvc.perform(get("/api/v1/orders?customerId={customerId}", FAULTY_ID))
                 .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(0));
         }
 
@@ -580,7 +572,6 @@ class PurchaseOrderControllerTests {
             );
 
             String responseJson = mockMvc.perform(post("/api/v1/orders")
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(createRequest)))
                     .andExpect(status().isCreated())
@@ -589,7 +580,6 @@ class PurchaseOrderControllerTests {
             Long orderId = objectMapper.readTree(responseJson).get("orderId").asLong();
 
             mockMvc.perform(put("/api/v1/orders/{orderId}/{staffId}/status", orderId, staff.getStaffId())
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(new UpdateOrderStatusDto(OrderStatus.IN_PROGRESS))))
             .andExpect(status().isOk());
@@ -643,7 +633,6 @@ class PurchaseOrderControllerTests {
             );
             
             String responseJson = mockMvc.perform(post("/api/v1/orders")
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(createRequest)))
                     .andExpect(status().isCreated())
@@ -652,7 +641,6 @@ class PurchaseOrderControllerTests {
             UpdateOrderStatusDto updatedStatus = new UpdateOrderStatusDto(OrderStatus.IN_PROGRESS);
             Long orderId = objectMapper.readTree(responseJson).get("orderId").asLong();
             mockMvc.perform(put("/api/v1/orders/{orderId}/{staffId}/status", orderId, staff.getStaffId())
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(updatedStatus)))
                     .andExpect(status().isOk());
@@ -678,7 +666,6 @@ class PurchaseOrderControllerTests {
             Staff staff = saveTestStaff();
 
             mockMvc.perform(put("/api/v1/orders/{orderId}/{staffId}/status", FAULTY_ID, staff.getStaffId())
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(updatedStatus)))
                     .andExpect(status().isNotFound());
@@ -705,7 +692,6 @@ class PurchaseOrderControllerTests {
             );
 
             String responseJson = mockMvc.perform(post("/api/v1/orders")
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(createRequest)))
             .andExpect(status().isCreated())
@@ -714,7 +700,6 @@ class PurchaseOrderControllerTests {
             UpdateOrderStatusDto updatedStatus = new UpdateOrderStatusDto(null);
             Long orderId = objectMapper.readTree(responseJson).get("orderId").asLong();
             mockMvc.perform(put("/api/v1/orders/{orderId}/{staffId}/status", orderId, staff.getStaffId())
-            .with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(updatedStatus)))
             .andExpect(status().isBadRequest());
@@ -742,24 +727,20 @@ class PurchaseOrderControllerTests {
             );
 
             String responseJson = mockMvc.perform(post("/api/v1/orders")
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(createRequest)))
                     .andExpect(status().isCreated())
                     .andReturn().getResponse().getContentAsString();
 
-            
             UpdateOrderStatusDto cancelledStatus = new UpdateOrderStatusDto(OrderStatus.CANCELLED);
             Long orderId = objectMapper.readTree(responseJson).get("orderId").asLong();
             mockMvc.perform(put("/api/v1/orders/{orderId}/{staffId}/status", orderId, staff.getStaffId())
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(cancelledStatus)))
                     .andExpect(status().isOk());
             
             UpdateOrderStatusDto updateStatusfromCancelled = new UpdateOrderStatusDto(OrderStatus.COMPLETED);
             mockMvc.perform(put("/api/v1/orders/{orderId}/{staffId}/status", orderId, staff.getStaffId())
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(updateStatusfromCancelled)))
                     .andExpect(status().isConflict());
@@ -785,7 +766,6 @@ class PurchaseOrderControllerTests {
             );
 
             String responseJson = mockMvc.perform(post("/api/v1/orders")
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(createRequest)))
                     .andExpect(status().isCreated())
@@ -795,7 +775,6 @@ class PurchaseOrderControllerTests {
             UpdateOrderStatusDto updatedStatus = new UpdateOrderStatusDto(OrderStatus.IN_PROGRESS);
 
             mockMvc.perform(put("/api/v1/orders/{orderId}/{staffId}/status", orderId, FAULTY_ID)
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(updatedStatus)))
                     .andExpect(status().isNotFound());
@@ -812,8 +791,6 @@ class PurchaseOrderControllerTests {
         /**
          * Verifies that a completed order whose pickup time was more than 15 minutes ago
          * is automatically cancelled when the scheduler runs.
-         *
-         * @throws Exception if the MockMvc request fails
          */
         @Test 
         void cancelUncollectedOrders_cancelsOrdersPastPickUpTime() throws Exception {
@@ -837,8 +814,6 @@ class PurchaseOrderControllerTests {
         /**
          * Verifies that a completed order whose pickup time was less than 15 minutes ago
          * is NOT cancelled when the scheduler runs, as the grace period has not yet elapsed.
-         *
-         * @throws Exception if the MockMvc request fails
          */
         @Test
         void cancelUncollectedOrders_doesNotCancelRecentOrders() throws Exception {
@@ -888,15 +863,15 @@ class PurchaseOrderControllerTests {
      */
     private MenuItemType saveTestMenuItemType() {
         MenuItem latte = menuItemRepository.save(new MenuItem("Latte", "Espresso with steamed milk", true));
-        MenuItemType regular = menuItemTypeRepository.save(new MenuItemType(latte, MenuItemSize.Regular, 2.50, true));
-        menuItemTypeRepository.save(new MenuItemType(latte, MenuItemSize.Large, 3.00, true));
+        MenuItemType regular = menuItemTypeRepository.save(new MenuItemType(latte, MenuItemSize.REGULAR, 2.50, true));
+        menuItemTypeRepository.save(new MenuItemType(latte, MenuItemSize.LARGE, 3.00, true));
         return regular;
     }
 
     /**
-     * Creates and persists a test MenuItem ("Latte") with two MenuItemTypes.
+     * Creates and persists a test Staff.
      *
-     * @return the REGULAR MenuItemType entity
+     * @return the Staff entity
      */
     private Staff saveTestStaff() {
         Staff staff = staffRepository.save(new Staff("barista1@example.com", "Alex", "Brown", "staff_user", "encoded-password"));

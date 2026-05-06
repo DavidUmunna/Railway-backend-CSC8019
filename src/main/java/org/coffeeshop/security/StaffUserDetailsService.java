@@ -44,4 +44,5 @@ public class StaffUserDetailsService implements UserDetailsService {
             List.of(new SimpleGrantedAuthority(role))
         );
     }
+
 }

@@ -13,11 +13,11 @@ import java.util.List;
  * @param types       the list of size and price variants for this menu item
  * @author Kulagina Tatiana
  * @version 1.0
- * @since 2026-04-18
+ * @since 2026-04-27
  */
 public record MenuItemDto(
-        Long id,
+        Long menuItemId,
         String name,
         String description,
         boolean isAvailable,
-        List<MenuItemTypeDto> types) {}
+        List<MenuItemTypeDto> menuItemTypes) {}

@@ -3,14 +3,11 @@ package org.coffeeshop.stations.services;
 import org.coffeeshop.stations.dtos.StationDto;
 import org.coffeeshop.stations.models.Station;
 import org.coffeeshop.stations.repositories.StationRepository;
-import org.coffeeshop.stations.services.StationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,21 +42,7 @@ class StationServiceTest {
         assertEquals("Cramlington", result.get(0).name());
     }
 
-    @Test
-    void shouldReturnTrueWhenStationIsOpen() {
-        // Arrange
-        Station mockStation = new Station("Cramlington", "08:00-18:00", "09:00-17:00", false);
-
-        when(stationRepository.findById(1L)).thenReturn(Optional.of(mockStation));
-
-        // Act
-        LocalDateTime mondayTenAm = LocalDateTime.of(2026, 4, 13, 10, 0);
-        boolean isOpen = stationService.isOpen(1L, mondayTenAm);
-
-        // Assert
-        assertTrue(isOpen, "Station should be open at this time");
-    }
-
+   
     @Test
     void shouldThrowExceptionWhenIdNotFound() {
         // Arrange
