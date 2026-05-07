@@ -28,7 +28,7 @@ CREATE TABLE purchase_order (
     order_date DATE NOT NULL,
     pickup_time TIME NOT NULL,
     order_status ENUM('ACCEPTED','IN_PROGRESS','COMPLETED', 'COLLECTED', 'CANCELLED') NOT NULL,
-    station_id INT,
+    station_id BIGINT,
     is_archived BOOLEAN DEFAULT FALSE,
     total_amount DECIMAL(8,2) DEFAULT 0.00 NOT NULL,
     FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
